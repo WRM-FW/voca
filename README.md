@@ -17,7 +17,7 @@ Windows 版同样有未修完的缺陷（在线词典内嵌视图、`Esc` 关闭
 
 ## 下载
 
-编译好的产物只放在 **GitHub Releases**，不提交进 git 树。请到 [Releases](../../releases) 页面下载：
+编译好的产物只放在 **GitHub Releases**，不提交进 git 树。请到 [Releases](https://github.com/WRM-FW/voca/releases) 页面下载：
 
 | 资产 | 平台 | 说明 |
 | :--- | :--- | :--- |
@@ -236,6 +236,6 @@ v1.0.3 内置向下兼容迁移器 `migrateStateIfNeeded`，读取 v1.0.0/v1.0.1
 
 ## 九、反馈渠道
 
-- 缺陷与功能请求：[GitHub Issues](../../issues)。请附上平台与系统版本、复现步骤，以及（涉及数据时）是否已导出 `.json` 备份。
+- 缺陷与功能请求：[GitHub Issues](https://github.com/WRM-FW/voca/issues)。请附上平台与系统版本、复现步骤，以及（涉及数据时）是否已导出 `.json` 备份。
 - 代码贡献：见 `CONTRIBUTING.md`；提交前请跑 `build_all.sh` + `verify_apk_deep.py` + `run_e2e_v103.py`。
 - 本项目按 MIT 许可提供，**不提供任何担保**；Android 版尤其请按"实验软件、可能丢数据"的前提使用。
