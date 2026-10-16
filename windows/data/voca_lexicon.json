@@ -1,0 +1,5664 @@
+[
+  {
+    "id": "voca_0001",
+    "seq": 1,
+    "word": "abandon",
+    "uk": "/əˈbændən/",
+    "us": "/əˈbændən/",
+    "cn": "v. 放弃，遗弃；n. 放任，狂热",
+    "en": "to leave a place, thing, or person forever; to stop doing an activity before finishing it",
+    "syn": [
+      "forsake",
+      "desert",
+      "relinquish",
+      "quit"
+    ],
+    "ex_en": "They had to abandon their car in the deep snow.",
+    "ex_cn": "他们不得不把车弃置在厚厚的积雪中。",
+    "tip": "词根：a(不)+band(布条/束缚)+on → 解开束缚任其远去 → 放弃，遗弃",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0002",
+    "seq": 2,
+    "word": "abstract",
+    "uk": "/ˈæbstrækt/",
+    "us": "/ˈæbstrækt/",
+    "cn": "adj. 抽象的；n. 摘要，梗概；v. 提取，做摘要",
+    "en": "existing in thought or as an idea but not having a physical or concrete existence",
+    "syn": [
+      "theoretical",
+      "conceptual",
+      "summary",
+      "extract"
+    ],
+    "ex_en": "Please write a 200-word abstract for your research paper.",
+    "ex_cn": "请为你的研究论文写一份200字的摘要。",
+    "tip": "词根：abs(离开)+tract(拉、抽) → 从具体事物中抽离出来 → 抽象的；摘要",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0003",
+    "seq": 3,
+    "word": "accumulate",
+    "uk": "/əˈkjuːmjəleɪt/",
+    "us": "/əˈkjuːmjəleɪt/",
+    "cn": "v. 积累，积聚，堆积",
+    "en": "to gather or acquire an increasing number or quantity of something over time",
+    "syn": [
+      "amass",
+      "collect",
+      "gather",
+      "hoard"
+    ],
+    "ex_en": "Dust quickly accumulates if a room is not cleaned regularly.",
+    "ex_cn": "如果房间不定期打扫，灰尘很快就会积聚起来。",
+    "tip": "词根：ac(表加强)+cumul(堆积)+ate → 不断堆积 → 积累",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0004",
+    "seq": 4,
+    "word": "accurate",
+    "uk": "/ˈækjərət/",
+    "us": "/ˈækjərət/",
+    "cn": "adj. 精确的，准确的，正确无误的",
+    "en": "correct in all details; exact and free from error",
+    "syn": [
+      "precise",
+      "exact",
+      "correct",
+      "faithful"
+    ],
+    "ex_en": "The meteorological station provided an accurate weather forecast.",
+    "ex_cn": "气象站提供了准确的天气预报。",
+    "tip": "词根：ac(一再)+cur(关心、注意)+ate → 一再小心核对 → 准确的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0005",
+    "seq": 5,
+    "word": "acknowledge",
+    "uk": "/əkˈnɒlɪdʒ/",
+    "us": "/əkˈnɑːlɪdʒ/",
+    "cn": "v. 承认，致谢，告知收到",
+    "en": "to accept or admit the existence or truth of; to express gratitude for",
+    "syn": [
+      "admit",
+      "recognize",
+      "grant",
+      "thank"
+    ],
+    "ex_en": "She refused to acknowledge that there was a flaw in the plan.",
+    "ex_cn": "她拒绝承认计划中存在缺陷。",
+    "tip": "助记：ac(去)+knowledge(知道) → 让大家都知道 → 承认；致谢",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0006",
+    "seq": 6,
+    "word": "acquire",
+    "uk": "/əˈkwaɪə(r)/",
+    "us": "/əˈkwaɪər/",
+    "cn": "v. 获得，取得；学到，习得",
+    "en": "to buy or obtain an asset or object; to learn or develop a skill or habit",
+    "syn": [
+      "obtain",
+      "gain",
+      "attain",
+      "procure"
+    ],
+    "ex_en": "Children acquire native language skills rapidly through daily interaction.",
+    "ex_cn": "儿童通过日常互动迅速习得母语技能。",
+    "tip": "词根：ac(加强)+quir(寻求)+e → 不断寻求并拿到 → 获得，习得",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0007",
+    "seq": 7,
+    "word": "adapt",
+    "uk": "/əˈdæpt/",
+    "us": "/əˈdæpt/",
+    "cn": "v. 使适应，使适合；改编，改写",
+    "en": "to become adjusted to new conditions; to modify for a new use or purpose",
+    "syn": [
+      "adjust",
+      "accommodate",
+      "modify",
+      "tailor"
+    ],
+    "ex_en": "Organisms must adapt to shifting environmental conditions to survive.",
+    "ex_cn": "生物必须适应不断变化的环境条件才能生存。",
+    "tip": "词根：ad(趋向)+apt(适当的) → 使变得适当 → 适应；改编（注意区分 adopt 收养/采纳）",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0008",
+    "seq": 8,
+    "word": "adequate",
+    "uk": "/ˈædɪkwət/",
+    "us": "/ˈædɪkwət/",
+    "cn": "adj. 充足的，足够的；适当的，胜任的",
+    "en": "satisfactory or acceptable in quality or quantity",
+    "syn": [
+      "sufficient",
+      "enough",
+      "ample",
+      "competent"
+    ],
+    "ex_en": "Make sure you get adequate sleep before the final examination.",
+    "ex_cn": "期末考试前务必保证充足的睡眠。",
+    "tip": "词根：ad(去)+equ(相等)+ate → 与需求相匹配的 → 充足的，适当的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0009",
+    "seq": 9,
+    "word": "advocate",
+    "uk": "/ˈædvəkeɪt/",
+    "us": "/ˈædvəkeɪt/",
+    "cn": "v. 拥护，提倡，主张；n. 提倡者，辩护律师",
+    "en": "to publicly recommend or support a particular policy or way of doing things",
+    "syn": [
+      "champion",
+      "uphold",
+      "promote",
+      "proponent"
+    ],
+    "ex_en": "Health experts advocate a balanced diet rich in vegetables and fiber.",
+    "ex_cn": "健康专家提倡富含蔬菜和纤维的均衡饮食。",
+    "tip": "词根：ad(加强)+voc(声音/喊叫)+ate → 大声疾呼支持 → 提倡，拥护",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0010",
+    "seq": 10,
+    "word": "allocate",
+    "uk": "/ˈæləkeɪt/",
+    "us": "/ˈæləkeɪt/",
+    "cn": "v. 分配，分派，拨给（资金或资源）",
+    "en": "to distribute resources or duties for a particular purpose",
+    "syn": [
+      "assign",
+      "allot",
+      "distribute",
+      "apportion"
+    ],
+    "ex_en": "The committee decided to allocate more funds to basic scientific research.",
+    "ex_cn": "委员会决定向基础科学研究拨付更多资金。",
+    "tip": "词根：al(去)+loc(地方)+ate → 把资源放到指定位置 → 分配，拨给",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0011",
+    "seq": 11,
+    "word": "alter",
+    "uk": "/ˈɔːltə(r)/",
+    "us": "/ˈɔːltər/",
+    "cn": "v. 改变，更改，改动",
+    "en": "to change or cause to change in character or composition, typically in a comparatively small way",
+    "syn": [
+      "modify",
+      "change",
+      "transform",
+      "adjust"
+    ],
+    "ex_en": "Nothing can alter the fact that we are responsible for our own choices.",
+    "ex_cn": "没有什么能改变我们必须为自己选择负责这一事实。",
+    "tip": "词根：alter(其他的) → 变成其他的样子 → 改变，改动",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0012",
+    "seq": 12,
+    "word": "ambiguous",
+    "uk": "/æmˈbɪɡjuəs/",
+    "us": "/æmˈbɪɡjuəs/",
+    "cn": "adj. 模棱两可的，含糊不清的，有歧义的",
+    "en": "open to more than one interpretation; not having one obvious meaning",
+    "syn": [
+      "vague",
+      "equivocal",
+      "unclear",
+      "cryptic"
+    ],
+    "ex_en": "The wording of the agreement is ambiguous and needs clarification.",
+    "ex_cn": "协议的措辞模棱两可，需要进一步澄清。",
+    "tip": "词根：ambi(两边)+ig(走)+uous → 往两边都能走 → 模棱两可的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0013",
+    "seq": 13,
+    "word": "anticipate",
+    "uk": "/ænˈtɪsɪpeɪt/",
+    "us": "/ænˈtɪsɪpeɪt/",
+    "cn": "v. 预期，预料；期盼；先于…行动",
+    "en": "to regard as probable; to expect or predict and prepare for",
+    "syn": [
+      "expect",
+      "foresee",
+      "predict",
+      "await"
+    ],
+    "ex_en": "We anticipate that demand for renewable energy will continue to rise.",
+    "ex_cn": "我们预计对可再生能源的需求将继续上升。",
+    "tip": "词根：anti(前)+cip(拿/抓)+ate → 提前把握趋势 → 预期，预料",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0014",
+    "seq": 14,
+    "word": "apparent",
+    "uk": "/əˈpærənt/",
+    "us": "/əˈpærənt/",
+    "cn": "adj. 显而易见的，明显的；表面上的",
+    "en": "clearly visible or understood; seeming real or true, but not necessarily so",
+    "syn": [
+      "obvious",
+      "evident",
+      "manifest",
+      "ostensible"
+    ],
+    "ex_en": "It soon became apparent that the project needed additional engineers.",
+    "ex_cn": "很快就能明显看出该项目需要更多工程师。",
+    "tip": "词根：ap(加强)+par(显现)+ent → 显现出来的 → 明显的；表面上的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0015",
+    "seq": 15,
+    "word": "assess",
+    "uk": "/əˈses/",
+    "us": "/əˈses/",
+    "cn": "v. 评估，评定；估算（价值或质量）",
+    "en": "to evaluate or estimate the nature, ability, or quality of something",
+    "syn": [
+      "evaluate",
+      "appraise",
+      "judge",
+      "gauge"
+    ],
+    "ex_en": "Standardized tests are one way to assess students' academic progress.",
+    "ex_cn": "标准化测试是评估学生学业进步的一种方式。",
+    "tip": "词根：as(旁边)+sess(坐) → 坐在旁边评审打分 → 评估，评定",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0016",
+    "seq": 16,
+    "word": "attribute",
+    "uk": "/əˈtrɪbjuːt/",
+    "us": "/əˈtrɪbjuːt/",
+    "cn": "v. 把…归因于；n. 属性，特质，标志",
+    "en": "to regard something as being caused by; a quality or feature regarded as a characteristic",
+    "syn": [
+      "ascribe",
+      "credit",
+      "trait",
+      "quality"
+    ],
+    "ex_en": "She attributes her recovery to regular exercise and a positive mindset.",
+    "ex_cn": "她把自己的康复归功于规律的运动和积极的心态。",
+    "tip": "词根：at(去)+tribut(给予)+e → 把原因归给某事 → 归因于；属性",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0017",
+    "seq": 17,
+    "word": "authentic",
+    "uk": "/ɔːˈθentɪk/",
+    "us": "/ɔːˈθentɪk/",
+    "cn": "adj. 真正的，真品的；可靠的，地道的",
+    "en": "of undisputed origin and not a copy; genuine and reliable",
+    "syn": [
+      "genuine",
+      "real",
+      "bona fide",
+      "reliable"
+    ],
+    "ex_en": "The museum confirmed that the ancient manuscript is completely authentic.",
+    "ex_cn": "博物馆确认这份古代手稿完全是真品。",
+    "tip": "词根：auth(自己/作者)+entic → 出自原作者亲手之作 → 真品的，地道的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0018",
+    "seq": 18,
+    "word": "available",
+    "uk": "/əˈveɪləbl/",
+    "us": "/əˈveɪləbl/",
+    "cn": "adj. 可获得的，可用的；有空的",
+    "en": "able to be used or obtained; at someone's disposal",
+    "syn": [
+      "accessible",
+      "obtainable",
+      "handy",
+      "free"
+    ],
+    "ex_en": "All dictionaries in Voca are available offline without internet access.",
+    "ex_cn": "Voca中的所有词库均可在无网络环境下离线使用。",
+    "tip": "词根：a(加强)+vail(价值/效用)+able → 能发挥效用的 → 可用的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0019",
+    "seq": 19,
+    "word": "barrier",
+    "uk": "/ˈbæriə(r)/",
+    "us": "/ˈbæriər/",
+    "cn": "n. 障碍，壁垒；屏障，栅栏",
+    "en": "a fence or other obstacle that prevents movement or access",
+    "syn": [
+      "obstacle",
+      "hurdle",
+      "barricade",
+      "impediment"
+    ],
+    "ex_en": "Language should be a bridge for communication rather than a barrier.",
+    "ex_cn": "语言应当成为沟通的桥梁，而不是障碍。",
+    "tip": "词根：bar(横木/阻挡)+rier → 挡在面前的栅栏 → 障碍，壁垒",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0020",
+    "seq": 20,
+    "word": "beneficial",
+    "uk": "/ˌbenɪˈfɪʃl/",
+    "us": "/ˌbenɪˈfɪʃl/",
+    "cn": "adj. 有益的，有利的，有帮助的",
+    "en": "resulting in good; favorable or advantageous",
+    "syn": [
+      "advantageous",
+      "favorable",
+      "helpful",
+      "salutary"
+    ],
+    "ex_en": "Spaced repetition is highly beneficial for long-term vocabulary retention.",
+    "ex_cn": "间隔重复对词汇的长期记忆非常有益。",
+    "tip": "词根：bene(好)+fic(做)+ial → 做出好事的 → 有益的，有利的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0021",
+    "seq": 21,
+    "word": "bias",
+    "uk": "/ˈbaɪəs/",
+    "us": "/ˈbaɪəs/",
+    "cn": "n. 偏见，成见；偏差；v. 使有偏见",
+    "en": "inclination or prejudice for or against one person or group, especially in an unfair way",
+    "syn": [
+      "prejudice",
+      "partiality",
+      "favoritism",
+      "skew"
+    ],
+    "ex_en": "Researchers must design double-blind trials to eliminate observer bias.",
+    "ex_cn": "研究人员必须设计双盲试验以消除观察者偏差。",
+    "tip": "考研高频词：注意其学术含义“统计偏差、认知偏见”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0022",
+    "seq": 22,
+    "word": "capacity",
+    "uk": "/kəˈpæsəti/",
+    "us": "/kəˈpæsəti/",
+    "cn": "n. 容量，容积；能力，才能；身份，职位",
+    "en": "the maximum amount that something can contain; the ability or power to do something",
+    "syn": [
+      "volume",
+      "capability",
+      "competence",
+      "role"
+    ],
+    "ex_en": "The stadium has a seating capacity of sixty thousand spectators.",
+    "ex_cn": "这座体育场可容纳六万名观众。",
+    "tip": "词根：cap(抓、容纳)+acity → 能够容纳的量 → 容量；能力",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0023",
+    "seq": 23,
+    "word": "catalyst",
+    "uk": "/ˈkætəlɪst/",
+    "us": "/ˈkætəlɪst/",
+    "cn": "n. 催化剂；促进因素，刺激因素",
+    "en": "a substance that increases the rate of a chemical reaction; a person or thing that precipitates an event",
+    "syn": [
+      "stimulus",
+      "spark",
+      "impetus",
+      "spur"
+    ],
+    "ex_en": "Technological innovation acts as a catalyst for economic transformation.",
+    "ex_cn": "技术创新是经济转型的催化剂。",
+    "tip": "词根：cata(向下)+lyst(分解) → 加速化学分解之物 → 催化剂；促进因素",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0024",
+    "seq": 24,
+    "word": "chronic",
+    "uk": "/ˈkrɒnɪk/",
+    "us": "/ˈkrɑːnɪk/",
+    "cn": "adj. 慢性的，长期的；积习难改的",
+    "en": "persisting for a long time or constantly recurring",
+    "syn": [
+      "persistent",
+      "long-standing",
+      "incurable",
+      "inveterate"
+    ],
+    "ex_en": "Lack of rest can lead to chronic fatigue and reduced concentration.",
+    "ex_cn": "缺乏休息会导致慢性疲劳和注意力下降。",
+    "tip": "词根：chron(时间)+ic → 持续很长时间的 → 慢性的，长期的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0025",
+    "seq": 25,
+    "word": "clarify",
+    "uk": "/ˈklærəfaɪ/",
+    "us": "/ˈklærəfaɪ/",
+    "cn": "v. 澄清，阐明，使清晰易懂",
+    "en": "to make a statement or situation less confused and more clearly comprehensible",
+    "syn": [
+      "elucidate",
+      "explain",
+      "illuminate",
+      "clear up"
+    ],
+    "ex_en": "Could you clarify the second point in your project proposal?",
+    "ex_cn": "你能阐明一下你项目提案中的第二点吗？",
+    "tip": "词根：clar(清楚)+ify(使…) → 使变得清楚 → 澄清，阐明",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0026",
+    "seq": 26,
+    "word": "coherent",
+    "uk": "/kəʊˈhɪərənt/",
+    "us": "/koʊˈhɪrənt/",
+    "cn": "adj. 连贯的，条理清楚的；一致的",
+    "en": "logical and consistent; united as or forming a whole",
+    "syn": [
+      "logical",
+      "consistent",
+      "articulate",
+      "cohesive"
+    ],
+    "ex_en": "The essay presents a coherent argument supported by empirical data.",
+    "ex_cn": "这篇论文提出了一个由实证数据支撑的条理清晰的论点。",
+    "tip": "词根：co(共同)+her(粘附)+ent → 紧密粘合在一起 → 连贯的，有条理的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0027",
+    "seq": 27,
+    "word": "coincide",
+    "uk": "/ˌkəʊɪnˈsaɪd/",
+    "us": "/ˌkoʊɪnˈsaɪd/",
+    "cn": "v. 同时发生；相符，一致；位置重合",
+    "en": "to occur at or during the same time; to correspond in nature or in position",
+    "syn": [
+      "concur",
+      "correspond",
+      "match",
+      "overlap"
+    ],
+    "ex_en": "His business trip happened to coincide with the international book fair.",
+    "ex_cn": "他的出差恰好与国际书展同时进行。",
+    "tip": "词根：co(共同)+in(进入)+cide(落下) → 落到同一个点上 → 同时发生；相符",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0028",
+    "seq": 28,
+    "word": "collapse",
+    "uk": "/kəˈlæps/",
+    "us": "/kəˈlæps/",
+    "cn": "v./n. 倒塌，坍塌；崩溃，瓦解；暴跌",
+    "en": "to fall down or give way suddenly; a sudden failure of an institution or system",
+    "syn": [
+      "crumble",
+      "topple",
+      "breakdown",
+      "disintegrate"
+    ],
+    "ex_en": "Negotiations were on the verge of collapse before the new compromise.",
+    "ex_cn": "在达成新妥协之前，谈判曾濒临破裂。",
+    "tip": "词根：col(共同)+laps(滑落)+e → 全部滑落下来 → 倒塌，崩溃",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0029",
+    "seq": 29,
+    "word": "colleague",
+    "uk": "/ˈkɒliːɡ/",
+    "us": "/ˈkɑːliːɡ/",
+    "cn": "n. 同事，同僚",
+    "en": "a person with whom one works in a profession or business",
+    "syn": [
+      "coworker",
+      "associate",
+      "partner",
+      "peer"
+    ],
+    "ex_en": "She discussed the new software architecture with her senior colleagues.",
+    "ex_cn": "她与资深同事们讨论了新的软件架构。",
+    "tip": "词根：col(共同)+leag(选择/选派)+ue → 被选派到一起工作的人 → 同事",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0030",
+    "seq": 30,
+    "word": "compensate",
+    "uk": "/ˈkɒmpenseɪt/",
+    "us": "/ˈkɑːmpenseɪt/",
+    "cn": "v. 补偿，赔偿；弥补，抵消",
+    "en": "to give someone something, typically money, in recognition of loss, suffering, or injury",
+    "syn": [
+      "reimburse",
+      "recompense",
+      "make up for",
+      "offset"
+    ],
+    "ex_en": "Hard work and systematic methods can compensate for a lack of experience.",
+    "ex_cn": "努力工作和系统的方法可以弥补经验的不足。",
+    "tip": "词根：com(全部)+pens(称重/花费)+ate → 把失去的分量补齐 → 补偿，弥补",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0031",
+    "seq": 31,
+    "word": "compile",
+    "uk": "/kəmˈpaɪl/",
+    "us": "/kəmˈpaɪl/",
+    "cn": "v. 汇编，编纂；编译（代码）；搜集（资料）",
+    "en": "to produce a list or book by assembling information collected from other sources; to convert source code into machine code",
+    "syn": [
+      "assemble",
+      "collect",
+      "anthologize",
+      "build"
+    ],
+    "ex_en": "It took the lexicographers five years to compile this bilingual dictionary.",
+    "ex_cn": "词典编纂者花了五年时间才编成这部双语词典。",
+    "tip": "词根：com(一起)+pil(堆积)+e → 搜集堆放到一起 → 汇编；编译",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0032",
+    "seq": 32,
+    "word": "complement",
+    "uk": "/ˈkɒmplɪment/",
+    "us": "/ˈkɑːmplɪment/",
+    "cn": "v. 补充，补足，使完善；n. 补充物，补语",
+    "en": "a thing that contributes extra features to something else in such a way as to improve or emphasize its quality",
+    "syn": [
+      "supplement",
+      "enhance",
+      "complete",
+      "accompaniment"
+    ],
+    "ex_en": "Listening dictation and spelling tests complement each other in word learning.",
+    "ex_cn": "在单词学习中，听写训练和拼写测试相辅相成。",
+    "tip": "注意区分：complement（补充，e=complete完善）vs compliment（赞美，i=我夸你）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0033",
+    "seq": 33,
+    "word": "comprehensive",
+    "uk": "/ˌkɒmprɪˈhensɪv/",
+    "us": "/ˌkɑːmprɪˈhensɪv/",
+    "cn": "adj. 全面的，综合的，详尽的",
+    "en": "including or dealing with all or nearly all elements or aspects of something",
+    "syn": [
+      "thorough",
+      "exhaustive",
+      "complete",
+      "all-inclusive"
+    ],
+    "ex_en": "We conducted a comprehensive review of the existing software architecture.",
+    "ex_cn": "我们对现有软件架构进行了全面深入的审查。",
+    "tip": "词根：com(全部)+prehens(抓住)+ive → 把所有方面都抓在手里 → 全面的，综合的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0034",
+    "seq": 34,
+    "word": "compromise",
+    "uk": "/ˈkɒmprəmaɪz/",
+    "us": "/ˈkɑːmprəmaɪz/",
+    "cn": "n./v. 妥协，折中；v. 危及，损害（原则或安全）",
+    "en": "an agreement reached by each side making concessions; to weaken or harm by accepting standards that are lower than desirable",
+    "syn": [
+      "concession",
+      "settlement",
+      "jeopardize",
+      "undermine"
+    ],
+    "ex_en": "We must never compromise data reliability for the sake of rapid delivery.",
+    "ex_cn": "我们绝不能为了快速交付而牺牲数据的可靠性。",
+    "tip": "考研熟词僻义：除“妥协”外，考研常考动词义“危及、损害（名誉/安全/原则）”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0035",
+    "seq": 35,
+    "word": "conceive",
+    "uk": "/kənˈsiːv/",
+    "us": "/kənˈsiːv/",
+    "cn": "v. 构想，设想；怀孕；心怀（某种情感）",
+    "en": "to form or devise a plan or idea in the mind",
+    "syn": [
+      "envision",
+      "imagine",
+      "devise",
+      "formulate"
+    ],
+    "ex_en": "It is difficult to conceive of modern life without portable computing devices.",
+    "ex_cn": "很难设想没有便携式计算设备的现代生活会是什么样。",
+    "tip": "词根：con(共同)+ceiv(拿、抓) → 在脑海里抓取形成概念 → 构想，设想",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0036",
+    "seq": 36,
+    "word": "concentrate",
+    "uk": "/ˈkɒnsntreɪt/",
+    "us": "/ˈkɑːnsntreɪt/",
+    "cn": "v. 集中（注意力），全神贯注；浓缩；n. 浓缩物",
+    "en": "to focus all one's attention on a particular object or activity",
+    "syn": [
+      "focus",
+      "center",
+      "intensify",
+      "immerse"
+    ],
+    "ex_en": "A clean interface helps learners concentrate on memorizing vocabulary.",
+    "ex_cn": "简洁的界面有助于学习者集中精力记忆词汇。",
+    "tip": "词根：con(共同)+centr(中心)+ate → 聚拢到同一个中心 → 集中，专注",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0037",
+    "seq": 37,
+    "word": "confer",
+    "uk": "/kənˈfɜː(r)/",
+    "us": "/kənˈfɜːr/",
+    "cn": "v. 授予（学位或称号）；商讨，协商",
+    "en": "to grant a title, degree, benefit, or right; to have discussions or exchange opinions",
+    "syn": [
+      "bestow",
+      "grant",
+      "award",
+      "consult"
+    ],
+    "ex_en": "The university will confer honorary degrees on three distinguished scientists.",
+    "ex_cn": "该大学将向三位杰出科学家授予荣誉学位。",
+    "tip": "词根：con(共同)+fer(带来) → 把意见拿到一起（商讨）；把荣誉带给某人（授予）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0038",
+    "seq": 38,
+    "word": "confident",
+    "uk": "/ˈkɒnfɪdənt/",
+    "us": "/ˈkɑːnfɪdənt/",
+    "cn": "adj. 自信的，有信心的；确信的，有把握的",
+    "en": "feeling or showing certainty about something; self-assured",
+    "syn": [
+      "assured",
+      "certain",
+      "positive",
+      "poised"
+    ],
+    "ex_en": "Consistent daily review makes students feel confident in the examination hall.",
+    "ex_cn": "坚持每日复习能让学生在考场上充满自信。",
+    "tip": "词根：con(完全)+fid(相信)+ent → 完全相信自己的 → 自信的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0039",
+    "seq": 39,
+    "word": "confine",
+    "uk": "/kənˈfaɪn/",
+    "us": "/kənˈfaɪn/",
+    "cn": "v. 限制，局限于；禁闭，关押；n. [pl.] 界限，范围",
+    "en": "to keep or restrict someone or something within certain limits of space, scope, or time",
+    "syn": [
+      "restrict",
+      "limit",
+      "bound",
+      "imprison"
+    ],
+    "ex_en": "Please confine your remarks to the specific topic under discussion.",
+    "ex_cn": "请将你的发言限制在当前讨论的具体议题范围内。",
+    "tip": "词根：con(共同)+fin(边界)+e → 圈在边界之内 → 限制，局限于",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0040",
+    "seq": 40,
+    "word": "confirm",
+    "uk": "/kənˈfɜːm/",
+    "us": "/kənˈfɜːrm/",
+    "cn": "v. 证实，确认；批准；使更坚定",
+    "en": "to establish the truth or correctness of something previously believed or suspected",
+    "syn": [
+      "verify",
+      "validate",
+      "corroborate",
+      "affirm"
+    ],
+    "ex_en": "Experiments confirm that active recall is far more effective than passive reading.",
+    "ex_cn": "实验证实，主动回忆远比被动阅读有效得多。",
+    "tip": "词根：con(完全)+firm(坚定) → 使完全确定 → 确认，证实",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0041",
+    "seq": 41,
+    "word": "conflict",
+    "uk": "/ˈkɒnflɪkt/",
+    "us": "/ˈkɑːnflɪkt/",
+    "cn": "n. 冲突，矛盾，争执；v. 抵触，冲突",
+    "en": "a serious disagreement or argument; to be incompatible or at variance",
+    "syn": [
+      "clash",
+      "dispute",
+      "friction",
+      "collide"
+    ],
+    "ex_en": "When sources conflict, always verify against the most recent primary evidence.",
+    "ex_cn": "当信息来源发生冲突时，务必以最新的一手证据为准进行核实。",
+    "tip": "词根：con(共同)+flict(打击) → 互相撞击 → 冲突，抵触",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0042",
+    "seq": 42,
+    "word": "conform",
+    "uk": "/kənˈfɔːm/",
+    "us": "/kənˈfɔːrm/",
+    "cn": "v. 遵守，遵从（规则或标准）；顺应，一致",
+    "en": "to comply with rules, standards, or laws; to behave according to socially acceptable conventions",
+    "syn": [
+      "comply",
+      "abide by",
+      "adhere",
+      "match"
+    ],
+    "ex_en": "All exported packages must conform to the platform's binary specifications.",
+    "ex_cn": "所有导出的安装包都必须符合平台的二进制规范。",
+    "tip": "词根：con(共同)+form(形状/形式) → 保持同样的形式 → 遵守，顺应",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0043",
+    "seq": 43,
+    "word": "confront",
+    "uk": "/kənˈfrʌnt/",
+    "us": "/kənˈfrʌnt/",
+    "cn": "v. 面临，遭遇（困难）；勇敢面对；对质",
+    "en": "to come face to face with someone with hostile or argumentative intent; to deal with a difficult situation",
+    "syn": [
+      "face",
+      "encounter",
+      "tackle",
+      "brave"
+    ],
+    "ex_en": "We must confront technical challenges directly rather than avoiding them.",
+    "ex_cn": "我们必须直面技术挑战，而不是回避它们。",
+    "tip": "词根：con(共同)+front(前额/正面) → 正面迎上去 → 面临，直面",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0044",
+    "seq": 44,
+    "word": "consensus",
+    "uk": "/kənˈsensəs/",
+    "us": "/kənˈsensəs/",
+    "cn": "n. 共识，一致的意见",
+    "en": "a general agreement among a group of people",
+    "syn": [
+      "agreement",
+      "accord",
+      "harmony",
+      "unanimity"
+    ],
+    "ex_en": "After a thorough discussion, the engineering team reached a consensus on the design.",
+    "ex_cn": "经过充分讨论，工程团队就设计方案达成了共识。",
+    "tip": "词根：con(共同)+sens(感觉/看法)+us → 大家看法一致 → 共识",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0045",
+    "seq": 45,
+    "word": "consequence",
+    "uk": "/ˈkɒnsɪkwəns/",
+    "us": "/ˈkɑːnsɪkwens/",
+    "cn": "n. 结果，后果；重要性，重大意义",
+    "en": "a result or effect of an action or condition; importance or relevance",
+    "syn": [
+      "result",
+      "outcome",
+      "aftermath",
+      "significance"
+    ],
+    "ex_en": "Understanding the long-term consequences of design choices is essential.",
+    "ex_cn": "理解设计决策的长远后果至关重要。",
+    "tip": "考研熟词僻义：of no consequence 意为“无关紧要、无足轻重”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0046",
+    "seq": 46,
+    "word": "conserve",
+    "uk": "/kənˈsɜːv/",
+    "us": "/kənˈsɜːrv/",
+    "cn": "v. 保护，保存；节省，节约（能源或资源）",
+    "en": "to protect something environmentally or culturally important from harm or destruction",
+    "syn": [
+      "preserve",
+      "protect",
+      "save",
+      "husband"
+    ],
+    "ex_en": "Dark mode on OLED screens helps conserve battery power on mobile devices.",
+    "ex_cn": "OLED屏幕上的纯黑模式有助于节省移动设备的电池电量。",
+    "tip": "词根：con(全部)+serv(保持)+e → 完整地保存下来 → 保护，节约",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0047",
+    "seq": 47,
+    "word": "consistent",
+    "uk": "/kənˈsɪstənt/",
+    "us": "/kənˈsɪstənt/",
+    "cn": "adj. 一致的，始终如一的；相符的，不矛盾的",
+    "en": "acting or done in the same way over time; compatible or in agreement",
+    "syn": [
+      "steady",
+      "uniform",
+      "compatible",
+      "congruent"
+    ],
+    "ex_en": "Both platforms must maintain a consistent core learning workflow.",
+    "ex_cn": "两个平台必须保持一致的核心学习流程。",
+    "tip": "词根：con(共同)+sist(站立)+ent → 始终站在同一立场上 → 始终如一的，一致的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0048",
+    "seq": 48,
+    "word": "conspicuous",
+    "uk": "/kənˈspɪkjuəs/",
+    "us": "/kənˈspɪkjuəs/",
+    "cn": "adj. 显眼的，引人注目的，明显的",
+    "en": "standing out so as to be clearly visible; attracting notice or attention",
+    "syn": [
+      "prominent",
+      "noticeable",
+      "striking",
+      "salient"
+    ],
+    "ex_en": "Errors in spelling were conspicuous on the printed summary sheet.",
+    "ex_cn": "打印出来的汇总表上，拼写错误格外显眼。",
+    "tip": "词根：con(加强)+spic(看)+uous → 一眼就能看到的 → 显眼的，引人注目的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0049",
+    "seq": 49,
+    "word": "constant",
+    "uk": "/ˈkɒnstənt/",
+    "us": "/ˈkɑːnstənt/",
+    "cn": "adj. 持续不断的；恒定的，不变的；n. 常数，常量",
+    "en": "occurring continuously over a period of time; remaining the same",
+    "syn": [
+      "continuous",
+      "perpetual",
+      "invariable",
+      "steady"
+    ],
+    "ex_en": "Offline software does not require a constant network connection to function.",
+    "ex_cn": "离线软件不需要持续不断的网络连接即可正常运行。",
+    "tip": "词根：con(加强)+stant(站立) → 站在那里纹丝不动 → 恒定的，持续的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0050",
+    "seq": 50,
+    "word": "constitute",
+    "uk": "/ˈkɒnstɪtjuːt/",
+    "us": "/ˈkɑːnstɪtuːt/",
+    "cn": "v. 构成，组成；被视为，算作；设立",
+    "en": "to be a part of a whole; to combine to form something",
+    "syn": [
+      "comprise",
+      "compose",
+      "form",
+      "make up"
+    ],
+    "ex_en": "Twelve months constitute a calendar year.",
+    "ex_cn": "十二个月构成一个日历年。",
+    "tip": "词根：con(共同)+stitut(建立/放置)+e → 放在一起建立起来 → 构成，组成",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0051",
+    "seq": 51,
+    "word": "constrain",
+    "uk": "/kənˈstreɪn/",
+    "us": "/kənˈstreɪn/",
+    "cn": "v. 限制，约束；强迫，迫使",
+    "en": "to severely restrict the scope, extent, or activity of; to compel or force",
+    "syn": [
+      "restrict",
+      "limit",
+      "curb",
+      "compel"
+    ],
+    "ex_en": "Hardware memory limits may constrain the size of in-memory caches.",
+    "ex_cn": "硬件内存上限可能会限制内存缓存的大小。",
+    "tip": "词根：con(共同)+strain(拉紧) → 把绳子拉紧捆住 → 限制，约束",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0052",
+    "seq": 52,
+    "word": "consume",
+    "uk": "/kənˈsjuːm/",
+    "us": "/kənˈsuːm/",
+    "cn": "v. 消耗，耗费；吃，喝；使着迷，充满",
+    "en": "to use up a resource; to eat, drink, or ingest; to completely fill the mind of",
+    "syn": [
+      "deplete",
+      "exhaust",
+      "devour",
+      "absorb"
+    ],
+    "ex_en": "Lightweight native applications consume far less memory than heavy frameworks.",
+    "ex_cn": "轻量级原生应用程序比臃肿的框架消耗少得多的内存。",
+    "tip": "词根：con(全部)+sum(拿)+e → 全部拿光用掉 → 消耗，耗费",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0053",
+    "seq": 53,
+    "word": "contemporary",
+    "uk": "/kənˈtemprəri/",
+    "us": "/kənˈtempəreri/",
+    "cn": "adj. 当代的，现代的；同时代的；n. 同代人，同龄人",
+    "en": "living or occurring at the same time; belonging to or occurring in the present",
+    "syn": [
+      "modern",
+      "current",
+      "present-day",
+      "coeval"
+    ],
+    "ex_en": "Voca blends contemporary minimalist typography with proven memory science.",
+    "ex_cn": "Voca将当代极简主义排版与经过验证的记忆科学融为一体。",
+    "tip": "词根：con(共同)+tempor(时间)+ary → 处于同一时代的 → 同时代的；当代的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0054",
+    "seq": 54,
+    "word": "contend",
+    "uk": "/kənˈtend/",
+    "us": "/kənˈtend/",
+    "cn": "v. 声称，主张；竞争，争夺；处理，对付（困难）",
+    "en": "to assert something as a position in an argument; to struggle to surmount a difficulty",
+    "syn": [
+      "assert",
+      "maintain",
+      "compete",
+      "grapple"
+    ],
+    "ex_en": "Some linguists contend that context is the single best aid for vocabulary acquisition.",
+    "ex_cn": "一些语言学家主张，语境是词汇习得最好的辅助手段。",
+    "tip": "考研高频词：contend that...（主张/认为…）；contend with...（对付/抗衡…）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0055",
+    "seq": 55,
+    "word": "context",
+    "uk": "/ˈkɒntekst/",
+    "us": "/ˈkɑːntekst/",
+    "cn": "n. 上下文，语境；背景，环境，来龙去脉",
+    "en": "the circumstances that form the setting for an event, statement, or idea",
+    "syn": [
+      "background",
+      "setting",
+      "frame of reference",
+      "environment"
+    ],
+    "ex_en": "Guessing a word's meaning from context strengthens deep semantic memory.",
+    "ex_cn": "根据上下文猜测词义能够强化深层语义记忆。",
+    "tip": "词根：con(共同)+text(编织) → 编织在一起的前后文 → 语境，背景",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0056",
+    "seq": 56,
+    "word": "contradict",
+    "uk": "/ˌkɒntrəˈdɪkt/",
+    "us": "/ˌkɑːntrəˈdɪkt/",
+    "cn": "v. 反驳，否定；与…相矛盾，与…抵触",
+    "en": "to deny the truth of a statement by asserting the opposite; to be in conflict with",
+    "syn": [
+      "refute",
+      "rebut",
+      "negate",
+      "conflict with"
+    ],
+    "ex_en": "The witness's second statement did not contradict the physical evidence.",
+    "ex_cn": "证人的第二份陈述与物证并不矛盾。",
+    "tip": "词根：contra(反)+dict(说) → 反着说 → 反驳，相矛盾",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0057",
+    "seq": 57,
+    "word": "contribute",
+    "uk": "/kənˈtrɪbjuːt/",
+    "us": "/kənˈtrɪbjuːt/",
+    "cn": "v. 捐献，贡献；促成，有助于；撰稿，投稿",
+    "en": "to give something in order to help achieve or provide something; to help to cause",
+    "syn": [
+      "donate",
+      "supply",
+      "conduce",
+      "submit"
+    ],
+    "ex_en": "Daily phonetic practice will contribute significantly to your listening comprehension.",
+    "ex_cn": "每日的音标与发音练习将极大地促进你的听力理解能力。",
+    "tip": "词根：con(共同)+tribut(给予)+e → 大家一起出钱出力 → 贡献，有助于",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0058",
+    "seq": 58,
+    "word": "controversy",
+    "uk": "/ˈkɒntrəvɜːsi/",
+    "us": "/ˈkɑːntrəvɜːrsi/",
+    "cn": "n. 争论，争议，论战",
+    "en": "prolonged public disagreement or heated discussion",
+    "syn": [
+      "debate",
+      "dispute",
+      "contention",
+      "argument"
+    ],
+    "ex_en": "The new policy sparked a heated controversy among education specialists.",
+    "ex_cn": "这项新政策在教育专家中引发了激烈的争议。",
+    "tip": "词根：contro(反)+vers(转)+y → 观点反着转 → 争议，论战",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0059",
+    "seq": 59,
+    "word": "convene",
+    "uk": "/kənˈviːn/",
+    "us": "/kənˈviːn/",
+    "cn": "v. 召集，传唤；集合，开会",
+    "en": "to come or bring together for a meeting or activity; to assemble",
+    "syn": [
+      "assemble",
+      "summon",
+      "gather",
+      "convoke"
+    ],
+    "ex_en": "The committee will convene next Monday to finalize the syllabus update.",
+    "ex_cn": "委员会将于下周一开会，敲定大纲更新内容。",
+    "tip": "词根：con(共同)+ven(来)+e → 大家来到一起 → 召集，开会",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0060",
+    "seq": 60,
+    "word": "converge",
+    "uk": "/kənˈvɜːdʒ/",
+    "us": "/kənˈvɜːrdʒ/",
+    "cn": "v. 汇集，聚集；趋同，收敛",
+    "en": "to tend to meet at a point; to approach an intersection or common state",
+    "syn": [
+      "meet",
+      "intersect",
+      "merge",
+      "coalesce"
+    ],
+    "ex_en": "Desktop and mobile user experiences converge around a unified learning engine.",
+    "ex_cn": "桌面端和移动端的用户体验围绕统一的学习引擎交汇融合。",
+    "tip": "词根：con(共同)+verg(倾斜/转向)+e → 朝同一个点汇拢 → 汇集，收敛（反义：diverge 分歧）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0061",
+    "seq": 61,
+    "word": "convey",
+    "uk": "/kənˈveɪ/",
+    "us": "/kənˈveɪ/",
+    "cn": "v. 表达，传递（思想或感情）；运送，输送",
+    "en": "to make an idea, impression, or feeling known or understandable to someone; to transport",
+    "syn": [
+      "communicate",
+      "express",
+      "transmit",
+      "transport"
+    ],
+    "ex_en": "Colors and typography help convey a calm, focused atmosphere.",
+    "ex_cn": "色彩和排版有助于传递一种平静、专注的氛围。",
+    "tip": "词根：con(共同)+vey(道路/走) → 通过道路送过去 → 运送；传递（思想）",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0062",
+    "seq": 62,
+    "word": "convince",
+    "uk": "/kənˈvɪns/",
+    "us": "/kənˈvɪns/",
+    "cn": "v. 使确信，使信服；说服，劝说",
+    "en": "to cause someone to believe firmly in the truth of something; to persuade",
+    "syn": [
+      "persuade",
+      "satisfy",
+      "assure",
+      "sway"
+    ],
+    "ex_en": "Empirical test results convinced the team to adopt the offline SQLite architecture.",
+    "ex_cn": "实证测试结果使团队信服并采用了离线SQLite架构。",
+    "tip": "词根：con(彻底)+vinc(征服)+e → 彻底以理服人 → 使信服，说服",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0063",
+    "seq": 63,
+    "word": "cooperate",
+    "uk": "/kəʊˈɒpəreɪt/",
+    "us": "/koʊˈɑːpəreɪt/",
+    "cn": "v. 合作，协作；配合",
+    "en": "to work jointly toward the same end; to assist someone or comply with their requests",
+    "syn": [
+      "collaborate",
+      "team up",
+      "coordinate",
+      "assist"
+    ],
+    "ex_en": "Hardware and software layers cooperate seamlessly to reduce latency.",
+    "ex_cn": "硬件层与软件层无缝协作以降低延迟。",
+    "tip": "词根：co(共同)+oper(工作)+ate → 一起工作 → 合作，协作",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0064",
+    "seq": 64,
+    "word": "coordinate",
+    "uk": "/kəʊˈɔːdɪneɪt/",
+    "us": "/koʊˈɔːrdɪneɪt/",
+    "cn": "v. 协调，统筹；n. 坐标；adj. 同等的，并列的",
+    "en": "to bring the different elements of a complex activity or organization into a harmonious relationship",
+    "syn": [
+      "harmonize",
+      "synchronize",
+      "organize",
+      "integrate"
+    ],
+    "ex_en": "The scheduler coordinates new word learning with five Ebbinghaus review stages.",
+    "ex_cn": "调度器将新词学习与五个艾宾浩斯复习阶段统筹协调起来。",
+    "tip": "词根：co(共同)+ordin(秩序/排列)+ate → 排成共同的秩序 → 协调；坐标",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0065",
+    "seq": 65,
+    "word": "correspond",
+    "uk": "/ˌkɒrəˈspɒnd/",
+    "us": "/ˌkɔːrəˈspɑːnd/",
+    "cn": "v. 相一致，符合；相当于；通信",
+    "en": "to have a close similarity; to match or agree almost exactly; to communicate by exchanging letters",
+    "syn": [
+      "accord",
+      "match",
+      "tally",
+      "parallel"
+    ],
+    "ex_en": "The test conclusions must correspond strictly to actual verification results.",
+    "ex_cn": "测试结论必须与实际验证结果严格一致。",
+    "tip": "词根：cor(共同)+respond(回应) → 彼此呼应 → 相符，一致；通信",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0066",
+    "seq": 66,
+    "word": "criteria",
+    "uk": "/kraɪˈtɪəriə/",
+    "us": "/kraɪˈtɪriə/",
+    "cn": "n. [pl.] 标准，准则，原则（单数 criterion）",
+    "en": "principles or standards by which something may be judged or decided",
+    "syn": [
+      "standards",
+      "benchmarks",
+      "measures",
+      "touchstones"
+    ],
+    "ex_en": "Data integrity and offline availability are our primary evaluation criteria.",
+    "ex_cn": "数据完整性与离线可用性是我们的首要评估准则。",
+    "tip": "词根：crit(判断)+eria → 用于衡量判断的依据 → 准则，标准（注意其为复数形式）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0067",
+    "seq": 67,
+    "word": "crucial",
+    "uk": "/ˈkruːʃl/",
+    "us": "/ˈkruːʃl/",
+    "cn": "adj. 至关重要的，决定性的，关键的",
+    "en": "decisive or critical, especially in the success or failure of something",
+    "syn": [
+      "critical",
+      "vital",
+      "pivotal",
+      "paramount"
+    ],
+    "ex_en": "Timely review within 24 hours is crucial for consolidating short-term memory.",
+    "ex_cn": "24小时内的及时复习对于巩固短期记忆至关重要。",
+    "tip": "词根：cruc(十字路口)+ial → 处在人生十字路口的 → 关键的，决定性的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0068",
+    "seq": 68,
+    "word": "cultivate",
+    "uk": "/ˈkʌltɪveɪt/",
+    "us": "/ˈkʌltɪveɪt/",
+    "cn": "v. 培养，陶冶；耕作，栽培；结交",
+    "en": "to try to acquire or develop a quality, sentiment, or skill; to prepare and use land for crops",
+    "syn": [
+      "foster",
+      "nurture",
+      "develop",
+      "till"
+    ],
+    "ex_en": "Reading English definitions helps cultivate an authentic sense of the language.",
+    "ex_cn": "阅读英文释义有助于培养地道的语感。",
+    "tip": "词根：cult(耕种/培养)+iv+ate → 像耕耘土地一样培育心智 → 培养，耕作",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0069",
+    "seq": 69,
+    "word": "cumulative",
+    "uk": "/ˈkjuːmjələtɪv/",
+    "us": "/ˈkjuːmjəleɪtɪv/",
+    "cn": "adj. 累积的，渐增的",
+    "en": "increasing or increased in quantity, degree, or force by successive additions",
+    "syn": [
+      "accruing",
+      "aggregate",
+      "collective",
+      "snowballing"
+    ],
+    "ex_en": "The cumulative effect of learning thirty words a day is ten thousand words a year.",
+    "ex_cn": "每天学三十个单词的累积效应是一年掌握一万词。",
+    "tip": "词根：cumul(堆积)+ative → 越堆越多的 → 累积的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0070",
+    "seq": 70,
+    "word": "curb",
+    "uk": "/kɜːb/",
+    "us": "/kɜːrb/",
+    "cn": "v. 控制，抑制，约束；n. 路缘，马勒",
+    "en": "to restrain or keep in check; a check or restraint on something",
+    "syn": [
+      "restrain",
+      "check",
+      "bridle",
+      "inhibit"
+    ],
+    "ex_en": "Structured review schedules help curb the natural rate of forgetting.",
+    "ex_cn": "结构化的复习计划有助于遏制自然的遗忘速度。",
+    "tip": "考研高频词：原指勒马的嚼子，引申为“抑制、控制、遏制”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0071",
+    "seq": 71,
+    "word": "decline",
+    "uk": "/dɪˈklaɪn/",
+    "us": "/dɪˈklaɪn/",
+    "cn": "v./n. 下降，减少，衰退；v. 婉言拒绝",
+    "en": "to become smaller, fewer, or less; to politely refuse an invitation or offer",
+    "syn": [
+      "decrease",
+      "dwindle",
+      "deteriorate",
+      "refuse"
+    ],
+    "ex_en": "Without periodic reinforcement, memory retention will inevitably decline.",
+    "ex_cn": "如果没有周期性的强化，记忆留存率不可避免地会下降。",
+    "tip": "词根：de(向下)+clin(倾斜)+e → 向下倾斜 → 下降，衰退；婉拒",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0072",
+    "seq": 72,
+    "word": "dedicate",
+    "uk": "/ˈdedɪkeɪt/",
+    "us": "/ˈdedɪkeɪt/",
+    "cn": "v. 把…奉献给；致力于，专注于",
+    "en": "to devote time, effort, or oneself to a particular task or purpose",
+    "syn": [
+      "devote",
+      "commit",
+      "consecrate",
+      "pledge"
+    ],
+    "ex_en": "She decided to dedicate thirty minutes every morning to vocabulary review.",
+    "ex_cn": "她决定每天早晨专门花三十分钟复习词汇。",
+    "tip": "词根：de(加强)+dic(说/宣告)+ate → 庄重宣告将一生献给事业 → 致力于，奉献",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0073",
+    "seq": 73,
+    "word": "deduce",
+    "uk": "/dɪˈdjuːs/",
+    "us": "/dɪˈduːs/",
+    "cn": "v. 推论，推断，演绎",
+    "en": "to arrive at a fact or a conclusion by reasoning; to draw as a logical conclusion",
+    "syn": [
+      "infer",
+      "conclude",
+      "derive",
+      "extrapolate"
+    ],
+    "ex_en": "From the root and prefix, you can often deduce the general meaning of an unfamiliar word.",
+    "ex_cn": "从词根和前缀中，你通常可以推断出陌生单词的大致含义。",
+    "tip": "词根：de(向下)+duc(引导)+e → 顺着逻辑向下推导 → 演绎，推断",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0074",
+    "seq": 74,
+    "word": "deficiency",
+    "uk": "/dɪˈfɪʃnsi/",
+    "us": "/dɪˈfɪʃnsi/",
+    "cn": "n. 缺乏，不足；缺陷，缺点",
+    "en": "a lack or shortage; a failing or shortcoming",
+    "syn": [
+      "shortage",
+      "scarcity",
+      "deficit",
+      "flaw"
+    ],
+    "ex_en": "Vocabulary deficiency is often the primary bottleneck in reading comprehension.",
+    "ex_cn": "词汇量匮乏往往是阅读理解中的首要瓶颈。",
+    "tip": "词根：de(向下/不够)+fic(做)+iency → 做得不够 → 缺乏，不足",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0075",
+    "seq": 75,
+    "word": "deliberate",
+    "uk": "/dɪˈlɪbərət/",
+    "us": "/dɪˈlɪbərət/",
+    "cn": "adj. 故意的，蓄意的；深思熟虑的；v. 仔细考虑，商议",
+    "en": "done consciously and intentionally; careful and unhurried",
+    "syn": [
+      "intentional",
+      "calculated",
+      "considered",
+      "ponder"
+    ],
+    "ex_en": "Deliberate practice focuses specifically on the words you frequently miss.",
+    "ex_cn": "刻意练习专门针对你经常记错的那些重难点词汇。",
+    "tip": "考研高频熟词：作形容词为“故意的；深思熟虑的”，作动词为“仔细商讨”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0076",
+    "seq": 76,
+    "word": "demonstrate",
+    "uk": "/ˈdemənstreɪt/",
+    "us": "/ˈdemənstreɪt/",
+    "cn": "v. 证明，证实；演示，展示；游行示威",
+    "en": "to clearly show the existence or truth of something by giving proof or evidence",
+    "syn": [
+      "prove",
+      "establish",
+      "illustrate",
+      "exhibit"
+    ],
+    "ex_en": "Ebbinghaus's classic experiments demonstrate how rapidly initial forgetting occurs.",
+    "ex_cn": "艾宾浩斯的经典实验证明了最初阶段的遗忘发生得有多快。",
+    "tip": "词根：de(加强)+monstr(展示)+ate → 清楚地展示出来 → 证明，演示",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0077",
+    "seq": 77,
+    "word": "denote",
+    "uk": "/dɪˈnəʊt/",
+    "us": "/dɪˈnoʊt/",
+    "cn": "v. 表示，意味着；作为…的符号",
+    "en": "to be a sign of; to indicate; to stand as a name or symbol for",
+    "syn": [
+      "indicate",
+      "signify",
+      "represent",
+      "designate"
+    ],
+    "ex_en": "In phonetic transcriptions, the stress mark denotes which syllable receives primary emphasis.",
+    "ex_cn": "在音标中，重音符号表示哪个音节需要重读。",
+    "tip": "词根：de(加强)+not(标记)+e → 用记号标明 → 表示，意味着",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0078",
+    "seq": 78,
+    "word": "depict",
+    "uk": "/dɪˈpɪkt/",
+    "us": "/dɪˈpɪkt/",
+    "cn": "v. 描绘，描画；描写，描述",
+    "en": "to show or represent by a drawing, painting, or other art form; to portray in words",
+    "syn": [
+      "portray",
+      "describe",
+      "illustrate",
+      "render"
+    ],
+    "ex_en": "The progress chart clearly depicts your daily vocabulary growth curve.",
+    "ex_cn": "进度图表清晰地描绘出你每日的词汇增长曲线。",
+    "tip": "词根：de(加强)+pict(画) → 生动地画出来 → 描绘，描述",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0079",
+    "seq": 79,
+    "word": "deplete",
+    "uk": "/dɪˈpliːt/",
+    "us": "/dɪˈpliːt/",
+    "cn": "v. 耗尽，用尽，使衰竭",
+    "en": "to use up the supply or resources of; to diminish in number or quantity",
+    "syn": [
+      "exhaust",
+      "drain",
+      "consume",
+      "impoverish"
+    ],
+    "ex_en": "Studying for five hours without a break will quickly deplete your mental energy.",
+    "ex_cn": "连续学习五小时不休息会迅速耗尽你的脑力精力。",
+    "tip": "词根：de(去掉)+plet(满)+e → 从满的状态抽空 → 耗尽，用尽",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0080",
+    "seq": 80,
+    "word": "derive",
+    "uk": "/dɪˈraɪv/",
+    "us": "/dɪˈraɪv/",
+    "cn": "v. 源于，来自；从…中获得；推导",
+    "en": "to obtain something from a specified source; to base a concept on a logical extension",
+    "syn": [
+      "stem",
+      "originate",
+      "obtain",
+      "extract"
+    ],
+    "ex_en": "Many English academic words derive from Latin and classical Greek roots.",
+    "ex_cn": "许多英语学术词汇源于拉丁语和古典希腊语词根。",
+    "tip": "词根：de(向下)+riv(河流)+e → 顺着源流往下流淌 → 源于，导出",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0081",
+    "seq": 81,
+    "word": "detect",
+    "uk": "/dɪˈtekt/",
+    "us": "/dɪˈtekt/",
+    "cn": "v. 侦查，探测，察觉，发现",
+    "en": "to discover or identify the presence or existence of something",
+    "syn": [
+      "discover",
+      "spot",
+      "perceive",
+      "discern"
+    ],
+    "ex_en": "The import module automatically detects UTF-8 and GBK file encodings.",
+    "ex_cn": "导入模块会自动检测 UTF-8 和 GBK 文件编码。",
+    "tip": "词根：de(去掉)+tect(盖子) → 揭开盖子发现真相 → 探测，察觉",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0082",
+    "seq": 82,
+    "word": "deteriorate",
+    "uk": "/dɪˈtɪəriəreɪt/",
+    "us": "/dɪˈtɪriəreɪt/",
+    "cn": "v. 恶化，变坏，退化",
+    "en": "to become progressively worse",
+    "syn": [
+      "worsen",
+      "degenerate",
+      "decline",
+      "decay"
+    ],
+    "ex_en": "Language proficiency can deteriorate rapidly if you stop reading and practicing.",
+    "ex_cn": "如果停止阅读和练习，语言能力可能会迅速退化。",
+    "tip": "词根：deterior(更坏)+ate → 变得越来越糟 → 恶化，退化",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0083",
+    "seq": 83,
+    "word": "determine",
+    "uk": "/dɪˈtɜːmɪn/",
+    "us": "/dɪˈtɜːrmɪn/",
+    "cn": "v. 决定，确定；查明，测定；下定决心",
+    "en": "to cause something to occur in a particular way; to ascertain or establish exactly",
+    "syn": [
+      "decide",
+      "ascertain",
+      "establish",
+      "resolve"
+    ],
+    "ex_en": "Your daily consistency will determine how quickly you master the entire lexicon.",
+    "ex_cn": "你每天的坚持将决定你多快能掌握整个词库。",
+    "tip": "词根：de(加强)+termin(界限)+e → 划定明确的界限 → 确定，决定",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0084",
+    "seq": 84,
+    "word": "deviate",
+    "uk": "/ˈdiːvieɪt/",
+    "us": "/ˈdiːvieɪt/",
+    "cn": "v. 偏离，背离，违背",
+    "en": "to depart from an established course or standard",
+    "syn": [
+      "diverge",
+      "stray",
+      "depart",
+      "digress"
+    ],
+    "ex_en": "Do not deviate from your Ebbinghaus review plan during the critical first week.",
+    "ex_cn": "在关键的第一周内，不要偏离你的艾宾浩斯复习计划。",
+    "tip": "词根：de(偏离)+vi(道路)+ate → 走离正轨 → 偏离，背离",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0085",
+    "seq": 85,
+    "word": "devise",
+    "uk": "/dɪˈvaɪz/",
+    "us": "/dɪˈvaɪz/",
+    "cn": "v. 设计，发明，想出（计划或方法）",
+    "en": "to plan or invent a complex procedure, system, or mechanism by careful thought",
+    "syn": [
+      "conceive",
+      "formulate",
+      "invent",
+      "contrive"
+    ],
+    "ex_en": "Hermann Ebbinghaus devised a scientific method to measure memory decay.",
+    "ex_cn": "赫尔曼·艾宾浩斯设计了一种测量记忆衰退的科学方法。",
+    "tip": "助记：与名牌设备 device 同源，作动词意为“精心设计、想出”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0086",
+    "seq": 86,
+    "word": "differentiate",
+    "uk": "/ˌdɪfəˈrenʃieɪt/",
+    "us": "/ˌdɪfəˈrenʃieɪt/",
+    "cn": "v. 区分，区别；使不同，产生差异",
+    "en": "to recognize or ascertain what makes someone or something different",
+    "syn": [
+      "distinguish",
+      "discriminate",
+      "contrast",
+      "separate"
+    ],
+    "ex_en": "Good learners differentiate between active writing vocabulary and passive reading words.",
+    "ex_cn": "优秀的学习者会区分主动写作词汇与被动阅读词汇。",
+    "tip": "词根：different(不同的)+iate → 分辨出不同之处 → 区分，区别",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0087",
+    "seq": 87,
+    "word": "diffuse",
+    "uk": "/dɪˈfjuːz/",
+    "us": "/dɪˈfjuːz/",
+    "cn": "v. 传播，散布；扩散，弥漫；adj. 弥漫的，冗长的",
+    "en": "to spread or cause to spread over a wide area or among a large number of people",
+    "syn": [
+      "spread",
+      "disseminate",
+      "disperse",
+      "scatter"
+    ],
+    "ex_en": "Printed books helped diffuse scientific knowledge across continents.",
+    "ex_cn": "印刷书籍帮助科学知识跨越大陆广泛传播。",
+    "tip": "词根：dif(分开)+fus(流/倾倒)+e → 四散流开 → 扩散，传播",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0088",
+    "seq": 88,
+    "word": "dilemma",
+    "uk": "/dɪˈlemə/",
+    "us": "/dɪˈlemə/",
+    "cn": "n. 进退两难的境地，左右为难，困境",
+    "en": "a situation in which a difficult choice has to be made between two or more alternatives",
+    "syn": [
+      "predicament",
+      "quandary",
+      "impasse",
+      "catch-22"
+    ],
+    "ex_en": "Engineers often face a dilemma between feature richness and interface simplicity.",
+    "ex_cn": "工程师经常在功能丰富度与界面简洁性之间面临两难抉择。",
+    "tip": "词根：di(二)+lemma(前提/争论) → 两个前提都难选 → 进退两难",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0089",
+    "seq": 89,
+    "word": "diminish",
+    "uk": "/dɪˈmɪnɪʃ/",
+    "us": "/dɪˈmɪnɪʃ/",
+    "cn": "v. 减少，减小，削弱；贬低",
+    "en": "to make or become less; to cause to seem less impressive or valuable",
+    "syn": [
+      "decrease",
+      "lessen",
+      "dwindle",
+      "belittle"
+    ],
+    "ex_en": "As you move mastered words out of the list, your review workload will steadily diminish.",
+    "ex_cn": "随着你将熟词移出列表，你的复习负担会稳步减轻。",
+    "tip": "词根：di(加强)+min(小)+ish → 使变得越来越小 → 减少，削弱",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0090",
+    "seq": 90,
+    "word": "discern",
+    "uk": "/dɪˈsɜːn/",
+    "us": "/dɪˈsɜːrn/",
+    "cn": "v. 看出，察觉出；辨别，明辨",
+    "en": "to perceive or recognize something; to distinguish someone or something with difficulty",
+    "syn": [
+      "perceive",
+      "detect",
+      "distinguish",
+      "descry"
+    ],
+    "ex_en": "With practice, you can discern subtle differences in usage between near-synonyms.",
+    "ex_cn": "通过练习，你可以辨别近义词之间在用法上的微妙差异。",
+    "tip": "词根：dis(分开)+cern(筛分/搞清) → 把混在一起的东西分辨清 → 明辨，察觉",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0091",
+    "seq": 91,
+    "word": "discrepancy",
+    "uk": "/dɪˈskrepənsi/",
+    "us": "/dɪˈskrepənsi/",
+    "cn": "n. 差异，不一致，出入，矛盾",
+    "en": "a lack of compatibility or similarity between two or more facts",
+    "syn": [
+      "inconsistency",
+      "disparity",
+      "variance",
+      "divergence"
+    ],
+    "ex_en": "The audit revealed a discrepancy between the expected and actual record counts.",
+    "ex_cn": "审查发现预期记录数与实际记录数之间存在出入。",
+    "tip": "词根：dis(不一致)+crep(发出杂音)+ancy → 声音不和谐 → 差异，矛盾",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0092",
+    "seq": 92,
+    "word": "discrete",
+    "uk": "/dɪˈskriːt/",
+    "us": "/dɪˈskriːt/",
+    "cn": "adj. 离散的，不连续的，互不相连的",
+    "en": "individually separate and distinct",
+    "syn": [
+      "separate",
+      "distinct",
+      "individual",
+      "detached"
+    ],
+    "ex_en": "Breaking a massive lexicon into fifteen discrete lists makes learning manageable.",
+    "ex_cn": "将庞大的词库拆分为十五个独立的词表能让学习变得易于管理。",
+    "tip": "注意区分：discrete（离散的，e被t分开）vs discreet（言行谨慎的，ee紧挨在一起）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0093",
+    "seq": 93,
+    "word": "discriminate",
+    "uk": "/dɪˈskrɪmɪneɪt/",
+    "us": "/dɪˈskrɪmɪneɪt/",
+    "cn": "v. 区分，辨别；歧视，区别对待",
+    "en": "to recognize a distinction; to make an unjust or prejudicial distinction",
+    "syn": [
+      "differentiate",
+      "distinguish",
+      "single out",
+      "bias"
+    ],
+    "ex_en": "Phonetic training helps your ear discriminate between similar vowel sounds.",
+    "ex_cn": "语音训练有助于你的耳朵辨别相似的元音发音。",
+    "tip": "词根：dis(分开)+crimin(分辨/审理)+ate → 区分开来；区别对待",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0094",
+    "seq": 94,
+    "word": "displace",
+    "uk": "/dɪsˈpleɪs/",
+    "us": "/dɪsˈpleɪs/",
+    "cn": "v. 取代，替代；迫使…离开家园；置换",
+    "en": "to take over the place, position, or role of someone or something",
+    "syn": [
+      "replace",
+      "supplant",
+      "supersede",
+      "uproot"
+    ],
+    "ex_en": "Digital flashcard systems have largely displaced bulky paper index cards.",
+    "ex_cn": "数字化单词卡系统在很大程度上取代了笨重的纸质索引卡片。",
+    "tip": "词根：dis(移开)+place(位置) → 移走原物占其位置 → 取代，置换",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0095",
+    "seq": 95,
+    "word": "dispose",
+    "uk": "/dɪˈspəʊz/",
+    "us": "/dɪˈspoʊz/",
+    "cn": "v. 排列，布置；使倾向于；处理，丢弃（dispose of）",
+    "en": "to get rid of by throwing away or giving or selling to someone else; to incline someone toward",
+    "syn": [
+      "discard",
+      "jettison",
+      "arrange",
+      "incline"
+    ],
+    "ex_en": "Once a word is permanently memorized, you can dispose of it from your active queue.",
+    "ex_cn": "一旦某个单词被永久记住，你就可以将其从当前学习队列中移除。",
+    "tip": "词根：dis(分开)+pos(放置)+e → 分别安排妥当 → 处置，倾向于",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0096",
+    "seq": 96,
+    "word": "disrupt",
+    "uk": "/dɪsˈrʌpt/",
+    "us": "/dɪsˈrʌpt/",
+    "cn": "v. 扰乱，打乱，中断",
+    "en": "to interrupt an event, activity, or process by causing a disturbance or problem",
+    "syn": [
+      "interrupt",
+      "disturb",
+      "unsettle",
+      "derail"
+    ],
+    "ex_en": "Pop-up advertisements disrupt concentration, which is why Voca is completely ad-free.",
+    "ex_cn": "弹窗广告会打乱注意力，因此 Voca 完全不含任何广告。",
+    "tip": "词根：dis(四散)+rupt(断裂) → 使原本连续的过程断开 → 扰乱，中断",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0097",
+    "seq": 97,
+    "word": "dissipate",
+    "uk": "/ˈdɪsɪpeɪt/",
+    "us": "/ˈdɪsɪpeɪt/",
+    "cn": "v. （使）消散，散去；挥霍，浪费（时间或精力）",
+    "en": "to disappear or cause to disappear; to squander or fritter away",
+    "syn": [
+      "disperse",
+      "vanish",
+      "evaporate",
+      "squander"
+    ],
+    "ex_en": "Initial exam anxiety quickly dissipates once you follow a clear daily study plan.",
+    "ex_cn": "一旦你遵循清晰的每日学习计划，最初的考试焦虑很快就会消散。",
+    "tip": "词根：dis(四散)+sip(投掷)+ate → 四处挥洒殆尽 → 消散；挥霍",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0098",
+    "seq": 98,
+    "word": "distinct",
+    "uk": "/dɪˈstɪŋkt/",
+    "us": "/dɪˈstɪŋkt/",
+    "cn": "adj. 截然不同的，有区别的；清晰的，明显的",
+    "en": "recognizably different in nature from something else of a similar type; readily perceived",
+    "syn": [
+      "different",
+      "separate",
+      "clear-cut",
+      "unmistakable"
+    ],
+    "ex_en": "Voca offers four distinct visual themes tailored for daytime and nighttime reading.",
+    "ex_cn": "Voca 提供四种截然不同的视觉主题，专为日间和夜间阅读量身定制。",
+    "tip": "词根：di(分开)+stinct(刺/标志) → 做好不同标记区分开的 → 截然不同的，清晰的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0099",
+    "seq": 99,
+    "word": "distort",
+    "uk": "/dɪˈstɔːt/",
+    "us": "/dɪˈstɔːrt/",
+    "cn": "v. 扭曲，曲解，歪曲；使变形，失真",
+    "en": "to pull or twist out of shape; to give a misleading or false account of",
+    "syn": [
+      "twist",
+      "misrepresent",
+      "warp",
+      "falsify"
+    ],
+    "ex_en": "Never distort or fabricate test results when evaluating software stability.",
+    "ex_cn": "评估软件稳定性时，绝不能歪曲或伪造测试结果。",
+    "tip": "词根：dis(偏离)+tort(扭曲) → 拧歪了 → 扭曲，歪曲",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0100",
+    "seq": 100,
+    "word": "distribute",
+    "uk": "/dɪˈstrɪbjuːt/",
+    "us": "/dɪˈstrɪbjuːt/",
+    "cn": "v. 分配，分发；使分布，散布；分销",
+    "en": "to give shares of something; to deal out; to spread throughout a space or area",
+    "syn": [
+      "allocate",
+      "dispense",
+      "circulate",
+      "spread"
+    ],
+    "ex_en": "In shuffle mode, the algorithm distributes high-frequency words evenly across all lists.",
+    "ex_cn": "在乱序模式下，算法将高频词均匀分配到各个词表中。",
+    "tip": "词根：dis(分开)+tribut(给予)+e → 分发给每个人 → 分配，分布",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0101",
+    "seq": 101,
+    "word": "diverse",
+    "uk": "/daɪˈvɜːs/",
+    "us": "/daɪˈvɜːrs/",
+    "cn": "adj. 多种多样的，形形色色的，不同的",
+    "en": "showing a great deal of variety; very different",
+    "syn": [
+      "varied",
+      "manifold",
+      "assorted",
+      "multifarious"
+    ],
+    "ex_en": "Our learners have diverse goals ranging from graduate entrance exams to academic reading.",
+    "ex_cn": "我们的学习者有着从考研到学术阅读等多种多样的学习目标。",
+    "tip": "词根：di(分开)+vers(转)+e → 朝不同方向转 → 多样的，不同的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0102",
+    "seq": 102,
+    "word": "divert",
+    "uk": "/daɪˈvɜːt/",
+    "us": "/daɪˈvɜːrt/",
+    "cn": "v. 使转向，使改道；转移（注意力或资金）；使消遣",
+    "en": "to cause someone or something to change course or turn from one direction to another",
+    "syn": [
+      "redirect",
+      "deflect",
+      "distract",
+      "sidetrack"
+    ],
+    "ex_en": "Minimalist design ensures that decorative elements never divert your attention from the word.",
+    "ex_cn": "极简设计确保装饰元素绝不会分散你对单词本身的注意力。",
+    "tip": "词根：di(偏离)+vert(转) → 转到别的路上 → 使转向，转移注意力",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0103",
+    "seq": 103,
+    "word": "dominant",
+    "uk": "/ˈdɒmɪnənt/",
+    "us": "/ˈdɑːmɪnənt/",
+    "cn": "adj. 占主导地位的，占优势的；显性的",
+    "en": "most important, powerful, or influential",
+    "syn": [
+      "prevailing",
+      "predominant",
+      "ruling",
+      "preeminent"
+    ],
+    "ex_en": "Spaced repetition remains the dominant paradigm in evidence-based memory software.",
+    "ex_cn": "间隔重复仍然是循证记忆软件中占主导地位的范式。",
+    "tip": "词根：domin(统治/主人)+ant → 处于统治地位的 → 占主导地位的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0104",
+    "seq": 104,
+    "word": "drastic",
+    "uk": "/ˈdræstɪk/",
+    "us": "/ˈdræstɪk/",
+    "cn": "adj. 激烈的，猛烈的，大刀阔斧的，极端的",
+    "en": "likely to have a strong or far-reaching effect; radical and extreme",
+    "syn": [
+      "radical",
+      "sweeping",
+      "severe",
+      "extreme"
+    ],
+    "ex_en": "Removing mastered words brings a drastic reduction in daily review time.",
+    "ex_cn": "剔除已掌握的熟词能大幅缩减每日的复习耗时。",
+    "tip": "助记：drast(做/行动)+ic → 采取雷厉风行行动的 → 大刀阔斧的，猛烈的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0105",
+    "seq": 105,
+    "word": "durable",
+    "uk": "/ˈdjʊərəbl/",
+    "us": "/ˈdʊrəbl/",
+    "cn": "adj. 耐用的，持久的，长久的",
+    "en": "able to withstand wear, pressure, or damage; hard-wearing and long-lasting",
+    "syn": [
+      "lasting",
+      "enduring",
+      "resilient",
+      "sturdy"
+    ],
+    "ex_en": "Combining visual cards, audio dictation, and active spelling creates durable memory traces.",
+    "ex_cn": "将视觉卡片、听写和主动拼写相结合能形成持久的记忆痕迹。",
+    "tip": "词根：dur(持续/坚硬)+able → 能够长久持续的 → 耐用的，持久的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0106",
+    "seq": 106,
+    "word": "dynamic",
+    "uk": "/daɪˈnæmɪk/",
+    "us": "/daɪˈnæmɪk/",
+    "cn": "adj. 动态的；充满活力的；n. 动力，相互作用力",
+    "en": "characterized by constant change, activity, or progress; energetic",
+    "syn": [
+      "energetic",
+      "vibrant",
+      "fluid",
+      "adaptive"
+    ],
+    "ex_en": "The dynamic schedule adjusts automatically whenever you reset or customize your list count.",
+    "ex_cn": "每当你重置或自定义 List 数量时，动态计划表都会自动调整。",
+    "tip": "词根：dynam(力量/动力)+ic → 有内在驱动力的 → 动态的，充满活力的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0107",
+    "seq": 107,
+    "word": "elaborate",
+    "uk": "/ɪˈlæbərət/",
+    "us": "/ɪˈlæbərət/",
+    "cn": "adj. 精心制作的，详尽的，复杂的；v. 详细阐述，详尽说明",
+    "en": "involving many carefully arranged parts or details; to develop or present in detail",
+    "syn": [
+      "intricate",
+      "detailed",
+      "painstaking",
+      "expound"
+    ],
+    "ex_en": "Tap the dictionary button to elaborate on a word's etymology and collocations.",
+    "ex_cn": "点击词典按钮可详细展开单词的词源与搭配用法。",
+    "tip": "词根：e(出)+labor(劳动)+ate → 花费大量心血做出来的 → 精巧详尽的；详细阐述",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0108",
+    "seq": 108,
+    "word": "elevate",
+    "uk": "/ˈelɪveɪt/",
+    "us": "/ˈelɪveɪt/",
+    "cn": "v. 提升，提高，抬高；振奋（情绪）",
+    "en": "to raise or lift something to a higher position; to raise to a more important or impressive level",
+    "syn": [
+      "raise",
+      "uplift",
+      "promote",
+      "heighten"
+    ],
+    "ex_en": "Mastering core academic vocabulary will noticeably elevate your writing score.",
+    "ex_cn": "掌握核心学术词汇将显著提高你的写作得分。",
+    "tip": "词根：e(出)+lev(轻/举起)+ate → 向上举起 → 提升，提高",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0109",
+    "seq": 109,
+    "word": "elicit",
+    "uk": "/ɪˈlɪsɪt/",
+    "us": "/ɪˈlɪsɪt/",
+    "cn": "v. 引出，诱出，探出（事实或反应）",
+    "en": "to evoke or draw out a reaction, answer, or fact from someone",
+    "syn": [
+      "evoke",
+      "draw out",
+      "extract",
+      "prompt"
+    ],
+    "ex_en": "Hiding the Chinese translation is designed to elicit active recall from your memory.",
+    "ex_cn": "隐藏中文释义旨在诱发你大脑的主动回忆。",
+    "tip": "注意区分：elicit（引出、诱出，动词）vs illicit（非法的，形容词）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0110",
+    "seq": 110,
+    "word": "eliminate",
+    "uk": "/ɪˈlɪmɪneɪt/",
+    "us": "/ɪˈlɪmɪneɪt/",
+    "cn": "v. 消除，排除，淘汰，根除",
+    "en": "to completely remove or get rid of something",
+    "syn": [
+      "remove",
+      "eradicate",
+      "exclude",
+      "weed out"
+    ],
+    "ex_en": "Swipe left on any word you already know well to eliminate it from future study rounds.",
+    "ex_cn": "对任何你已经烂熟于心的单词向左滑动，即可将其从后续学习轮次中剔除。",
+    "tip": "词根：e(出)+limin(门槛)+ate → 赶出门槛之外 → 淘汰，消除",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0111",
+    "seq": 111,
+    "word": "elusive",
+    "uk": "/ɪˈluːsɪv/",
+    "us": "/ɪˈluːsɪv/",
+    "cn": "adj. 难以捉摸的，难懂的，易忘的，难以找到的",
+    "en": "difficult to find, catch, or achieve; difficult to remember or recall",
+    "syn": [
+      "evasive",
+      "slippery",
+      "fleeting",
+      "intangible"
+    ],
+    "ex_en": "The exact nuance of an elusive word becomes clear when seen in a vivid sentence.",
+    "ex_cn": "一个难以捉摸的词汇的微妙含义，在生动的例句中会变得清晰明了。",
+    "tip": "词根：e(出)+lus(玩耍/溜走)+ive → 泥鳅一样溜走的 → 难以捉摸的，易忘的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0112",
+    "seq": 112,
+    "word": "emancipate",
+    "uk": "/ɪˈmænsɪpeɪt/",
+    "us": "/ɪˈmænsɪpeɪt/",
+    "cn": "v. 解放，使摆脱束缚，使获得自由",
+    "en": "to set free, especially from legal, social, or political restrictions",
+    "syn": [
+      "liberate",
+      "free",
+      "unshackle",
+      "release"
+    ],
+    "ex_en": "Offline capability emancipates learners from reliance on unstable network connections.",
+    "ex_cn": "离线能力将学习者从对不稳定网络连接的依赖中解放出来。",
+    "tip": "词根：e(出)+man(手)+cip(抓)+ate → 从紧抓的手中放出来 → 解放",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0113",
+    "seq": 113,
+    "word": "embody",
+    "uk": "/ɪmˈbɒdi/",
+    "us": "/ɪmˈbɑːdi/",
+    "cn": "v. 体现，具体表现；包含，收录",
+    "en": "to be an expression of or give a tangible or visible form to an idea, quality, or feeling",
+    "syn": [
+      "personify",
+      "exemplify",
+      "manifest",
+      "incorporate"
+    ],
+    "ex_en": "Voca's interface is crafted to embody clarity, focus, and effortless efficiency.",
+    "ex_cn": "Voca的界面设计旨在体现清晰、专注与流畅高效。",
+    "tip": "词根：em(使…)+body(身体/实体) → 赋予具体形体 → 体现，包含",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0114",
+    "seq": 114,
+    "word": "embrace",
+    "uk": "/ɪmˈbreɪs/",
+    "us": "/ɪmˈbreɪs/",
+    "cn": "v./n. 拥抱；欣然接受，采纳；包含",
+    "en": "to hold closely in one's arms; to accept or support willingly and enthusiastically",
+    "syn": [
+      "welcome",
+      "adopt",
+      "espouse",
+      "encompass"
+    ],
+    "ex_en": "Successful learners embrace mistakes during spelling tests as opportunities to strengthen memory.",
+    "ex_cn": "成功的学习者欣然接受拼写测试中的错误，将其视为强化记忆的契机。",
+    "tip": "词根：em(进入)+brace(双臂) → 揽入双臂之中 → 拥抱；欣然接受",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0115",
+    "seq": 115,
+    "word": "emerge",
+    "uk": "/ɪˈmɜːdʒ/",
+    "us": "/ɪˈmɜːrdʒ/",
+    "cn": "v. 浮现，出现；显露，为人所知；摆脱出来",
+    "en": "to move out of or away from something and come into view; to become apparent",
+    "syn": [
+      "appear",
+      "surface",
+      "arise",
+      "transpire"
+    ],
+    "ex_en": "Clear patterns of progress emerge after just seven days of Ebbinghaus review.",
+    "ex_cn": "仅仅经过七天的艾宾浩斯复习，清晰的进步轨迹就会显现出来。",
+    "tip": "词根：e(出)+merg(沉没)+e → 从水中浮出水面 → 浮现，出现",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0116",
+    "seq": 116,
+    "word": "empirical",
+    "uk": "/ɪmˈpɪrɪkl/",
+    "us": "/ɪmˈpɪrɪkl/",
+    "cn": "adj. 实证的，以经验或实验为依据的",
+    "en": "based on, concerned with, or verifiable by observation or experience rather than theory or pure logic",
+    "syn": [
+      "experimental",
+      "observational",
+      "practical",
+      "verifiable"
+    ],
+    "ex_en": "Every conclusion in our technical report is grounded in empirical verification.",
+    "ex_cn": "我们技术报告中的每一项结论都建立在实证验证的基础之上。",
+    "tip": "考研核心学术词：常与 theoretical（理论上的）对比出现，意为“实证的、实验验证的”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0117",
+    "seq": 117,
+    "word": "emulate",
+    "uk": "/ˈemjuleɪt/",
+    "us": "/ˈemjuleɪt/",
+    "cn": "v. 效仿，模仿并赶超；仿真，模拟",
+    "en": "to match or surpass a person or achievement, typically by imitation",
+    "syn": [
+      "imitate",
+      "rival",
+      "follow",
+      "simulate"
+    ],
+    "ex_en": "While drawing inspiration from classic apps, Voca does not merely emulate them.",
+    "ex_cn": "在汲取经典应用灵感的同时，Voca 并非简单地模仿它们。",
+    "tip": "词根：emul(竞争/赶超)+ate → 在学习借鉴中力求超越 → 效仿，仿真",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0118",
+    "seq": 118,
+    "word": "encompass",
+    "uk": "/ɪnˈkʌmpəs/",
+    "us": "/ɪnˈkʌmpəs/",
+    "cn": "v. 包含，涵盖，包括；包围，环绕",
+    "en": "to surround and have or hold within; to include comprehensively",
+    "syn": [
+      "include",
+      "comprise",
+      "embrace",
+      "surround"
+    ],
+    "ex_en": "The built-in lexicons encompass CET-4, CET-6, Postgraduate, and Academic English.",
+    "ex_cn": "内置词库涵盖了四级、六级、考研和学术英语词汇。",
+    "tip": "词根：en(进入)+compass(罗盘/范围) → 纳入罗盘范围之内 → 包含，涵盖",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0119",
+    "seq": 119,
+    "word": "endeavor",
+    "uk": "/ɪnˈdevə(r)/",
+    "us": "/ɪnˈdevər/",
+    "cn": "v./n. 努力，尽力，竭力；事业，尝试",
+    "en": "to try hard to do or achieve something; an attempt to achieve a goal",
+    "syn": [
+      "strive",
+      "aspire",
+      "undertaking",
+      "enterprise"
+    ],
+    "ex_en": "Mastering a foreign language is a rewarding lifelong endeavor.",
+    "ex_cn": "掌握一门外语是一项回报丰厚的终身事业。",
+    "tip": "助记：en(使)+deavor(职责) → 尽心尽力履行职责 → 努力，事业",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0120",
+    "seq": 120,
+    "word": "endow",
+    "uk": "/ɪnˈdaʊ/",
+    "us": "/ɪnˈdaʊ/",
+    "cn": "v. 赋予，赐予（天生能力或特质）；向…捐钱（设立基金）",
+    "en": "to provide with a quality, ability, or asset; to give or bequeath an income or property to",
+    "syn": [
+      "bestow",
+      "equip",
+      "bless",
+      "fund"
+    ],
+    "ex_en": "Human beings are endowed with a remarkable capacity for associative memory.",
+    "ex_cn": "人类天生具备非凡的联想记忆能力。",
+    "tip": "常考搭配：be endowed with...（天生具有…，被赋予…）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0121",
+    "seq": 121,
+    "word": "endure",
+    "uk": "/ɪnˈdjʊə(r)/",
+    "us": "/ɪnˈdʊr/",
+    "cn": "v. 忍受，忍耐；持久，持续存在",
+    "en": "to suffer something painful or difficult patiently; to remain in existence; to last",
+    "syn": [
+      "withstand",
+      "tolerate",
+      "persevere",
+      "last"
+    ],
+    "ex_en": "Knowledge acquired through spaced active recall will endure for years.",
+    "ex_cn": "通过间隔主动回忆获得的知识将持久保留多年。",
+    "tip": "词根：en(使)+dur(持久/坚硬)+e → 经受住考验持续下去 → 忍耐；持久",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0122",
+    "seq": 122,
+    "word": "enhance",
+    "uk": "/ɪnˈhɑːns/",
+    "us": "/ɪnˈhæns/",
+    "cn": "v. 提高，增强，增进（价值、质量或吸引力）",
+    "en": "to intensify, increase, or further improve the quality, value, or extent of",
+    "syn": [
+      "improve",
+      "augment",
+      "elevate",
+      "boost"
+    ],
+    "ex_en": "Bilingual example sentences and audio pronunciation greatly enhance memory retention.",
+    "ex_cn": "双语例句与语音朗读极大地增强了记忆留存率。",
+    "tip": "词根：en(使)+hanc(高)+e → 使推向更高水平 → 提高，增强",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0123",
+    "seq": 123,
+    "word": "enlightenment",
+    "uk": "/ɪnˈlaɪtnmənt/",
+    "us": "/ɪnˈlaɪtnmənt/",
+    "cn": "n. 启迪，启发，开导；启蒙运动",
+    "en": "the action of enlightening or the state of being enlightened; spiritual or intellectual awakening",
+    "syn": [
+      "illumination",
+      "insight",
+      "edification",
+      "awakening"
+    ],
+    "ex_en": "Reading philosophical classics brings intellectual enlightenment and critical perspective.",
+    "ex_cn": "阅读哲学经典能带来智识上的启迪与批判性视角。",
+    "tip": "词根：en(使)+light(光)+en+ment → 照亮心灵驱散蒙昧 → 启迪，启蒙",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0124",
+    "seq": 124,
+    "word": "entail",
+    "uk": "/ɪnˈteɪl/",
+    "us": "/ɪnˈteɪl/",
+    "cn": "v. 牵涉，需要，使成为必要；蕴含",
+    "en": "to involve something as a necessary or inevitable part or consequence",
+    "syn": [
+      "involve",
+      "require",
+      "necessitate",
+      "demand"
+    ],
+    "ex_en": "Building reliable dual-platform software entails rigorous testing and data validation.",
+    "ex_cn": "开发可靠的双平台软件需要严格的测试与数据验证。",
+    "tip": "考研高频词：A entails B 意为“A必然伴随/需要B”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0125",
+    "seq": 125,
+    "word": "entity",
+    "uk": "/ˈentəti/",
+    "us": "/ˈentəti/",
+    "cn": "n. 实体，独立存在物；组织，机构",
+    "en": "a thing with distinct and independent existence",
+    "syn": [
+      "organization",
+      "body",
+      "unit",
+      "being"
+    ],
+    "ex_en": "In database design, each vocabulary word is modeled as an independent entity.",
+    "ex_cn": "在数据库设计中，每个词汇都被建模为一个独立的实体。",
+    "tip": "词根：ent(存在)+ity → 客观实在之物 → 实体",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0126",
+    "seq": 126,
+    "word": "enumerate",
+    "uk": "/ɪˈnjuːməreɪt/",
+    "us": "/ɪˈnuːməreɪt/",
+    "cn": "v. 列举，枚举，逐一清点",
+    "en": "to mention a number of things one by one",
+    "syn": [
+      "list",
+      "itemize",
+      "catalog",
+      "recount"
+    ],
+    "ex_en": "The documentation enumerates all supported import file formats and keyboard shortcuts.",
+    "ex_cn": "文档逐一列举了所有受支持的导入文件格式和键盘快捷键。",
+    "tip": "词根：e(出)+numer(数字)+ate → 按数字一个个点出来 → 列举，枚举",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0127",
+    "seq": 127,
+    "word": "envision",
+    "uk": "/ɪnˈvɪʒn/",
+    "us": "/ɪnˈvɪʒn/",
+    "cn": "v. 设想，展望，想象（未来蓝图）",
+    "en": "to imagine as a future possibility; to visualize",
+    "syn": [
+      "foresee",
+      "envisage",
+      "conceive",
+      "picture"
+    ],
+    "ex_en": "We envision Voca as a lifelong companion for independent language learners.",
+    "ex_cn": "我们将 Voca 设想为自主语言学习者的终身伴侣。",
+    "tip": "词根：en(进入)+vision(视界/愿景) → 在脑海中描绘愿景 → 展望，设想",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0128",
+    "seq": 128,
+    "word": "ephemeral",
+    "uk": "/ɪˈfemərəl/",
+    "us": "/ɪˈfemərəl/",
+    "cn": "adj. 短暂的，转瞬即逝的，朝生暮死的",
+    "en": "lasting for a very short time",
+    "syn": [
+      "fleeting",
+      "transient",
+      "short-lived",
+      "evanescent"
+    ],
+    "ex_en": "Without Ebbinghaus review, cramming before an exam produces only ephemeral memory.",
+    "ex_cn": "如果没有艾宾浩斯式的复习，考前突击只能产生转瞬即逝的短暂记忆。",
+    "tip": "词根：epi(在…期间)+hemer(一天)+al → 只活一天的 → 转瞬即逝的",
+    "books": [
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0129",
+    "seq": 129,
+    "word": "equilibrium",
+    "uk": "/ˌiːkwɪˈlɪbriəm/",
+    "us": "/ˌiːkwɪˈlɪbriəm/",
+    "cn": "n. 平衡，均衡；心理平静",
+    "en": "a state in which opposing forces or influences are balanced",
+    "syn": [
+      "balance",
+      "symmetry",
+      "stability",
+      "poise"
+    ],
+    "ex_en": "An effective study plan maintains an equilibrium between new words and review tasks.",
+    "ex_cn": "高效的学习计划在新学词汇与复习任务之间保持均衡。",
+    "tip": "词根：equi(相等)+libr(天平/重量)+ium → 天平两端重量相等 → 平衡，均衡",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0130",
+    "seq": 130,
+    "word": "equivalent",
+    "uk": "/ɪˈkwɪvələnt/",
+    "us": "/ɪˈkwɪvələnt/",
+    "cn": "adj. 相等的，等价的，等效的；n. 对等物，对应词",
+    "en": "equal in value, amount, function, meaning, etc.",
+    "syn": [
+      "equal",
+      "comparable",
+      "counterpart",
+      "tantamount"
+    ],
+    "ex_en": "Not every English word has a single exact one-to-one equivalent in Chinese.",
+    "ex_cn": "并非每个英语单词在汉语中都有唯一完全对应的词。",
+    "tip": "词根：equi(相等)+val(价值)+ent → 价值完全相等的 → 等价的；对应词",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0131",
+    "seq": 131,
+    "word": "eradicate",
+    "uk": "/ɪˈrædɪkeɪt/",
+    "us": "/ɪˈrædɪkeɪt/",
+    "cn": "v. 根除，根绝，彻底消灭",
+    "en": "to destroy completely; to put an end to",
+    "syn": [
+      "eliminate",
+      "exterminate",
+      "uproot",
+      "abolish"
+    ],
+    "ex_en": "Repeated spelling challenges help eradicate stubborn spelling mistakes.",
+    "ex_cn": "反复的拼写挑战有助于根除顽固的拼写错误。",
+    "tip": "词根：e(出)+radic(根)+ate → 连根拔起 → 根除，杜绝",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0132",
+    "seq": 132,
+    "word": "erroneous",
+    "uk": "/ɪˈrəʊniəs/",
+    "us": "/ɪˈroʊniəs/",
+    "cn": "adj. 错误的，不正确的",
+    "en": "wrong; incorrect; based on mistaken belief",
+    "syn": [
+      "incorrect",
+      "mistaken",
+      "fallacious",
+      "inaccurate"
+    ],
+    "ex_en": "The system immediately highlights erroneous letters in red during spelling mode.",
+    "ex_cn": "在拼词模式中，系统会立即用红色高亮显示错误的字母。",
+    "tip": "词根：err(错误)+oneous → 犯错的 → 错误的，不正确的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0133",
+    "seq": 133,
+    "word": "escalate",
+    "uk": "/ˈeskəleɪt/",
+    "us": "/ˈeskəleɪt/",
+    "cn": "v. （使）逐步升级，（使）加剧，不断恶化",
+    "en": "to increase rapidly; to become or cause to become more intense or serious",
+    "syn": [
+      "intensify",
+      "mount",
+      "spiral",
+      "heighten"
+    ],
+    "ex_en": "If you skip three days of review, your backlog of unreviewed lists will quickly escalate.",
+    "ex_cn": "如果你跳过三天的复习，积压的未复习词表就会迅速增加。",
+    "tip": "助记：来自 escalator（自动扶梯）→ 像坐扶梯一样层层升高 → 升级，加剧",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0134",
+    "seq": 134,
+    "word": "essential",
+    "uk": "/ɪˈsenʃl/",
+    "us": "/ɪˈsenʃl/",
+    "cn": "adj. 必不可少的，极其重要的；本质的；n. 要素，必需品",
+    "en": "absolutely necessary; extremely important; fundamental",
+    "syn": [
+      "indispensable",
+      "vital",
+      "fundamental",
+      "requisite"
+    ],
+    "ex_en": "Local data persistence is essential for a truly offline vocabulary application.",
+    "ex_cn": "本地数据持久化对于真正离线的背单词应用来说是必不可少的。",
+    "tip": "词根：ess(存在/本质)+ent+ial → 构成事物本质的 → 本质的，必不可少的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0135",
+    "seq": 135,
+    "word": "establish",
+    "uk": "/ɪˈstæblɪʃ/",
+    "us": "/ɪˈstæblɪʃ/",
+    "cn": "v. 建立，创立；确立，证实",
+    "en": "to set up on a firm or permanent basis; to show something to be true or certain",
+    "syn": [
+      "found",
+      "institute",
+      "confirm",
+      "demonstrate"
+    ],
+    "ex_en": "First, establish a realistic daily target that fits your schedule.",
+    "ex_cn": "首先，确立一个切合你日程安排的每日目标。",
+    "tip": "词根：e+stabl(稳定)+ish → 使稳固地立起来 → 建立，证实",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0136",
+    "seq": 136,
+    "word": "evaluate",
+    "uk": "/ɪˈvæljueɪt/",
+    "us": "/ɪˈvæljueɪt/",
+    "cn": "v. 评估，评价；求…的值",
+    "en": "to form an idea of the amount, number, or value of; to assess",
+    "syn": [
+      "assess",
+      "appraise",
+      "gauge",
+      "estimate"
+    ],
+    "ex_en": "Self-testing in single-language mode lets you honestly evaluate your familiarity.",
+    "ex_cn": "在单语模式下自测能让你诚实地评估自己对单词的熟悉程度。",
+    "tip": "词根：e(出)+valu(价值)+ate → 评定出某物的价值 → 评估，评价",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0137",
+    "seq": 137,
+    "word": "evoke",
+    "uk": "/ɪˈvəʊk/",
+    "us": "/ɪˈvoʊk/",
+    "cn": "v. 唤起，引起，勾起（记忆、感情或图像）",
+    "en": "to bring or recall a feeling, memory, or image to the conscious mind",
+    "syn": [
+      "arouse",
+      "awaken",
+      "conjure",
+      "elicit"
+    ],
+    "ex_en": "Hearing a word pronounced in a natural sentence helps evoke its meaning instantly.",
+    "ex_cn": "在自然例句中听到单词发音有助于瞬间唤起它的词义。",
+    "tip": "词根：e(出)+vok(喊/呼唤)+e → 把内心深处的记忆呼唤出来 → 唤起，勾起",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0138",
+    "seq": 138,
+    "word": "exacerbate",
+    "uk": "/ɪɡˈzæsəbeɪt/",
+    "us": "/ɪɡˈzæsərbeɪt/",
+    "cn": "v. 使恶化，使加重，使加剧",
+    "en": "to make a problem, bad situation, or negative feeling worse",
+    "syn": [
+      "aggravate",
+      "worsen",
+      "compound",
+      "intensify"
+    ],
+    "ex_en": "Rote memorization without context only exacerbates learner boredom and fatigue.",
+    "ex_cn": "脱离语境的死记硬背只会加剧学习者的枯燥与疲惫感。",
+    "tip": "词根：ex(加强)+acerb(酸苦/尖刻)+ate → 使情况变得更苦涩 → 使恶化，加剧",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0139",
+    "seq": 139,
+    "word": "exaggerate",
+    "uk": "/ɪɡˈzædʒəreɪt/",
+    "us": "/ɪɡˈzædʒəreɪt/",
+    "cn": "v. 夸大，夸张，言过其实",
+    "en": "to represent something as being larger, better, or worse than it really is",
+    "syn": [
+      "overstate",
+      "magnify",
+      "inflate",
+      "embellish"
+    ],
+    "ex_en": "It is impossible to exaggerate the importance of vocabulary in academic reading.",
+    "ex_cn": "在学术阅读中，词汇的重要性无论怎样强调都不为过。",
+    "tip": "词根：ex(出)+agger(堆积)+ate → 堆得高出实际 → 夸大，夸张",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0140",
+    "seq": 140,
+    "word": "exceed",
+    "uk": "/ɪkˈsiːd/",
+    "us": "/ɪkˈsiːd/",
+    "cn": "v. 超过，超出；超越（限制或权限）",
+    "en": "to be greater in number or size than a quantity, number, or other measurable thing",
+    "syn": [
+      "surpass",
+      "outstrip",
+      "transcend",
+      "top"
+    ],
+    "ex_en": "When a single file exceeds the 10 MB transfer limit, alternative local synthesis is required.",
+    "ex_cn": "当单个文件超出10MB传输上限时，需要采用替代的本地构建方案。",
+    "tip": "词根：ex(出)+ceed(走) → 走出界限之外 → 超过，超出",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0141",
+    "seq": 141,
+    "word": "exception",
+    "uk": "/ɪkˈsepʃn/",
+    "us": "/ɪkˈsepʃn/",
+    "cn": "n. 例外，除外；异议",
+    "en": "a person or thing that is excluded from a general statement or does not follow a rule",
+    "syn": [
+      "anomaly",
+      "deviation",
+      "exclusion",
+      "omission"
+    ],
+    "ex_en": "Every rule in English grammar seems to have at least one interesting exception.",
+    "ex_cn": "英语语法中的每一条规则似乎都至少有一个有趣的例外。",
+    "tip": "词根：ex(出)+cept(拿)+ion → 单独拿出来不按常理算的 → 例外",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0142",
+    "seq": 142,
+    "word": "exemplify",
+    "uk": "/ɪɡˈzemplɪfaɪ/",
+    "us": "/ɪɡˈzemplɪfaɪ/",
+    "cn": "v. 是…的典范（或典型）；举例说明",
+    "en": "to be a typical example of; to give an example of; to illustrate by giving examples",
+    "syn": [
+      "illustrate",
+      "epitomize",
+      "embody",
+      "demonstrate"
+    ],
+    "ex_en": "Well-chosen sentences exemplify how a word functions in real communication.",
+    "ex_cn": "精选的例句能够举例说明单词在真实交流中是如何运用的。",
+    "tip": "词根：exempl(榜样/例子)+ify(使…) → 用例子加以说明；成为典范",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0143",
+    "seq": 143,
+    "word": "exhaust",
+    "uk": "/ɪɡˈzɔːst/",
+    "us": "/ɪɡˈzɔːst/",
+    "cn": "v. 使筋疲力尽；耗尽，用光；详尽探讨；n. 废气",
+    "en": "to drain of strength or energy; to use up completely; to explore a subject thoroughly",
+    "syn": [
+      "deplete",
+      "drain",
+      "fatigue",
+      "tire"
+    ],
+    "ex_en": "Short, focused 15-minute study sessions prevent you from exhausting your attention span.",
+    "ex_cn": "简短专注的15分钟学习单元能防止你耗尽注意力。",
+    "tip": "考研熟词僻义：exhaust all possibilities 意为“穷尽/详尽探讨所有可能性”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0144",
+    "seq": 144,
+    "word": "explicit",
+    "uk": "/ɪkˈsplɪsɪt/",
+    "us": "/ɪkˈsplɪsɪt/",
+    "cn": "adj. 明确的，清楚的，直截了当的；详述的",
+    "en": "stated clearly and in detail, leaving no room for confusion or doubt",
+    "syn": [
+      "clear-cut",
+      "definite",
+      "unambiguous",
+      "express"
+    ],
+    "ex_en": "Our test report makes an explicit distinction between verified facts and inferences.",
+    "ex_cn": "我们的测试报告在已验证事实与合理推断之间做出了明确的区分。",
+    "tip": "词根：ex(出)+plic(折叠)+it → 把折叠的东西完全展开 → 明确的（反义：implicit 隐含的）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0145",
+    "seq": 145,
+    "word": "exploit",
+    "uk": "/ɪkˈsplɔɪt/",
+    "us": "/ɪkˈsplɔɪt/",
+    "cn": "v. 开发，利用，发挥；剥削；n. 英勇事迹，功绩",
+    "en": "to make full use of and derive benefit from a resource; to use unfairly",
+    "syn": [
+      "utilize",
+      "harness",
+      "leverage",
+      "capitalize on"
+    ],
+    "ex_en": "Voca exploits the spacing effect of human memory to maximize learning efficiency.",
+    "ex_cn": "Voca 充分利用人类记忆的间隔效应，将学习效率最大化。",
+    "tip": "考研高频词：中性义为“开发、充分利用（资源/机制）”，贬义为“剥削”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0146",
+    "seq": 146,
+    "word": "facilitate",
+    "uk": "/fəˈsɪlɪteɪt/",
+    "us": "/fəˈsɪlɪteɪt/",
+    "cn": "v. 促进，推动，使便利，使容易",
+    "en": "to make an action or process easy or easier",
+    "syn": [
+      "assist",
+      "expedite",
+      "ease",
+      "further"
+    ],
+    "ex_en": "Keyboard shortcuts on Windows facilitate rapid navigation through word lists.",
+    "ex_cn": "Windows端的键盘快捷键为快速浏览单词列表提供了极大便利。",
+    "tip": "词根：facil(容易)+itate → 使事情变得容易 → 促进，使便利",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0147",
+    "seq": 147,
+    "word": "feasible",
+    "uk": "/ˈfiːzəbl/",
+    "us": "/ˈfiːzəbl/",
+    "cn": "adj. 可行的，行得通的，办得到的",
+    "en": "possible to do easily or conveniently; likely or probable",
+    "syn": [
+      "practicable",
+      "viable",
+      "workable",
+      "achievable"
+    ],
+    "ex_en": "Dividing 3,000 words into 15 manageable lists makes the 30-day goal completely feasible.",
+    "ex_cn": "将3000词划分为15个易于管理的词表，使30天攻克目标完全可行。",
+    "tip": "词根：feas(做)+ible → 能够做得到的 → 可行的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0148",
+    "seq": 148,
+    "word": "fluctuate",
+    "uk": "/ˈflʌktʃueɪt/",
+    "us": "/ˈflʌktʃueɪt/",
+    "cn": "v. 波动，起伏，涨落，动摇",
+    "en": "to rise and fall irregularly in number or amount",
+    "syn": [
+      "vary",
+      "oscillate",
+      "waver",
+      "seesaw"
+    ],
+    "ex_en": "Even when your daily free time fluctuates, you can adjust the list size flexibly.",
+    "ex_cn": "即使你每天的空闲时间有所波动，你也可以灵活调整词表大小。",
+    "tip": "词根：fluct(波浪/流动)+uate → 像海浪一样上下起伏 → 波动，涨落",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0149",
+    "seq": 149,
+    "word": "formulate",
+    "uk": "/ˈfɔːmjuleɪt/",
+    "us": "/ˈfɔːrmjuleɪt/",
+    "cn": "v. 制定，规划，构想；确切表达；用公式表示",
+    "en": "to create or prepare methodically; to express an idea in a concise or systematic way",
+    "syn": [
+      "devise",
+      "frame",
+      "articulate",
+      "codify"
+    ],
+    "ex_en": "Before writing any code, we formulate a comprehensive architectural plan.",
+    "ex_cn": "在编写任何代码之前，我们先制定一份周密的技术架构方案。",
+    "tip": "词根：formul(公式/规则)+ate → 形成系统的规则或方案 → 制定，确切表达",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0150",
+    "seq": 150,
+    "word": "foster",
+    "uk": "/ˈfɒstə(r)/",
+    "us": "/ˈfɑːstər/",
+    "cn": "v. 培养，促进，助长；养育，代养；adj. 寄养的",
+    "en": "to encourage or promote the development of something; to bring up a child",
+    "syn": [
+      "cultivate",
+      "nurture",
+      "promote",
+      "encourage"
+    ],
+    "ex_en": "Immediate visual and audio feedback helps foster a lasting daily study habit.",
+    "ex_cn": "即时的视觉和音效反馈有助于培养持久的每日学习习惯。",
+    "tip": "助记：与 food（食物）同源 → 给食物喂养长大 → 养育；培养，促进",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0151",
+    "seq": 151,
+    "word": "fundamental",
+    "uk": "/ˌfʌndəˈmentl/",
+    "us": "/ˌfʌndəˈmentl/",
+    "cn": "adj. 基本的，根本的，核心的；n. 基本原理，基础",
+    "en": "forming a necessary base or core; of central importance",
+    "syn": [
+      "basic",
+      "foundational",
+      "elementary",
+      "cardinal"
+    ],
+    "ex_en": "Offline independence is a fundamental design requirement of the Voca project.",
+    "ex_cn": "离线独立运行是 Voca 项目的一项根本设计要求。",
+    "tip": "词根：fund(底部/基础)+ament+al → 作为地基的 → 根本的，基础的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0152",
+    "seq": 152,
+    "word": "genuine",
+    "uk": "/ˈdʒenjuɪn/",
+    "us": "/ˈdʒenjuɪn/",
+    "cn": "adj. 真正的，名副其实的；真诚的，真心的",
+    "en": "truly what something is said to be; authentic; sincere",
+    "syn": [
+      "authentic",
+      "real",
+      "sincere",
+      "unfeigned"
+    ],
+    "ex_en": "Deliverables must be genuine executable packages rather than static mockups.",
+    "ex_cn": "交付物必须是真正可运行的程序包，而非静态界面原型。",
+    "tip": "词根：genu(出生/血统)+ine → 血统纯正的 → 真正的，真诚的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0153",
+    "seq": 153,
+    "word": "hamper",
+    "uk": "/ˈhæmpə(r)/",
+    "us": "/ˈhæmpər/",
+    "cn": "v. 妨碍，阻碍，牵制；n. 有盖提篮",
+    "en": "to hinder or impede the movement or progress of",
+    "syn": [
+      "hinder",
+      "impede",
+      "obstruct",
+      "thwart"
+    ],
+    "ex_en": "Cluttered interfaces and slow startup times hamper learning efficiency.",
+    "ex_cn": "杂乱的界面和缓慢的启动速度会妨碍学习效率。",
+    "tip": "考研高频词：常与 hinder / impede 同义替换，意为“阻碍、牵制”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0154",
+    "seq": 154,
+    "word": "harness",
+    "uk": "/ˈhɑːnɪs/",
+    "us": "/ˈhɑːrnɪs/",
+    "cn": "v. 控制并利用（自然力或资源）；给（马）套挽具；n. 挽具，安全带",
+    "en": "to control and make use of natural resources or power to produce energy or achieve a result",
+    "syn": [
+      "utilize",
+      "exploit",
+      "channel",
+      "mobilize"
+    ],
+    "ex_en": "Voca harnesses the Ebbinghaus forgetting curve to schedule optimal review intervals.",
+    "ex_cn": "Voca 利用艾宾浩斯遗忘曲线来规划最佳的复习间隔。",
+    "tip": "助记：原指给骏马套上马具使其拉车，引申为“驾驭、有效利用（力量/规律）”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0155",
+    "seq": 155,
+    "word": "hierarchy",
+    "uk": "/ˈhaɪərɑːki/",
+    "us": "/ˈhaɪərɑːrki/",
+    "cn": "n. 等级制度；层次体系，层级结构",
+    "en": "a system or organization in which people or groups are ranked one above the other",
+    "syn": [
+      "ranking",
+      "pecking order",
+      "stratification",
+      "grading"
+    ],
+    "ex_en": "Clear typographic hierarchy separates the headword, phonetics, definitions, and examples.",
+    "ex_cn": "清晰的排版层级将单词词目、音标、释义和例句分离开来。",
+    "tip": "词根：hier(神圣/高级)+arch(统治)+y → 层层管辖的体系 → 层级结构，等级体系",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0156",
+    "seq": 156,
+    "word": "holistic",
+    "uk": "/həʊˈlɪstɪk/",
+    "us": "/hoʊˈlɪstɪk/",
+    "cn": "adj. 整体的，全面的，全局的",
+    "en": "characterized by comprehension of the parts of something as intimately interconnected",
+    "syn": [
+      "comprehensive",
+      "integrated",
+      "unified",
+      "whole"
+    ],
+    "ex_en": "Combining listening, reading, and spelling provides a holistic approach to word mastery.",
+    "ex_cn": "将听音、认读与拼写相结合，提供了一种掌握词汇的整体方法。",
+    "tip": "助记：与 whole（整体）同源 → 从全局和整体看待事物的 → 整体的",
+    "books": [
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0157",
+    "seq": 157,
+    "word": "hypothesis",
+    "uk": "/haɪˈpɒθəsɪs/",
+    "us": "/haɪˈpɑːθəsɪs/",
+    "cn": "n. 假说，假设，前提（复数 hypotheses）",
+    "en": "a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation",
+    "syn": [
+      "theory",
+      "premise",
+      "postulate",
+      "proposition"
+    ],
+    "ex_en": "Scientists formulate a testable hypothesis before conducting controlled experiments.",
+    "ex_cn": "科学家在进行对照实验之前会提出一个可检验的假说。",
+    "tip": "词根：hypo(在…下面)+thesis(放置/论点) → 放在底下作为起点的前提 → 假说，假设",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0158",
+    "seq": 158,
+    "word": "illuminate",
+    "uk": "/ɪˈluːmɪneɪt/",
+    "us": "/ɪˈluːmɪneɪt/",
+    "cn": "v. 照亮，照明；阐明，启发，使清晰易懂",
+    "en": "to light up; to help to clarify or explain a subject or matter",
+    "syn": [
+      "clarify",
+      "elucidate",
+      "enlighten",
+      "brighten"
+    ],
+    "ex_en": "Etymological notes illuminate the hidden connections between seemingly unrelated words.",
+    "ex_cn": "词源注释阐明了看似无关的单词之间隐藏的内在联系。",
+    "tip": "词根：il(进入)+lumin(光)+ate → 把光投射进去 → 照亮；阐明，启发",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0159",
+    "seq": 159,
+    "word": "immerse",
+    "uk": "/ɪˈmɜːs/",
+    "us": "/ɪˈmɜːrs/",
+    "cn": "v. 使浸没；使沉浸在，使全神贯注于",
+    "en": "to dip or submerge in a liquid; to involve oneself deeply in a particular activity",
+    "syn": [
+      "absorb",
+      "engross",
+      "submerge",
+      "steep"
+    ],
+    "ex_en": "Card mode allows you to immerse yourself in one word at a time without distraction.",
+    "ex_cn": "卡片模式让你可以毫无干扰地一次沉浸于一个单词的学习中。",
+    "tip": "常考搭配：immerse oneself in... / be immersed in...（沉浸于…，全神贯注于…）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0160",
+    "seq": 160,
+    "word": "imperative",
+    "uk": "/ɪmˈperətɪv/",
+    "us": "/ɪmˈperətɪv/",
+    "cn": "adj. 势在必行的，极其重要的，必要的；祈使的；n. 必要的事，当务之急",
+    "en": "of vital importance; crucial; giving an authoritative command",
+    "syn": [
+      "vital",
+      "essential",
+      "urgent",
+      "mandatory"
+    ],
+    "ex_en": "Protecting user data across software updates is an absolute imperative.",
+    "ex_cn": "在软件升级过程中保护用户数据完整是绝对的当务之急。",
+    "tip": "词根：im+per(命令/帝王)+ative → 如同皇命般必须执行的 → 势在必行的；祈使语气",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0161",
+    "seq": 161,
+    "word": "implement",
+    "uk": "/ˈɪmplɪment/",
+    "us": "/ˈɪmplɪment/",
+    "cn": "v. 实施，执行，实现，贯彻；n. 工具，器具",
+    "en": "to put a decision, plan, agreement, or system into effect; a tool or utensil",
+    "syn": [
+      "execute",
+      "carry out",
+      "enact",
+      "realize"
+    ],
+    "ex_en": "We implemented a dual-layer persistence engine using LocalStorage and IndexedDB.",
+    "ex_cn": "我们使用 LocalStorage 和 IndexedDB 实现了双层持久化存储引擎。",
+    "tip": "考研高频词：作动词为“实施、实现”，作名词为“工具、器具”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0162",
+    "seq": 162,
+    "word": "implicit",
+    "uk": "/ɪmˈplɪsɪt/",
+    "us": "/ɪmˈplɪsɪt/",
+    "cn": "adj. 含蓄的，隐含的，不言而喻的；绝对的",
+    "en": "suggested though not directly expressed; always to be found in; essentially connected with",
+    "syn": [
+      "implied",
+      "tacit",
+      "unspoken",
+      "inherent"
+    ],
+    "ex_en": "Understanding implicit cultural connotations requires reading authentic examples.",
+    "ex_cn": "理解隐含的文化内涵需要阅读地道的例句。",
+    "tip": "词根：im(进入)+plic(折叠)+it → 折在里面没露出来的 → 隐含的（反义：explicit 明确的）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0163",
+    "seq": 163,
+    "word": "incentive",
+    "uk": "/ɪnˈsentɪv/",
+    "us": "/ɪnˈsentɪv/",
+    "cn": "n. 激励，刺激，诱因，鼓励；adj. 激励的",
+    "en": "a thing that motivates or encourages one to do something",
+    "syn": [
+      "motivation",
+      "stimulus",
+      "inducement",
+      "spur"
+    ],
+    "ex_en": "Tracking your daily streak and watching the unfamiliar list shrink provides a strong incentive.",
+    "ex_cn": "追踪每日连胜天数并看着生词列表不断缩小，能提供强大的学习动力。",
+    "tip": "词根：in(进入)+cent(唱歌)+ive → 奏起战歌鼓舞士气 → 激励，诱因",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0164",
+    "seq": 164,
+    "word": "incorporate",
+    "uk": "/ɪnˈkɔːpəreɪt/",
+    "us": "/ɪnˈkɔːrpəreɪt/",
+    "cn": "v. 包含，吸收，把…并入；注册成立公司",
+    "en": "to take in or contain something as part of a whole; to include",
+    "syn": [
+      "integrate",
+      "include",
+      "embody",
+      "assimilate"
+    ],
+    "ex_en": "Voca incorporates the best design ideas from minimalist cards and Ebbinghaus planners.",
+    "ex_cn": "Voca 融合吸收了极简卡片与艾宾浩斯规划表的精华设计理念。",
+    "tip": "词根：in(进入)+corpor(身体/整体)+ate → 并入同一个整体 → 纳入，包含",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0165",
+    "seq": 165,
+    "word": "indispensable",
+    "uk": "/ˌɪndɪˈspensəbl/",
+    "us": "/ˌɪndɪˈspensəbl/",
+    "cn": "adj. 不可或缺的，必不可少的，绝对必要的",
+    "en": "absolutely necessary; essential",
+    "syn": [
+      "essential",
+      "vital",
+      "crucial",
+      "requisite"
+    ],
+    "ex_en": "An accurate phonetic guide is an indispensable tool for self-taught learners.",
+    "ex_cn": "准确的音标指南是自学者不可或缺的工具。",
+    "tip": "词根：in(不)+dispens(免除/省掉)+able → 绝不能省掉的 → 不可或缺的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0166",
+    "seq": 166,
+    "word": "inevitable",
+    "uk": "/ɪnˈevɪtəbl/",
+    "us": "/ɪnˈevɪtəbl/",
+    "cn": "adj. 不可避免的，必然发生的",
+    "en": "certain to happen; unavoidable",
+    "syn": [
+      "unavoidable",
+      "inescapable",
+      "inexorable",
+      "certain"
+    ],
+    "ex_en": "Forgetting is an inevitable biological process unless countered by spaced review.",
+    "ex_cn": "遗忘是不可避免的生理过程，除非通过间隔复习加以对抗。",
+    "tip": "词根：in(不)+evit(避免)+able → 无法避免的 → 必然的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0167",
+    "seq": 167,
+    "word": "infer",
+    "uk": "/ɪnˈfɜː(r)/",
+    "us": "/ɪnˈfɜːr/",
+    "cn": "v. 推断，推论，推理",
+    "en": "to deduce or conclude information from evidence and reasoning rather than from explicit statements",
+    "syn": [
+      "deduce",
+      "conclude",
+      "surmise",
+      "gather"
+    ],
+    "ex_en": "Never infer unverified functionality without inspecting the actual artifact or documentation.",
+    "ex_cn": "在未检查实际文件或文档之前，切勿凭空推断未经证实的功能。",
+    "tip": "词根：in(进入)+fer(带来) → 从已知事实带出结论 → 推断，推论",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0168",
+    "seq": 168,
+    "word": "inherent",
+    "uk": "/ɪnˈhɪərənt/",
+    "us": "/ɪnˈhɪrənt/",
+    "cn": "adj. 内在的，固有的，与生俱来的",
+    "en": "existing in something as a permanent, essential, or characteristic attribute",
+    "syn": [
+      "intrinsic",
+      "innate",
+      "built-in",
+      "inborn"
+    ],
+    "ex_en": "Platform sandboxing has inherent constraints that must be documented transparently.",
+    "ex_cn": "平台沙箱具有固有的环境限制，必须透明如实地加以说明。",
+    "tip": "词根：in(在里面)+her(粘附)+ent → 本身就粘附在里面的 → 固有的，内在的（常接 in）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0169",
+    "seq": 169,
+    "word": "inhibit",
+    "uk": "/ɪnˈhɪbɪt/",
+    "us": "/ɪnˈhɪbɪt/",
+    "cn": "v. 抑制，阻止，妨碍；使拘谨",
+    "en": "to hinder, restrain, or prevent an action or process",
+    "syn": [
+      "impede",
+      "restrain",
+      "curb",
+      "suppress"
+    ],
+    "ex_en": "Fear of making mistakes can inhibit learners from practicing spoken English.",
+    "ex_cn": "害怕犯错可能会抑制学习者练习英语口语的积极性。",
+    "tip": "词根：in(里)+hibit(拿住/按住) → 按住不让动 → 抑制，阻止",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0170",
+    "seq": 170,
+    "word": "initiate",
+    "uk": "/ɪˈnɪʃieɪt/",
+    "us": "/ɪnˈɪʃieɪt/",
+    "cn": "v. 开始，发起，创始；使初步了解；n. 新加入者",
+    "en": "to cause a process or action to begin",
+    "syn": [
+      "commence",
+      "launch",
+      "instigate",
+      "pioneer"
+    ],
+    "ex_en": "Click 'Start Today's Plan' to initiate your scheduled Ebbinghaus learning session.",
+    "ex_cn": "点击“开始今日计划”即可启动你今日规划的艾宾浩斯学习单元。",
+    "tip": "词根：in(进入)+it(走)+iate → 迈出第一步 → 开始，发起",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0171",
+    "seq": 171,
+    "word": "innovative",
+    "uk": "/ˈɪnəveɪtɪv/",
+    "us": "/ˈɪnəveɪtɪv/",
+    "cn": "adj. 创新的，革新的，新颖的",
+    "en": "featuring new methods; advanced and original",
+    "syn": [
+      "groundbreaking",
+      "original",
+      "inventive",
+      "novel"
+    ],
+    "ex_en": "The five-card letter selector provides an innovative tactile way to practice spelling.",
+    "ex_cn": "五卡片字母点选器为练习单词拼写提供了一种新颖的触控交互方式。",
+    "tip": "词根：in(内)+nov(新)+ative → 由内而外推陈出新的 → 创新的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0172",
+    "seq": 172,
+    "word": "integrity",
+    "uk": "/ɪnˈteɡrəti/",
+    "us": "/ɪnˈteɡrəti/",
+    "cn": "n. 正直，诚实；完整性，完好无损",
+    "en": "the quality of being honest and having strong moral principles; the state of being whole and undivided",
+    "syn": [
+      "honesty",
+      "rectitude",
+      "wholeness",
+      "soundness"
+    ],
+    "ex_en": "Before exporting backups, the system verifies the structural integrity of all user records.",
+    "ex_cn": "在导出备份之前，系统会校验所有用户记录的结构完整性。",
+    "tip": "考研高频双义词：既指人的品格“正直、诚信”，也指数据/系统的“完整性、健全”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0173",
+    "seq": 173,
+    "word": "intelligible",
+    "uk": "/ɪnˈtelɪdʒəbl/",
+    "us": "/ɪnˈtelɪdʒəbl/",
+    "cn": "adj. 可理解的，清晰易懂的，明白的",
+    "en": "able to be understood; comprehensible",
+    "syn": [
+      "comprehensible",
+      "understandable",
+      "lucid",
+      "clear"
+    ],
+    "ex_en": "Technical architecture guides should be written in clear, intelligible prose.",
+    "ex_cn": "技术架构指南应当用清晰易懂的语言编写。",
+    "tip": "词根：intel(在…之间)+lig(选择/读)+ible → 能够读懂理解的 → 清晰易懂的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0174",
+    "seq": 174,
+    "word": "intricate",
+    "uk": "/ˈɪntrɪkət/",
+    "us": "/ˈɪntrɪkət/",
+    "cn": "adj. 错综复杂的，精细的，难懂的",
+    "en": "very complicated or detailed",
+    "syn": [
+      "complex",
+      "elaborate",
+      "convoluted",
+      "sophisticated"
+    ],
+    "ex_en": "An intricate network of synonyms and roots links thousands of English words together.",
+    "ex_cn": "错综复杂的同义词与词根网络将成千上万个英语单词联系在一起。",
+    "tip": "词根：in(进入)+tric(障碍/纠缠)+ate → 缠绕在一起的 → 错综复杂的，精细的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0175",
+    "seq": 175,
+    "word": "intrinsic",
+    "uk": "/ɪnˈtrɪnzɪk/",
+    "us": "/ɪnˈtrɪnzɪk/",
+    "cn": "adj. 固有的，内在的，本身的",
+    "en": "belonging naturally; essential",
+    "syn": [
+      "inherent",
+      "innate",
+      "essential",
+      "built-in"
+    ],
+    "ex_en": "Curiosity and the joy of mastery provide intrinsic motivation for lifelong learning.",
+    "ex_cn": "好奇心与掌握知识的喜悦为终身学习提供了内在动力。",
+    "tip": "常考对比：intrinsic value（内在价值）vs extrinsic reward（外在奖励）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0176",
+    "seq": 176,
+    "word": "intuitive",
+    "uk": "/ɪnˈtjuːɪtɪv/",
+    "us": "/ɪnˈtuːɪtɪv/",
+    "cn": "adj. 直觉的；直观易用的，无需教程即懂的",
+    "en": "using or based on what one feels to be true even without conscious reasoning; easy to understand or operate without explicit instruction",
+    "syn": [
+      "instinctive",
+      "natural",
+      "user-friendly",
+      "self-explanatory"
+    ],
+    "ex_en": "Swipe gestures and keyboard shortcuts make Voca's interface immediately intuitive.",
+    "ex_cn": "滑动手势与键盘快捷键使 Voca 的界面直观易用。",
+    "tip": "词根：in(向内)+tuit(看/守护)+ive → 内心一眼看穿的 → 直觉的；直观易用的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0177",
+    "seq": 177,
+    "word": "jeopardize",
+    "uk": "/ˈdʒepədaɪz/",
+    "us": "/ˈdʒepərdaɪz/",
+    "cn": "v. 危及，损害，使处于危险境地",
+    "en": "to put someone or something into a situation in which there is a danger of loss, harm, or failure",
+    "syn": [
+      "endanger",
+      "threaten",
+      "imperil",
+      "compromise"
+    ],
+    "ex_en": "Using unauthorized commercial dictionary data would jeopardize legal compliance.",
+    "ex_cn": "使用未经授权的商业词典数据会危及项目的法律合规性。",
+    "tip": "词根：jeopard(危险)+ize → 使陷入危险 → 危及，损害",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0178",
+    "seq": 178,
+    "word": "legitimate",
+    "uk": "/lɪˈdʒɪtɪmət/",
+    "us": "/lɪˈdʒɪtɪmət/",
+    "cn": "adj. 合法的，依法的；合理的，正当的；v. 使合法",
+    "en": "conforming to the law or to rules; able to be defended with logic or justification",
+    "syn": [
+      "lawful",
+      "legal",
+      "valid",
+      "justifiable"
+    ],
+    "ex_en": "All built-in lexicons are compiled from legitimate open-source and public-syllabus sources.",
+    "ex_cn": "所有内置词库均汇编自合法合规的开源词库与公共考纲资源。",
+    "tip": "词根：leg(法律)+itim+ate → 符合法律与事理的 → 合法的，正当合理的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0179",
+    "seq": 179,
+    "word": "lucid",
+    "uk": "/ˈluːsɪd/",
+    "us": "/ˈluːsɪd/",
+    "cn": "adj. 表达清楚的，清晰易懂的；头脑清醒的",
+    "en": "expressed clearly; easy to understand; showing ability to think clearly",
+    "syn": [
+      "clear",
+      "articulate",
+      "coherent",
+      "intelligible"
+    ],
+    "ex_en": "Each word entry includes a lucid English definition alongside concise Chinese meanings.",
+    "ex_cn": "每个词条都包含清晰易懂的英文释义以及简明的中文释义。",
+    "tip": "词根：luc(光)+id → 透亮的 → 清晰易懂的，清醒的",
+    "books": [
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0180",
+    "seq": 180,
+    "word": "manifest",
+    "uk": "/ˈmænɪfest/",
+    "us": "/ˈmænɪfest/",
+    "cn": "v. 表明，清楚显示，显现；adj. 明显的，显而易见的；n. 载货单",
+    "en": "to display or show a quality or feeling by one's acts or appearance; clear or obvious to the eye or mind",
+    "syn": [
+      "demonstrate",
+      "exhibit",
+      "evident",
+      "apparent"
+    ],
+    "ex_en": "The benefits of the 1-2-4-7-15 review cycle manifest clearly during final exam preparation.",
+    "ex_cn": "1-2-4-7-15复习周期的益处在期末备考阶段会清晰地显现出来。",
+    "tip": "词根：mani(手)+fest(打击/抓到) → 当场抓在手里无可抵赖 → 明显的；表明",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0181",
+    "seq": 181,
+    "word": "manipulate",
+    "uk": "/məˈnɪpjuleɪt/",
+    "us": "/məˈnɪpjuleɪt/",
+    "cn": "v. 操纵，控制；熟练操作；篡改（数据）",
+    "en": "to handle or control a tool, mechanism, or information in a skillful manner; to control unfairly",
+    "syn": [
+      "handle",
+      "operate",
+      "maneuver",
+      "rig"
+    ],
+    "ex_en": "Users can freely manipulate list counts, ordering modes, and export filters.",
+    "ex_cn": "用户可以自由操作调整词表数量、排序方式和导出筛选条件。",
+    "tip": "词根：mani(手)+pul(满)+ate → 用双手熟练摆弄 → 熟练操作；操纵",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0182",
+    "seq": 182,
+    "word": "meticulous",
+    "uk": "/məˈtɪkjələs/",
+    "us": "/məˈtɪkjələs/",
+    "cn": "adj. 一丝不苟的，细致入微的，极为谨慎的",
+    "en": "showing great attention to detail; very careful and precise",
+    "syn": [
+      "scrupulous",
+      "fastidious",
+      "thorough",
+      "punctilious"
+    ],
+    "ex_en": "Meticulous verification of every binary header ensures cross-platform compatibility.",
+    "ex_cn": "对每一个二进制文件头的一丝不苟的校验确保了跨平台兼容性。",
+    "tip": "词根：met(害怕)+icul+ous → 唯恐出一点差错的 → 一丝不苟的，严谨细致的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0183",
+    "seq": 183,
+    "word": "mitigate",
+    "uk": "/ˈmɪtɪɡeɪt/",
+    "us": "/ˈmɪtɪɡeɪt/",
+    "cn": "v. 减轻，缓和，缓解（负面影响或风险）",
+    "en": "to make less severe, serious, or painful",
+    "syn": [
+      "alleviate",
+      "relieve",
+      "lessen",
+      "assuage"
+    ],
+    "ex_en": "Warm paper and dark themes help mitigate visual fatigue during long study sessions.",
+    "ex_cn": "羊皮纸主题与暗夜主题有助于缓解长时间学习时的视觉疲劳。",
+    "tip": "词根：miti(温和)+gate(做) → 使变得缓和 → 减轻，缓解",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0184",
+    "seq": 184,
+    "word": "paradigm",
+    "uk": "/ˈpærədaɪm/",
+    "us": "/ˈpærədaɪm/",
+    "cn": "n. 范式，典范，范例，样式",
+    "en": "a typical example or pattern of something; a model or philosophical framework",
+    "syn": [
+      "model",
+      "pattern",
+      "archetype",
+      "standard"
+    ],
+    "ex_en": "Active recall combined with spaced repetition represents a proven learning paradigm.",
+    "ex_cn": "主动回忆结合间隔重复代表了一种经过验证的科学学习范式。",
+    "tip": "词根：para(在旁边)+digm(展示) → 摆在旁边供人参照的样本 → 范式，典范",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0185",
+    "seq": 185,
+    "word": "perceive",
+    "uk": "/pəˈsiːv/",
+    "us": "/pərˈsiːv/",
+    "cn": "v. 感知，察觉，发觉；认为，理解为",
+    "en": "to become aware or conscious of something; to come to realize or understand",
+    "syn": [
+      "discern",
+      "recognize",
+      "view",
+      "apprehend"
+    ],
+    "ex_en": "Learners quickly perceive a boost in reading speed after mastering core high-frequency words.",
+    "ex_cn": "在掌握核心高频词后，学习者很快就能察觉到阅读速度的提升。",
+    "tip": "词根：per(完全)+ceiv(抓/拿) → 通过感官完全捕捉到 → 感知，认为",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0186",
+    "seq": 186,
+    "word": "perpetual",
+    "uk": "/pəˈpetʃuəl/",
+    "us": "/pərˈpetʃuəl/",
+    "cn": "adj. 永久的，永恒的；连绵不断的，没完没了的",
+    "en": "never ending or changing; occurring repeatedly; so frequent as to seem endless",
+    "syn": [
+      "eternal",
+      "everlasting",
+      "incessant",
+      "continual"
+    ],
+    "ex_en": "Without marking mastered words, learners often feel trapped in a perpetual loop of easy words.",
+    "ex_cn": "如果不剔除已掌握的熟词，学习者往往会感觉被困在简单词的无尽循环中。",
+    "tip": "词根：per(从头到尾)+pet(追求/走)+ual → 一直走到底永不停息 → 永久的，不断的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0187",
+    "seq": 187,
+    "word": "persevere",
+    "uk": "/ˌpɜːsɪˈvɪə(r)/",
+    "us": "/ˌpɜːrsəˈvɪr/",
+    "cn": "v. 坚持不懈，锲而不舍，孜孜以求",
+    "en": "to continue in a course of action even in the face of difficulty or with little or no prospect of success",
+    "syn": [
+      "persist",
+      "endure",
+      "carry on",
+      "stand fast"
+    ],
+    "ex_en": "If you persevere through the 30-day Ebbinghaus matrix, every list will be reviewed five times.",
+    "ex_cn": "如果你坚持走完30天的艾宾浩斯矩阵，每个词表都将得到五轮扎实复习。",
+    "tip": "词根：per(自始至终)+severe(严格/严肃) → 自始至终严格要求自己 → 坚持不懈",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0188",
+    "seq": 188,
+    "word": "pertinent",
+    "uk": "/ˈpɜːtɪnənt/",
+    "us": "/ˈpɜːrtɪnənt/",
+    "cn": "adj. 相关的，中肯的，切题的",
+    "en": "relevant or applicable to a particular matter; apposite",
+    "syn": [
+      "relevant",
+      "applicable",
+      "germane",
+      "apposite"
+    ],
+    "ex_en": "Each example sentence is concise and pertinent to the word's primary exam meaning.",
+    "ex_cn": "每个例句都简明扼要，且切合该单词在考试中的核心词义。",
+    "tip": "词根：per(加强)+tin(握住/保持)+ent → 紧紧扣住主题的 → 相关的，切题的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0189",
+    "seq": 189,
+    "word": "plausible",
+    "uk": "/ˈplɔːzəbl/",
+    "us": "/ˈplɔːzəbl/",
+    "cn": "adj. 貌似有理的，看似可信的",
+    "en": "seeming reasonable or probable; appearing worthy of belief",
+    "syn": [
+      "credible",
+      "believable",
+      "reasonable",
+      "conceivable"
+    ],
+    "ex_en": "In multiple-choice tests, distractors are designed to look plausible at first glance.",
+    "ex_cn": "在选择题测试中，干扰项被设计得咋一看貌似合理。",
+    "tip": "词根：plaus(鼓掌)+ible → 值得鼓掌叫好的、听起来很有道理的 → 貌似可信的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0190",
+    "seq": 190,
+    "word": "pragmatic",
+    "uk": "/præɡˈmætɪk/",
+    "us": "/præɡˈmætɪk/",
+    "cn": "adj. 务实的，讲究实际的，实用主义的",
+    "en": "dealing with things sensibly and realistically in a way that is based on practical rather than theoretical considerations",
+    "syn": [
+      "practical",
+      "realistic",
+      "sensible",
+      "down-to-earth"
+    ],
+    "ex_en": "Our architecture takes a pragmatic approach to ensure reliable offline execution.",
+    "ex_cn": "我们的架构采取务实的设计方案，以确保可靠的离线运行。",
+    "tip": "考研核心词：常与 idealistic（理想主义的）或 theoretical（理论的）相对，意为“务实的”",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0191",
+    "seq": 191,
+    "word": "precede",
+    "uk": "/prɪˈsiːd/",
+    "us": "/prɪˈsiːd/",
+    "cn": "v. 在…之前发生（或出现），先于；领先于",
+    "en": "to come before something in time, order, or position",
+    "syn": [
+      "antedate",
+      "predate",
+      "lead",
+      "forerun"
+    ],
+    "ex_en": "Thorough requirement analysis must always precede software implementation.",
+    "ex_cn": "周密的需求分析必须始终先于软件编码实现。",
+    "tip": "词根：pre(在前)+ced(走)+e → 走在前面 → 先于（注意区分 proceed 继续进行）",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0192",
+    "seq": 192,
+    "word": "precipitate",
+    "uk": "/prɪˈsɪpɪteɪt/",
+    "us": "/prɪˈsɪpɪteɪt/",
+    "cn": "v. 加速，促成（常指坏事）；使沉淀；adj. 仓促的，鲁莽的；n. 沉淀物",
+    "en": "to cause an event or situation to happen suddenly, unexpectedly, or prematurely",
+    "syn": [
+      "hasten",
+      "trigger",
+      "provoke",
+      "rash"
+    ],
+    "ex_en": "Rushing into coding without a clear plan can precipitate costly architectural rework.",
+    "ex_cn": "没有清晰规划就仓促编码可能会招致代价高昂的架构返工。",
+    "tip": "词根：pre(前)+cipit(头)+ate → 头朝下猛栽下去 → 加速促成；鲁莽的；沉淀",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0193",
+    "seq": 193,
+    "word": "preclude",
+    "uk": "/prɪˈkluːd/",
+    "us": "/prɪˈkluːd/",
+    "cn": "v. 排除，防止，使不可能，妨碍",
+    "en": "to prevent from happening; to make impossible",
+    "syn": [
+      "prevent",
+      "prohibit",
+      "rule out",
+      "obviate"
+    ],
+    "ex_en": "Strict sandbox isolation precludes direct outbound network downloads during runtime.",
+    "ex_cn": "严格的沙箱隔离排除了在运行期间直接向外网下载文件的可能性。",
+    "tip": "词根：pre(提前)+clud(关闭)+e → 提前把门关死 → 排除，使不可能",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0194",
+    "seq": 194,
+    "word": "predominant",
+    "uk": "/prɪˈdɒmɪnənt/",
+    "us": "/prɪˈdɑːmɪnənt/",
+    "cn": "adj. 占主导地位的，显著的，最主要的",
+    "en": "present as the strongest or main element; having or exerting control or power",
+    "syn": [
+      "dominant",
+      "prevailing",
+      "paramount",
+      "chief"
+    ],
+    "ex_en": "Emerald green is the predominant brand accent color in Voca's visual identity.",
+    "ex_cn": "翠绿色是 Voca 视觉识别体系中占主导地位的品牌强调色。",
+    "tip": "词根：pre(在前)+domin(统治)+ant → 占据最显著主导地位的 → 主导的，最主要的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0195",
+    "seq": 195,
+    "word": "prerequisite",
+    "uk": "/ˌpriːˈrekwɪzɪt/",
+    "us": "/ˌpriːˈrekwɪzɪt/",
+    "cn": "n. 先决条件，前提，必备条件；adj. 必备的",
+    "en": "a thing that is required as a prior condition for something else to happen or exist",
+    "syn": [
+      "precondition",
+      "requirement",
+      "necessity",
+      "sine qua non"
+    ],
+    "ex_en": "A solid foundation of 5,000 core words is a prerequisite for fluent academic reading.",
+    "ex_cn": "五千核心词汇的扎实基础是流利进行学术阅读的先决条件。",
+    "tip": "词根：pre(预先)+requisit(要求/需要)+e → 预先需要具备的条件 → 先决条件",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0196",
+    "seq": 196,
+    "word": "pristine",
+    "uk": "/ˈprɪstiːn/",
+    "us": "/ˈprɪstiːn/",
+    "cn": "adj. 原始状态的，未受破坏的；崭新的，一尘不染的",
+    "en": "in its original condition; unspoiled; clean and fresh as if new",
+    "syn": [
+      "immaculate",
+      "unspoiled",
+      "untouched",
+      "spotless"
+    ],
+    "ex_en": "Restoring a word from the vocabulary book reverts its definition to the pristine dictionary text.",
+    "ex_cn": "将单词从生词本移除会将其释义恢复为词库原始的纯净文本。",
+    "tip": "词根：prist(最初的)+ine → 保持最初完美状态的 → 一尘不染的，原始未受损的",
+    "books": [
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0197",
+    "seq": 197,
+    "word": "proficient",
+    "uk": "/prəˈfɪʃnt/",
+    "us": "/prəˈfɪʃnt/",
+    "cn": "adj. 精通的，熟练的，娴熟的",
+    "en": "competent or skilled in doing or using something",
+    "syn": [
+      "skilled",
+      "adept",
+      "accomplished",
+      "expert"
+    ],
+    "ex_en": "With systematic daily practice, you will soon become proficient in recognizing academic vocabulary.",
+    "ex_cn": "通过系统的每日练习，你很快就能熟练识别学术词汇。",
+    "tip": "常考搭配：be proficient in / at...（精通于…，熟练掌握…）",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0198",
+    "seq": 198,
+    "word": "profound",
+    "uk": "/prəˈfaʊnd/",
+    "us": "/prəˈfaʊnd/",
+    "cn": "adj. 深远的，深刻的；渊博的，深奥的",
+    "en": "very great or intense; having or showing great knowledge or insight",
+    "syn": [
+      "deep",
+      "far-reaching",
+      "penetrating",
+      "sagacious"
+    ],
+    "ex_en": "Ebbinghaus's discovery had a profound impact on modern educational psychology.",
+    "ex_cn": "艾宾浩斯的发现对现代教育心理学产生了深远的影响。",
+    "tip": "词根：pro(向前/到底)+found(底部) → 直达最深处的 → 深刻的，深远的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0199",
+    "seq": 199,
+    "word": "proliferate",
+    "uk": "/prəˈlɪfəreɪt/",
+    "us": "/prəˈlɪfəreɪt/",
+    "cn": "v. 激增，迅速繁殖，大量涌现",
+    "en": "to increase rapidly in numbers; to multiply",
+    "syn": [
+      "multiply",
+      "mushroom",
+      "burgeon",
+      "escalate"
+    ],
+    "ex_en": "Mobile learning apps have proliferated over the past decade, yet few work truly offline.",
+    "ex_cn": "过去十年间移动学习应用大量涌现，但真正能纯粹离线运行的却寥寥无几。",
+    "tip": "词根：proli(后代)+fer(产生)+ate → 繁衍出大量后代 → 激增，迅速涌现",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0200",
+    "seq": 200,
+    "word": "prominent",
+    "uk": "/ˈprɒmɪnənt/",
+    "us": "/ˈprɑːmɪnənt/",
+    "cn": "adj. 著名的，杰出的；突出的，显眼的",
+    "en": "important; famous; projecting from something; protuberant",
+    "syn": [
+      "eminent",
+      "distinguished",
+      "conspicuous",
+      "salient"
+    ],
+    "ex_en": "The language mode switcher is placed in a prominent position on the main toolbar.",
+    "ex_cn": "中英模式切换按钮被放置在主工具栏的显眼位置上。",
+    "tip": "词根：pro(向前)+min(伸出/突出)+ent → 向前凸出来的 → 突出的，显眼的，杰出的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0201",
+    "seq": 201,
+    "word": "propagate",
+    "uk": "/ˈprɒpəɡeɪt/",
+    "us": "/ˈprɑːpəɡeɪt/",
+    "cn": "v. 传播，宣传，普及；繁殖，增殖",
+    "en": "to spread and promote an idea, theory, etc. widely; to breed specimens of a plant or animal",
+    "syn": [
+      "disseminate",
+      "spread",
+      "circulate",
+      "promulgate"
+    ],
+    "ex_en": "Edits made to a word inside the starred notebook automatically propagate to the main lexicon view.",
+    "ex_cn": "在生词本中对单词释义所做的修改会自动同步传递到主词库视图中。",
+    "tip": "词根：pro(向前)+pag(插条/固定)+ate → 把枝条插下去繁衍传开 → 传播，繁殖",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0202",
+    "seq": 202,
+    "word": "reciprocate",
+    "uk": "/rɪˈsɪprəkeɪt/",
+    "us": "/rɪˈsɪprəkeɪt/",
+    "cn": "v. 回报，酬答，投桃报李；往复运动",
+    "en": "to respond to a gesture or action by making a corresponding one",
+    "syn": [
+      "return",
+      "repay",
+      "requite",
+      "retaliate"
+    ],
+    "ex_en": "Your brain will reciprocate your consistent study effort with effortless reading comprehension.",
+    "ex_cn": "你的大脑将以轻松自如的阅读理解力来回报你持之以恒的学习付出。",
+    "tip": "词根：re(向后)+ciproc(向后)+ate → 有来有往 → 回报，互惠",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0203",
+    "seq": 203,
+    "word": "reconcile",
+    "uk": "/ˈrekənsaɪl/",
+    "us": "/ˈrekənsaɪl/",
+    "cn": "v. 使和解，调解；使一致，调和（矛盾）；甘心接受",
+    "en": "to restore friendly relations between; to make one account consistent with another",
+    "syn": [
+      "harmonize",
+      "resolve",
+      "settle",
+      "reunite"
+    ],
+    "ex_en": "Voca is designed to reconcile minimalist aesthetics with high-density study efficiency.",
+    "ex_cn": "Voca 旨在将极简主义美学与高密度的学习效率融洽统一起来。",
+    "tip": "考研高频词：reconcile A with B（使A与B调和一致/调解矛盾）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0204",
+    "seq": 204,
+    "word": "redundant",
+    "uk": "/rɪˈdʌndənt/",
+    "us": "/rɪˈdʌndənt/",
+    "cn": "adj. 多余的，累赘的；被裁员的；冗余的",
+    "en": "not or no longer needed or useful; superfluous",
+    "syn": [
+      "superfluous",
+      "unnecessary",
+      "surplus",
+      "excess"
+    ],
+    "ex_en": "Marking known words as mastered eliminates redundant repetition of vocabulary you already know.",
+    "ex_cn": "将认识的词标记为熟词，可以消除对已知词汇的多余重复。",
+    "tip": "词根：red(反复)+und(波浪)+ant → 波浪一层又一层涌来过多 → 多余的，冗余的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0205",
+    "seq": 205,
+    "word": "refute",
+    "uk": "/rɪˈfjuːt/",
+    "us": "/rɪˈfjuːt/",
+    "cn": "v. 驳斥，反驳，批驳，证明…是错误的",
+    "en": "to prove a statement or theory to be wrong or false; to disprove",
+    "syn": [
+      "disprove",
+      "rebut",
+      "debunk",
+      "contradict"
+    ],
+    "ex_en": "Solid experimental evidence was presented to refute the outdated assumption.",
+    "ex_cn": "展示了确凿的实验证据来驳斥那个过时的假设。",
+    "tip": "词根：re(反)+fut(打击)+e → 反击对方的谬论 → 驳斥，证明…有误",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0206",
+    "seq": 206,
+    "word": "reinforce",
+    "uk": "/ˌriːɪnˈfɔːs/",
+    "us": "/ˌriːɪnˈfɔːrs/",
+    "cn": "v. 加强，强化，加固；增援",
+    "en": "to strengthen or support, especially with additional personnel or material",
+    "syn": [
+      "strengthen",
+      "fortify",
+      "bolster",
+      "consolidate"
+    ],
+    "ex_en": "Each review stage on Days 1, 2, 4, 7, and 15 serves to reinforce neural pathways.",
+    "ex_cn": "第1、2、4、7、15天的每个复习阶段都起到了强化神经通路的作用。",
+    "tip": "词根：re(再次)+in(进入)+force(力量) → 再次注入强大的力量 → 强化，加固",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0207",
+    "seq": 207,
+    "word": "relinquish",
+    "uk": "/rɪˈlɪŋkwɪʃ/",
+    "us": "/rɪˈlɪŋkwɪʃ/",
+    "cn": "v. 放弃，交出，让出（权力、职位或控制权）",
+    "en": "to voluntarily cease to keep or claim; to give up",
+    "syn": [
+      "surrender",
+      "renounce",
+      "forsake",
+      "waive"
+    ],
+    "ex_en": "Offline storage ensures that users never relinquish ownership of their personal study records.",
+    "ex_cn": "离线存储确保用户永远不会失去对个人学习记录的所有权。",
+    "tip": "词根：re(向后)+linqu(离开/留)+ish → 放手留给别人 → 放弃，交出",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0208",
+    "seq": 208,
+    "word": "resilient",
+    "uk": "/rɪˈzɪliənt/",
+    "us": "/rɪˈzɪliənt/",
+    "cn": "adj. 有弹性的；有韧性的，能迅速恢复的，抗压的",
+    "en": "able to withstand or recover quickly from difficult conditions",
+    "syn": [
+      "tough",
+      "adaptable",
+      "buoyant",
+      "hardy"
+    ],
+    "ex_en": "A resilient storage engine recovers gracefully even after an unexpected power loss.",
+    "ex_cn": "具有韧性的存储引擎即使在意外断电后也能完好地恢复数据。",
+    "tip": "词根：re(回)+sil(跳)+ient → 被压下去还能弹回来的 → 有韧性的，迅速恢复的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0209",
+    "seq": 209,
+    "word": "retain",
+    "uk": "/rɪˈteɪn/",
+    "us": "/rɪˈteɪn/",
+    "cn": "v. 保持，保留；记住（信息）；聘请（律师）",
+    "en": "to continue to have something; to keep possession of; to absorb and continue to hold",
+    "syn": [
+      "keep",
+      "preserve",
+      "remember",
+      "maintain"
+    ],
+    "ex_en": "Learners retain up to 90% of vocabulary when following the five-stage Ebbinghaus schedule.",
+    "ex_cn": "遵循五阶段艾宾浩斯复习计划时，学习者能记住高达90%的词汇。",
+    "tip": "词根：re(回)+tain(拿住) → 牢牢拿在手里不丢 → 保持，记住",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0210",
+    "seq": 210,
+    "word": "retrieve",
+    "uk": "/rɪˈtriːv/",
+    "us": "/rɪˈtriːv/",
+    "cn": "v. 找回，取回；检索（数据）；挽回",
+    "en": "to get or bring something back; to find and extract stored data",
+    "syn": [
+      "recover",
+      "reclaim",
+      "fetch",
+      "regain"
+    ],
+    "ex_en": "You can instantly retrieve any accidentally deleted word from the Mastered Words drawer.",
+    "ex_cn": "你可以随时从“熟词表”抽屉中立即找回任何误删的单词。",
+    "tip": "词根：re(重新)+triev(找到)+e → 重新找回来 → 找回，检索",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0211",
+    "seq": 211,
+    "word": "rigorous",
+    "uk": "/ˈrɪɡərəs/",
+    "us": "/ˈrɪɡərəs/",
+    "cn": "adj. 严格的，严密的，缜密的；严酷的",
+    "en": "extremely thorough, exhaustive, or accurate; strictly applied or adhered to",
+    "syn": [
+      "strict",
+      "stringent",
+      "meticulous",
+      "exacting"
+    ],
+    "ex_en": "All core functions underwent rigorous verification before packaging the final release.",
+    "ex_cn": "所有核心功能在打包最终发布版之前都经过了严密的验证。",
+    "tip": "词根：rigor(严格/僵硬)+ous → 一丝不苟毫不松懈的 → 严密的，严格的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0212",
+    "seq": 212,
+    "word": "scrutinize",
+    "uk": "/ˈskruːtənaɪz/",
+    "us": "/ˈskruːtənaɪz/",
+    "cn": "v. 仔细检查，细看，详审",
+    "en": "to examine or inspect closely and thoroughly",
+    "syn": [
+      "inspect",
+      "examine",
+      "scan",
+      "probe"
+    ],
+    "ex_en": "We scrutinized the IPA package metadata and official specifications before designing Voca.",
+    "ex_cn": "在设计 Voca 之前，我们仔细审视了 IPA 包元数据与官方技术规格。",
+    "tip": "词根：scrutin(翻找检查)+ize → 翻个底朝天仔细查 → 仔细检查，详审",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0213",
+    "seq": 213,
+    "word": "simultaneous",
+    "uk": "/ˌsɪmlˈteɪniəs/",
+    "us": "/ˌsaɪmlˈteɪniəs/",
+    "cn": "adj. 同时发生的，同时进行的，同步的",
+    "en": "occurring, operating, or done at the same time",
+    "syn": [
+      "concurrent",
+      "synchronous",
+      "coincident",
+      "concomitant"
+    ],
+    "ex_en": "Bilingual mode provides simultaneous visibility of both the English word and its Chinese meaning.",
+    "ex_cn": "双语模式让你能够同时看到英语单词及其汉语释义。",
+    "tip": "词根：simul(同时/相似)+taneous → 在同一时刻发生的 → 同时的，同步的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0214",
+    "seq": 214,
+    "word": "spontaneous",
+    "uk": "/spɒnˈteɪniəs/",
+    "us": "/spɑːnˈteɪniəs/",
+    "cn": "adj. 自发的，不由自主的；自然的，天真率直的",
+    "en": "performed or occurring as a result of a sudden inner impulse or inclination and without premeditation",
+    "syn": [
+      "unplanned",
+      "impulsive",
+      "natural",
+      "instinctive"
+    ],
+    "ex_en": "True fluency means spontaneous comprehension without translating word by word.",
+    "ex_cn": "真正的流利意味着自发的理解，而无需逐词翻译。",
+    "tip": "词根：spont(自愿/心意)+aneous → 发自本心自然流露的 → 自发的，自然的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0215",
+    "seq": 215,
+    "word": "subsequent",
+    "uk": "/ˈsʌbsɪkwənt/",
+    "us": "/ˈsʌbsɪkwənt/",
+    "cn": "adj. 随后的，后来的，接下去的",
+    "en": "coming after something in time; following",
+    "syn": [
+      "following",
+      "ensuing",
+      "succeeding",
+      "later"
+    ],
+    "ex_en": "Day 1 is for initial memorization, while subsequent days focus on spaced reinforcement.",
+    "ex_cn": "第一天用于初次记忆，而随后的几天则侧重于间隔强化。",
+    "tip": "词根：sub(在后面)+sequ(跟随)+ent → 紧跟在后面的 → 随后的，后来的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0216",
+    "seq": 216,
+    "word": "substantiate",
+    "uk": "/səbˈstænʃieɪt/",
+    "us": "/səbˈstænʃieɪt/",
+    "cn": "v. 证实，证明，为…提供确凿证据",
+    "en": "to provide evidence to support or prove the truth of",
+    "syn": [
+      "corroborate",
+      "verify",
+      "validate",
+      "confirm"
+    ],
+    "ex_en": "Every claim in the test report must be substantiated by actual execution checks.",
+    "ex_cn": "测试报告中的每一项声明都必须有实际的运行检查结果予以证实。",
+    "tip": "词根：substant(实质/实体)+iate → 拿出实质证据支撑 → 证实，证明",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0217",
+    "seq": 217,
+    "word": "subtle",
+    "uk": "/ˈsʌtl/",
+    "us": "/ˈsʌtl/",
+    "cn": "adj. 微妙的，细微的；敏锐的；巧妙的（注意字母 b 不发音）",
+    "en": "so delicate or precise as to be difficult to analyze or describe; making use of clever and indirect methods",
+    "syn": [
+      "nuanced",
+      "delicate",
+      "faint",
+      "understated"
+    ],
+    "ex_en": "Subtle card animations provide tactile feedback without distracting the learner.",
+    "ex_cn": "微妙细腻的卡片动效提供了触感反馈，同时不会分散学习者的注意力。",
+    "tip": "发音与拼写重点：字母 b 不发音（/ˈsʌtl/），常考形容词义“微妙的、不易察觉的”",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0218",
+    "seq": 218,
+    "word": "succinct",
+    "uk": "/səkˈsɪŋkt/",
+    "us": "/səkˈsɪŋkt/",
+    "cn": "adj. 简明的，简洁的，言简意赅的",
+    "en": "briefly and clearly expressed",
+    "syn": [
+      "concise",
+      "terse",
+      "compact",
+      "pithy"
+    ],
+    "ex_en": "Dictionary definitions should be succinct so learners can grasp the core meaning at a glance.",
+    "ex_cn": "词典释义应当简明扼要，以便学习者一眼掌握核心词义。",
+    "tip": "词根：suc(在下面)+cinct(束紧衣带) → 把长袍扎紧利落 → 简明的，言简意赅的",
+    "books": [
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0219",
+    "seq": 219,
+    "word": "sustain",
+    "uk": "/səˈsteɪn/",
+    "us": "/səˈsteɪn/",
+    "cn": "v. 维持，保持；支撑；遭受，承受",
+    "en": "to strengthen or support physically or mentally; to cause to continue for an extended period",
+    "syn": [
+      "maintain",
+      "uphold",
+      "preserve",
+      "endure"
+    ],
+    "ex_en": "Visual progress rings help sustain learner engagement across the full 30-day cycle.",
+    "ex_cn": "可视化的进度环有助于在整个30天周期内持续维持学习者的投入度。",
+    "tip": "词根：sus(在下面)+tain(握住/撑住) → 在底下牢牢托住 → 维持，支撑",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0220",
+    "seq": 220,
+    "word": "synthesize",
+    "uk": "/ˈsɪnθəsaɪz/",
+    "us": "/ˈsɪnθəsaɪz/",
+    "cn": "v. 综合，整合；合成（物质或声音）",
+    "en": "to combine a number of things into a coherent whole; to produce by chemical or electronic synthesis",
+    "syn": [
+      "integrate",
+      "combine",
+      "amalgamate",
+      "blend"
+    ],
+    "ex_en": "The audio engine can synthesize clear tones and speech completely offline.",
+    "ex_cn": "音频引擎能够在完全离线的状态下合成清晰的提示音与语音。",
+    "tip": "词根：syn(共同)+thes(放置)+ize → 放到一起融合成整体 → 综合，合成",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0221",
+    "seq": 221,
+    "word": "tangible",
+    "uk": "/ˈtændʒəbl/",
+    "us": "/ˈtændʒəbl/",
+    "cn": "adj. 有形的，可触摸的；切实的，明确的",
+    "en": "perceptible by touch; clear and definite; real",
+    "syn": [
+      "palpable",
+      "concrete",
+      "substantial",
+      "real"
+    ],
+    "ex_en": "Watching your mastered word count climb gives you a tangible sense of achievement.",
+    "ex_cn": "看着已掌握的熟词数量不断攀升，会给你带来切实的成就感。",
+    "tip": "词根：tang(接触/触摸)+ible → 摸得着的 → 有形的，切实的（反义：intangible 无形的）",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0222",
+    "seq": 222,
+    "word": "tentative",
+    "uk": "/ˈtentətɪv/",
+    "us": "/ˈtentətɪv/",
+    "cn": "adj. 试探性的，暂定的；犹豫不决的",
+    "en": "not certain or fixed; provisional; done without confidence",
+    "syn": [
+      "provisional",
+      "preliminary",
+      "exploratory",
+      "hesitant"
+    ],
+    "ex_en": "Inferences without binary confirmation must be labeled as tentative rather than verified facts.",
+    "ex_cn": "未经二进制确认的推断必须标明为试探性推断，而非已验证事实。",
+    "tip": "词根：tent(尝试/试探)+ative → 试探着来的 → 暂定的，试探性的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0223",
+    "seq": 223,
+    "word": "threshold",
+    "uk": "/ˈθreʃhəʊld/",
+    "us": "/ˈθreʃhoʊld/",
+    "cn": "n. 门槛，门口；阈限，临界值；开端，起点",
+    "en": "a strip of wood or stone forming the bottom of a doorway; the magnitude or intensity that must be exceeded for a certain reaction",
+    "syn": [
+      "brink",
+      "verge",
+      "doorstep",
+      "limit"
+    ],
+    "ex_en": "Once a word's unfamiliarity score crosses a threshold, it is prioritized for extra spelling practice.",
+    "ex_cn": "一旦单词的“不会程度”超过设定阈值，系统就会优先安排其进行额外的拼写强化。",
+    "tip": "助记：thresh(打谷)+hold(保持) → 门口挡住谷粒的木板 → 门槛，临界值",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0224",
+    "seq": 224,
+    "word": "transcend",
+    "uk": "/trænˈsend/",
+    "us": "/trænˈsend/",
+    "cn": "v. 超越，超出（界限或范围），胜过",
+    "en": "to be or go beyond the range or limits of something abstract; to surpass",
+    "syn": [
+      "surpass",
+      "exceed",
+      "eclipse",
+      "outstrip"
+    ],
+    "ex_en": "Good software design transcends platform boundaries while respecting native ergonomics.",
+    "ex_cn": "优秀的软件设计在尊重各平台原生操作习惯的同时，超越了平台界限。",
+    "tip": "词根：trans(跨越)+scend(攀爬) → 翻越过去 → 超越，胜过",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0225",
+    "seq": 225,
+    "word": "transient",
+    "uk": "/ˈtrænziənt/",
+    "us": "/ˈtrænʃnt/",
+    "cn": "adj. 短暂的，转瞬即逝的，暂住的；n. 暂住者，瞬态",
+    "en": "lasting only for a short time; impermanent",
+    "syn": [
+      "fleeting",
+      "ephemeral",
+      "temporary",
+      "short-lived"
+    ],
+    "ex_en": "Sensory memory is transient and fades within seconds unless transferred to long-term storage.",
+    "ex_cn": "感觉记忆是短暂的，除非转化为长期存储，否则在几秒钟内就会消退。",
+    "tip": "词根：trans(越过)+i(走)+ent → 匆匆走过不停留的 → 短暂的，转瞬即逝的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0226",
+    "seq": 226,
+    "word": "transparent",
+    "uk": "/trænsˈpærənt/",
+    "us": "/trænsˈpærənt/",
+    "cn": "adj. 透明的；公开透明的；显而易见的，易懂的",
+    "en": "allowing light to pass through so that objects behind can be distinctly seen; open to public scrutiny",
+    "syn": [
+      "clear",
+      "translucent",
+      "candid",
+      "limpid"
+    ],
+    "ex_en": "Our documentation provides a transparent account of all data sources and licenses.",
+    "ex_cn": "我们的文档对所有数据来源及开源授权依据提供了公开透明的说明。",
+    "tip": "词根：trans(穿过)+par(显现)+ent → 光线能穿透显现的 → 透明的，坦率的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 4
+  },
+  {
+    "id": "voca_0227",
+    "seq": 227,
+    "word": "ubiquitous",
+    "uk": "/juːˈbɪkwɪtəs/",
+    "us": "/juːˈbɪkwɪtəs/",
+    "cn": "adj. 无处不在的，普遍存在的，随处可见的",
+    "en": "present, appearing, or found everywhere",
+    "syn": [
+      "omnipresent",
+      "pervasive",
+      "universal",
+      "everywhere"
+    ],
+    "ex_en": "Smartphones and laptops have made digital learning tools ubiquitous in modern education.",
+    "ex_cn": "智能手机和笔记本电脑使数字化学习工具在现代教育中无处不在。",
+    "tip": "词根：ubi(何处/处处)+quit+ous → 到处都有的 → 无处不在的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0228",
+    "seq": 228,
+    "word": "undermine",
+    "uk": "/ˌʌndəˈmaɪn/",
+    "us": "/ˌʌndərˈmaɪn/",
+    "cn": "v. 逐渐削弱，暗中损害，动摇（根基或权威）",
+    "en": "to erode the base or foundation of; to lessen the effectiveness, power, or ability of, especially gradually or insidiously",
+    "syn": [
+      "weaken",
+      "subvert",
+      "erode",
+      "sabotage"
+    ],
+    "ex_en": "Inconsistent study habits will gradually undermine your confidence before the exam.",
+    "ex_cn": "三天打鱼两天晒网的学习习惯会在考前逐渐削弱你的信心。",
+    "tip": "词根：under(在…下面)+mine(挖矿/挖地道) → 在城墙底下挖地道 → 暗中破坏，动摇根基",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0229",
+    "seq": 229,
+    "word": "unprecedented",
+    "uk": "/ʌnˈpresɪdentɪd/",
+    "us": "/ʌnˈpresɪdentɪd/",
+    "cn": "adj. 史无前例的，空前的，前所未有的",
+    "en": "never done or known before",
+    "syn": [
+      "unparalleled",
+      "unmatched",
+      "novel",
+      "extraordinary"
+    ],
+    "ex_en": "Modern offline storage APIs offer unprecedented reliability for standalone educational apps.",
+    "ex_cn": "现代离线存储接口为单机教育应用提供了前所未有的可靠性。",
+    "tip": "词根：un(无)+precedent(先例)+ed → 没有先例的 → 史无前例的，空前的",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0230",
+    "seq": 230,
+    "word": "validate",
+    "uk": "/ˈvælɪdeɪt/",
+    "us": "/ˈvælɪdeɪt/",
+    "cn": "v. 证实，验证，确认…有效；使生效，批准",
+    "en": "to check or prove the validity or accuracy of something; to make or declare legally valid",
+    "syn": [
+      "verify",
+      "confirm",
+      "authenticate",
+      "substantiate"
+    ],
+    "ex_en": "Automated scripts validate the APK signature block and PE32+ executable headers.",
+    "ex_cn": "自动化脚本对 APK 签名块和 PE32+ 可执行文件头进行了严格验证。",
+    "tip": "词根：valid(有效的)+ate → 证明其有效 → 验证，证实",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0231",
+    "seq": 231,
+    "word": "versatile",
+    "uk": "/ˈvɜːsətaɪl/",
+    "us": "/ˈvɜːrsətl/",
+    "cn": "adj. 多才多艺的；多功能的，用途广泛的",
+    "en": "able to adapt or be adapted to many different functions or activities",
+    "syn": [
+      "adaptable",
+      "multifaceted",
+      "all-around",
+      "flexible"
+    ],
+    "ex_en": "Voca is a versatile vocabulary studio supporting card review, dictation, spelling, and PDF printing.",
+    "ex_cn": "Voca 是一款多功能词汇学习工坊，支持卡片复习、听写、拼词和打印版导出。",
+    "tip": "词根：vers(转)+atile → 能灵活转向应对各种场景的 → 多功能的，多才多艺的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0232",
+    "seq": 232,
+    "word": "viable",
+    "uk": "/ˈvaɪəbl/",
+    "us": "/ˈvaɪəbl/",
+    "cn": "adj. 可行的，切实可行的；能独立存活的，能发展的",
+    "en": "capable of working successfully; feasible; capable of surviving or living successfully",
+    "syn": [
+      "feasible",
+      "workable",
+      "practicable",
+      "sustainable"
+    ],
+    "ex_en": "Local SQLite and IndexedDB storage provide a viable architecture for zero-network operation.",
+    "ex_cn": "本地 SQLite 与 IndexedDB 存储为零网络运行提供了切实可行的架构。",
+    "tip": "词根：vi(生命/生活)+able → 能活下去的、行得通的 → 可行的，能存续的",
+    "books": [
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  },
+  {
+    "id": "voca_0233",
+    "seq": 233,
+    "word": "vulnerable",
+    "uk": "/ˈvʌlnərəbl/",
+    "us": "/ˈvʌlnərəbl/",
+    "cn": "adj. 脆弱的，易受伤害的，易受攻击的",
+    "en": "exposed to the possibility of being attacked or harmed, either physically or emotionally",
+    "syn": [
+      "susceptible",
+      "exposed",
+      "defenseless",
+      "fragile"
+    ],
+    "ex_en": "Newly learned words are highly vulnerable to forgetting during the first twenty-four hours.",
+    "ex_cn": "新学到的单词在最初的二十四小时内极易被遗忘。",
+    "tip": "词根：vulner(伤口)+able → 容易受伤的 → 脆弱的，易受影响的（常接 to）",
+    "books": [
+      "cet4",
+      "cet6",
+      "kaoyan",
+      "academic"
+    ],
+    "freq": 5
+  }
+]

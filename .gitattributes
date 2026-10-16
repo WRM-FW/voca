@@ -1,0 +1,27 @@
+# Normalize line endings so a checkout is byte-identical to what the build produces.
+# make_html_v103_part3.py writes index.html with newline="\n"; a CRLF checkout would
+# make every rebuild differ by one byte per line.
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.dib binary
+*.woff2 binary
+*.db binary
+*.sqlite binary
+*.apk binary
+*.exe binary
+*.zip binary
+
+*.html text eol=lf
+*.py   text eol=lf
+*.sh   text eol=lf
+*.c    text eol=lf
+*.java text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.txt  text eol=lf
+*.csv  text eol=lf
+*.sql  text eol=lf
+*.gradle text eol=lf
+*.xml text eol=lf

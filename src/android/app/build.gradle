@@ -1,0 +1,22 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.voca.app'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.voca.app"
+        minSdk 19
+        targetSdk 28
+        versionCode 4
+        versionName "1.0.3"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}

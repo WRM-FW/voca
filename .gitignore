@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# User runtime profile and local storage data (do not commit personal learning records)
+windows/data/profile/
+*.bak
+
+# Temporary build artifacts
+build_tmp/
+*.tmp
+*.new
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Compiled binaries are published as GitHub Release assets, not committed to the tree.
+# Rebuild them locally with `bash scripts/build_all.sh`.
+windows/Voca.exe
+android/*.apk
