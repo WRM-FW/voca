@@ -21,7 +21,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     SetCurrentDirectoryW(dirBuf);
 
     wsprintfW(htmlBuf, L"%s\\app\\index.html", dirBuf);
-    wsprintfW(argsBuf, L"--app=\"%s\" --start-maximized --high-dpi-support=1 --user-data-dir=\"%s\\data\\profile\"", htmlBuf, dirBuf);
+    wsprintfW(argsBuf, L"--app=\"%s\" --start-maximized --high-dpi-support=1 --user-data-dir=\"%s\\data\\profile\" --no-first-run --no-default-browser-check --disable-extensions --disable-sync", htmlBuf, dirBuf);
 
     HINSTANCE res = ShellExecuteW(NULL, L"open", L"msedge.exe", argsBuf, dirBuf, SW_SHOWMAXIMIZED);
     if ((INT_PTR)res <= 32) {

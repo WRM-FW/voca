@@ -1,5 +1,7 @@
 # Voca v1.0.3 版本升级与跨平台数据迁移指南
 
+> **本文为 v1.0.3 时期的历史记录。** v1.0.4 起 Windows 改用原生 WebView2 宿主，学习数据目录从 `./data/profile/Default/` 变为 `./data/profile/EBWebView/Default/`（宿主启动时自动镜像一次）。当前有效的路径与步骤请看 `README.md` 第五节与 `docs/08`；存档结构本身未变（仍为 `schemaVersion: 4`）。
+
 本文档与项目根目录 `README.md` 第五节「用户数据：位置、备份与迁移」保持一致，提供从 v1.0.2（及更早版本）升级至 v1.0.3 的可执行步骤与路径说明。
 
 ## 一、各平台数据存储位置速查

@@ -1,3 +1,16 @@
+/*
+ * Reference Android shell. The shipped APK is assembled by scripts/build_apk_v103.py,
+ * which hand-emits classes.dex for exactly these three methods; editing this file does
+ * NOT change the APK. To build with the extra behaviour below, use the Gradle project
+ * (src/android/app) against a real Android SDK and a device.
+ *
+ * Known gaps that the web layer works around instead (see the "导出内容" copy-out box
+ * and "从粘贴内容恢复备份" in the data view):
+ *   - WebChromeClient.onShowFileChooser is not implemented, so <input type=file> is inert.
+ *   - No DownloadListener, so a[download] never writes a file.
+ *   - No PrintManager path, so window.print() does nothing.
+ *   - No edge-to-edge insets, so env(safe-area-inset-*) resolves to 0 on gesture-nav devices.
+ */
 package com.voca.app;
 
 import android.app.Activity;

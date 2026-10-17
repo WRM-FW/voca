@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 3 of Voca v1.0.3 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
+Generates Part 3 of Voca v1.0.4 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
 Upgrades in v1.0.3:
 1. Removed '掌握度' (mastery) across state, UI, sorting, immersive card, spelling, CSV, and PDF exports; retained '不会程度' (unfam 0..5) with left-click (+1) and right-click (-1).
 2. Removed '英英模式' (en_en) from language modes, hints, rendering, and keyboard shortcuts; auto-migrates legacy 'en_en' state to 'bilingual'.
@@ -43,24 +43,50 @@ JS_ENGINE = r"""
   const IDB_STORE = "app_state";
   const VALID_THEMES = ["daylight", "oled", "paper"];
   const VALID_LANG_MODES = ["bilingual", "en_only", "cn_only"];
-  const VALID_ONLINE_DICTS = ["eudic", "wordreference"];
+  const VALID_ONLINE_DICTS = ["eudic", "iciba", "wordreference"];
 
+  // Per-source capability flags below are NOT guesses: each was measured against the live site
+  // on 2026-10-17 (response headers + real Chromium frame load). See docs/06.
+  //   eudic /dicts  -> x-frame-options: SAMEORIGIN (frame always blocked), access-control-allow-origin: *
+  //   eudic /mdicts -> no x-frame-options (frame renders), access-control-allow-origin: *
+  //   iciba         -> no x-frame-options (frame renders), access-control-allow-origin: *
+  //   wordreference -> 200 carries x-frame-options: SAMEORIGIN *and* CSP frame-ancestors 'self'
+  //                    https://wordreference.com https://*.wordreference.com <third-party allowlist>
+  //                    plus an Anubis JS anti-bot gate. Content cannot be framed or fetched.
   const ONLINE_DICT_SOURCES = {
     eudic: {
       key: "eudic",
       name: "欧路词典",
-      template: "https://dict.eudic.net/dicts/en/@word@"
+      // /dicts/en/ answers with x-frame-options: SAMEORIGIN and replaces some Chinese
+      // characters inside the gloss with <img> tags, so a text extract of it is
+      // incomplete. /mdicts/en/ has no framing header, sends access-control-allow-origin: *,
+      // and carries the full gloss in #FCchild - so one URL serves both purposes.
+      parseUrl: "https://dict.eudic.net/mdicts/en/@word@",
+      embedUrl: "https://dict.eudic.net/mdicts/en/@word@",
+      canEmbed: true,
+      canFetch: true,
+    },
+    iciba: {
+      key: "iciba",
+      name: "爱词霸英汉词典",
+      parseUrl: "https://www.iciba.com/word?w=@word@",
+      embedUrl: "https://www.iciba.com/word?w=@word@",
+      canEmbed: true,
+      canFetch: true,
     },
     wordreference: {
       key: "wordreference",
       name: "WordReference 英汉词典",
-      template: "https://www.wordreference.com/enzh/@word@"
+      parseUrl: "https://www.wordreference.com/enzh/@word@",
+      embedUrl: "",
+      canEmbed: false,
+      canFetch: false,
     }
   };
 
   const defaultState = {
     schemaVersion: 4,
-    appVersion: "1.0.3",
+    appVersion: "1.0.4",
     currentBook: "cet4",
     currentListIndex: 0,
     langMode: "bilingual",      // bilingual | en_only | cn_only (en_en removed in v1.0.3)
@@ -79,7 +105,7 @@ JS_ENGINE = r"""
       cn_only: false
     },
     settings: {
-      onlineDict: "eudic",      // eudic | wordreference (Requirement 3 & 4)
+      onlineDict: "eudic",      // eudic | iciba | wordreference
       rowClickMode: "unfam_lr", // unfam_lr | left_sound_right_unfam | right_sound_left_unfam | sound_only
       accent: "en-US",
       phoneticDisplay: "both",  // both | us | uk | hide
@@ -106,9 +132,28 @@ JS_ENGINE = r"""
   let spellTyped = "";
   let spellFiveOptions = [];
 
-  let scrollIntervalId = null;
+  let scrollFrameId = null;
+  let scrollLastTick = 0;
   let scrollRunning = false;
   let scrollPausedByHover = false;
+  let scrollPausedByTouch = false;
+
+  // Touch devices have no hover, so the long press that lowers 不会程度 needs its own
+  // gesture record. One record per physical hold, tagged with who consumed it, so the
+  // native contextmenu a WebView raises for the same hold can never decrement twice.
+  let holdSeq = 0;
+  let activeHold = null;          // { seq, row, startedAt, consumedBy: null | "gesture" | "contextmenu" }
+  let suppressClickUntil = 0;
+  let lastTouchAt = 0;
+  const LONG_PRESS_MS = 480;
+  const LONG_PRESS_SLOP = 12;
+  const TOUCH_ECHO_MS = 1500;
+
+  function isTouchShell() {
+    // Provided by the input-capability script in <head>. Defaults to "not touch", which
+    // keeps the desktop right-click behaviour if that script is ever absent.
+    try { return !!(window.__VOCA_IS_TOUCH__ && window.__VOCA_IS_TOUCH__()); } catch (e) { return false; }
+  }
 
   let nbActiveSubTab = "starred";
   let currentModalWordId = null;
@@ -215,7 +260,7 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.3";
+    merged.appVersion = "1.0.4";
     return merged;
   }
 
@@ -1122,6 +1167,16 @@ JS_ENGINE = r"""
     }
   }
 
+  // Shared by the hardware Backspace key and the on-screen ⌫ key: a soft keyboard does
+  // not reliably expose either, and a phone player needs a visible delete.
+  function spellBackspace() {
+    if (spellTyped.length > 0) {
+      spellTyped = spellTyped.slice(0, -1);
+      playTone("down");
+      renderSpellingStage();
+    }
+  }
+
   function renderAutoScrollList() {
     const pool = getTrainingPool().slice(0, 150);
     const box = document.getElementById("scrollListContent");
@@ -1151,21 +1206,31 @@ JS_ENGINE = r"""
     const btn = document.getElementById("scrollBtnToggle");
     if (scrollRunning || forceStop) {
       scrollRunning = false;
-      if (scrollIntervalId) { clearInterval(scrollIntervalId); scrollIntervalId = null; }
+      if (scrollFrameId !== null) { cancelAnimationFrame(scrollFrameId); scrollFrameId = null; }
+      scrollLastTick = 0;
       btn.textContent = "▶ 开启自动滚动";
       return;
     }
     scrollRunning = true;
     btn.textContent = "⏸ 暂停自动滚动";
     const vp = document.getElementById("scrollViewport");
-    scrollIntervalId = setInterval(function() {
-      if (!scrollRunning || scrollPausedByHover) return;
+    scrollLastTick = 0;
+    // One step per real animation frame instead of setInterval(35ms): no competing
+    // timers on a mid-range WebView, and the speed is expressed as px per tick-normalised
+    // frame so 60Hz and 120Hz screens drift at the same rate.
+    scrollFrameId = requestAnimationFrame(function step(ts) {
+      if (!scrollRunning) { scrollFrameId = null; return; }
+      scrollFrameId = requestAnimationFrame(step);
+      if (document.hidden) { scrollLastTick = ts; return; }
+      const dt = scrollLastTick ? Math.min(120, ts - scrollLastTick) : 16;
+      scrollLastTick = ts;
+      if (scrollPausedByHover || scrollPausedByTouch) return;
       const spd = parseInt(document.getElementById("scrollSpeedSelect").value, 10) || 2;
-      vp.scrollTop += spd;
+      vp.scrollTop += spd * (dt / 35);
       if (vp.scrollTop + vp.clientHeight >= vp.scrollHeight - 2) {
         vp.scrollTop = 0;
       }
-    }, 35);
+    });
   }
 
   // ==================== 8. NOTEBOOK (生词本) & MASTERED (熟词表) ====================
@@ -1245,77 +1310,101 @@ JS_ENGINE = r"""
   }
 
   // ==================== 9. ONLINE DICTIONARY INTEGRATION & EDIT MODAL (Requirement 3 & 4) ====================
-  function buildOnlineDictUrl(rawWord, dictKey) {
+  function buildOnlineDictUrl(rawWord, dictKey, purpose) {
     const src = ONLINE_DICT_SOURCES[dictKey] || ONLINE_DICT_SOURCES.eudic;
+    const template = (purpose === "embed" ? src.embedUrl : src.parseUrl) || src.parseUrl;
     const cleanWord = String(rawWord || "").trim();
     const encodedWord = encodeURIComponent(cleanWord);
-    return src.template.replace("@word@", encodedWord);
+    return template.replace("@word@", encodedWord);
+  }
+
+  function stripNoise(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll("img, script, style, ins, iframe, .dictimgtoword, .guanggao").forEach(function (n) {
+      if (n.parentNode) n.parentNode.removeChild(n);
+    });
   }
 
   function parseOnlineDictionaryHtml(htmlText, dictKey, headword) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlText, "text/html");
-    const lowerText = (doc.body ? doc.body.textContent : htmlText).toLowerCase();
+    const bodyText = doc.body ? doc.body.textContent : htmlText;
+    const lowerText = bodyText.toLowerCase();
+    const blocks = [];
+    function push(t) {
+      const s = String(t == null ? "" : t).replace(/\s+/g, " ").trim();
+      if (!s || s.length < 2) return;
+      if (blocks.indexOf(s) !== -1) return;
+      if (blocks.length >= 12) return;
+      blocks.push(s);
+    }
 
     if (dictKey === "eudic") {
-      if (
-        lowerText.indexOf("未找到") !== -1 &&
-        lowerText.indexOf("解释") === -1 &&
-        !doc.querySelector("#ExpFCChild, #ExpSPECChild, .explain")
-      ) {
-        return { notFound: true, entries: [] };
-      }
-      const blocks = [];
-      const fc = doc.querySelector("#ExpFCChild") || doc.querySelector(".explain") || doc.querySelector("#ExpSPECChild");
-      if (fc) {
-        const items = fc.querySelectorAll("li, p, .exp, div");
-        if (items.length > 0) {
-          items.forEach(function(el) {
-            const t = (el.textContent || "").trim().replace(/\s+/g, " ");
-            if (t && blocks.indexOf(t) === -1 && blocks.length < 8) {
-              blocks.push(t);
-            }
-          });
+      // mdicts puts the 英汉-汉英 gloss in #FCchild (and specialist glosses in #SPECchild).
+      // v1.0.3 looked for "#ExpFCChild" — the /dicts/ page's id, with a capital C — which
+      // never matched anything, so the panel silently fell back to the boilerplate
+      // <meta name="description"> text.
+      const primary = ["#FCchild", "#SPECchild", "#FC", "#SPEC"];
+      for (let i = 0; i < primary.length && blocks.length === 0; i++) {
+        const box = doc.querySelector(primary[i]);
+        if (!box) continue;
+        stripNoise(box);
+        const items = box.querySelectorAll(".exp, li, p");
+        if (items.length) {
+          items.forEach(function (el) { push(el.textContent); });
         } else {
-          const raw = (fc.textContent || "").trim().replace(/\s+/g, " ");
-          if (raw) blocks.push(raw);
+          push(box.textContent);
         }
       }
-      const metaDesc = doc.querySelector('meta[name="description"]');
-      if (blocks.length === 0 && metaDesc && metaDesc.content) {
-        blocks.push(metaDesc.content.trim());
+      if (blocks.length === 0) {
+        doc.querySelectorAll(".expDiv .exp, #FC .exp").forEach(function (el) { push(el.textContent); });
       }
-      return { notFound: blocks.length === 0, entries: blocks };
-    } else {
-      // WordReference enzh parser
-      if (
-        doc.querySelector("#noEntryFound") ||
-        lowerText.indexOf("no translation found") !== -1 ||
-        lowerText.indexOf("未找到任何翻译") !== -1
-      ) {
-        return { notFound: true, entries: [] };
+      if (blocks.length === 0) {
+        doc.querySelectorAll("#phrase").forEach(function (el) {
+          const a = el.querySelector("a");
+          const e = el.querySelector(".exp");
+          if (a && e) push(a.textContent + " — " + e.textContent);
+        });
       }
-      const blocks = [];
-      const rows = doc.querySelectorAll("table.WRD tr.even, table.WRD tr.odd");
-      rows.forEach(function(tr) {
-        const fromW = tr.querySelector(".FrWrd");
-        const toW = tr.querySelector(".ToWrd");
-        const frEx = tr.querySelector(".FrEx");
-        const toEx = tr.querySelector(".ToEx");
-        if (fromW || toW) {
-          const line = ((fromW ? fromW.textContent.trim() : "") + " → " + (toW ? toW.textContent.trim() : "")).replace(/\s+/g, " ").trim();
-          if (line && line !== "→" && blocks.length < 10) blocks.push(line);
-        } else if (frEx || toEx) {
-          const exLine = "例: " + ((frEx ? frEx.textContent.trim() : "") + " " + (toEx ? toEx.textContent.trim() : "")).replace(/\s+/g, " ").trim();
-          if (exLine.length > 4 && blocks.length < 10) blocks.push(exLine);
-        }
-      });
-      const art = doc.querySelector("#articleWRD");
-      if (blocks.length === 0 && art && art.textContent.trim()) {
-        blocks.push(art.textContent.trim().replace(/\s+/g, " "));
-      }
-      return { notFound: blocks.length === 0, entries: blocks };
+      // A missing headword still answers 200 but renders the #page-status notice and
+      // no #FCchild, so absence of parsed glosses plus that marker is the not-found signal.
+      const missingMarker = !!doc.querySelector("#page-status") ||
+        /未收录|没有找到|未找到|抱歉|suggest/i.test(bodyText.slice(0, 4000));
+      return { notFound: blocks.length === 0 && missingMarker, entries: blocks };
     }
+
+    if (dictKey === "iciba") {
+      // iciba renders its entries client-side from an XHR; the served HTML carries no
+      // gloss text, so there is nothing to parse. The caller shows the live frame instead.
+      return { notFound: false, entries: [], parseable: false };
+    }
+
+    // WordReference enzh parser (kept for the injected test fetcher; the live app never
+    // frames or fetches this host — see ONLINE_DICT_SOURCES.canEmbed / canFetch).
+    if (
+      doc.querySelector("#noEntryFound") ||
+      lowerText.indexOf("no translation found") !== -1 ||
+      lowerText.indexOf("未找到任何翻译") !== -1
+    ) {
+      return { notFound: true, entries: [] };
+    }
+    const rows = doc.querySelectorAll("table.WRD tr.even, table.WRD tr.odd");
+    rows.forEach(function (tr) {
+      const fromW = tr.querySelector(".FrWrd");
+      const toW = tr.querySelector(".ToWrd");
+      const frEx = tr.querySelector(".FrEx");
+      const toEx = tr.querySelector(".ToEx");
+      if (fromW || toW) {
+        push((fromW ? fromW.textContent : "") + " → " + (toW ? toW.textContent : ""));
+      } else if (frEx || toEx) {
+        push("例: " + (frEx ? frEx.textContent : "") + " " + (toEx ? toEx.textContent : ""));
+      }
+    });
+    if (blocks.length === 0) {
+      const art = doc.querySelector("#articleWRD");
+      if (art) push(art.textContent);
+    }
+    return { notFound: blocks.length === 0, entries: blocks };
   }
 
   function queryOnlineDictionaryForModal(w) {
@@ -1326,11 +1415,13 @@ JS_ENGINE = r"""
 
     const dictKey = VALID_ONLINE_DICTS.indexOf(state.settings.onlineDict) !== -1 ? state.settings.onlineDict : "eudic";
     const dictCfg = ONLINE_DICT_SOURCES[dictKey];
-    const targetUrl = buildOnlineDictUrl(w.word, dictKey);
+    const parseUrl = buildOnlineDictUrl(w.word, dictKey, "parse");
+    const embedUrl = dictCfg.canEmbed ? buildOnlineDictUrl(w.word, dictKey, "embed") : "";
+    const pageUrl = dictCfg.embedUrl && dictCfg.embedUrl !== dictCfg.parseUrl ? parseUrl : parseUrl;
 
     document.getElementById("modalActiveDictBadge").textContent = dictCfg.name;
-    document.getElementById("modalDictUrlCode").textContent = targetUrl;
-    document.getElementById("modalDictExternalLink").href = targetUrl;
+    document.getElementById("modalDictUrlCode").textContent = parseUrl;
+    document.getElementById("modalDictExternalLink").href = parseUrl;
 
     document.querySelectorAll("#modalDictSourceGroup .seg-btn").forEach(function(btn) {
       btn.classList.toggle("active", btn.dataset.dict === dictKey);
@@ -1341,64 +1432,98 @@ JS_ENGINE = r"""
     const iframeWrap = document.getElementById("modalDictIframeWrap");
     const iframeEl = document.getElementById("modalOnlineDictIframe");
 
-    // Reset view to loading state (Never disguise a blank/unloaded box as normal result)
-    iframeWrap.style.display = "none";
-    iframeEl.src = "about:blank";
-    statusBanner.className = "dict-status-banner dict-status-loading";
-    statusBanner.textContent = "⏳ 正在向【" + dictCfg.name + "】请求词条“" + w.word + "” (" + targetUrl + ")...";
-    parsedBox.innerHTML =
-      '<div style="color:var(--text-muted); font-size:0.83rem;">正在连接远程词典服务，请稍候...</div>';
-
-    function renderFallbackFailure(reasonText) {
+    function clearFrame() {
+      iframeWrap.classList.remove("dict-frame-visible");
       iframeWrap.style.display = "none";
       iframeEl.src = "about:blank";
+    }
+    function showFrame(url) {
+      iframeEl.src = url;
+      iframeWrap.style.display = "";
+      iframeWrap.classList.add("dict-frame-visible");
+    }
+    function localRefHtml() {
+      return '<div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border-color);">' +
+        '<strong>📚 本地离线词库基础参考（非在线返回结果）</strong>：<br>' +
+        '<span>单词：<strong>' + escapeHtml(w.word) + '</strong> ' + escapeHtml(getPhoneticString(w)) + '</span><br>' +
+        '<span>本地释义：' + escapeHtml(w.cn) + '</span>' +
+      '</div>';
+    }
+
+    // Reset view to loading state (never leave a stale frame or a blank box on screen)
+    clearFrame();
+    statusBanner.className = "dict-status-banner dict-status-loading";
+    statusBanner.textContent = "⏳ 正在查询【" + dictCfg.name + "】词条“" + w.word + "”...";
+    parsedBox.innerHTML = '<div class="dict-parsed-hint">正在连接远程词典服务，请稍候...</div>';
+
+    function renderFallbackFailure(reasonText) {
+      clearFrame();
       statusBanner.className = "dict-status-banner dict-status-error";
-      statusBanner.textContent = "⚠️ 无法加载【" + dictCfg.name + "】在线内容：" + reasonText;
+      statusBanner.textContent = "⚠️ 未能获取【" + dictCfg.name + "】在线内容：" + reasonText;
       parsedBox.innerHTML =
-        '<div style="font-size:0.84rem; color:var(--text-secondary);">' +
-          '<div style="font-weight:700; color:var(--rose-mark); margin-bottom:6px;">在线词典未返回内容（绝不将空白页或连接失败伪装为正常查询结果）：</div>' +
-          '<div>• <strong>目标在线地址</strong>：<code>' + escapeHtml(targetUrl) + '</code></div>' +
-          '<div>• <strong>失败原因说明</strong>：' + escapeHtml(reasonText) + '</div>' +
-          '<div style="margin-top:8px; padding-top:8px; border-top:1px dashed var(--border-color);">' +
-            '<strong>📚 本地离线词库基础参考（非在线返回结果）</strong>：<br>' +
-            '<span>单词：<strong>' + escapeHtml(w.word) + '</strong> ' + escapeHtml(getPhoneticString(w)) + '</span><br>' +
-            '<span>本地释义：' + escapeHtml(w.cn) + '</span>' +
-          '</div>' +
+        '<div class="dict-parsed-note">' +
+          '<div class="dict-parsed-warn">在线词典未返回内容（空白页与失败状态一律不记为查询成功）：</div>' +
+          '<div>• <strong>目标地址</strong>：<code>' + escapeHtml(parseUrl) + '</code></div>' +
+          '<div>• <strong>失败原因</strong>：' + escapeHtml(reasonText) + '</div>' +
+          localRefHtml() +
         '</div>';
     }
 
     function renderNotFoundState() {
-      iframeWrap.style.display = "none";
-      iframeEl.src = "about:blank";
+      clearFrame();
       statusBanner.className = "dict-status-banner dict-status-warn";
-      statusBanner.textContent = "⚠️ 词条不存在：【" + dictCfg.name + "】未收录单词“" + w.word + "” (" + targetUrl + ")";
+      statusBanner.textContent = "⚠️ 词条不存在：【" + dictCfg.name + "】未收录单词“" + w.word + "”";
       parsedBox.innerHTML =
-        '<div style="font-size:0.84rem; color:var(--text-secondary);">' +
-          '<div>在线词典已响应，但未查询到匹配“<strong>' + escapeHtml(w.word) + '</strong>”的词条记录。请检查拼写，或切换另一个在线词典重试。</div>' +
+        '<div class="dict-parsed-note">' +
+          '<div>在线词典已响应，但未查询到匹配“<strong>' + escapeHtml(w.word) + '</strong>”的词条。可检查拼写，或切换其他在线词典重试。</div>' +
+          localRefHtml() +
         '</div>';
     }
 
-    function renderParsedSuccess(entries, showIframeToo) {
+    function renderParsedSuccess(entries) {
       statusBanner.className = "dict-status-banner dict-status-ok";
-      statusBanner.textContent = "✓ 已成功获取【" + dictCfg.name + "】中“" + w.word + "”的词典内容";
-      let listHtml = '<div style="font-weight:800; color:var(--brand-primary); margin-bottom:6px;">📖 ' + escapeHtml(dictCfg.name) + ' — ' + escapeHtml(w.word) + ' 词条释义：</div>';
-      entries.forEach(function(item, idx) {
-        listHtml += '<div style="margin-bottom:4px;">' + (idx + 1) + '. ' + escapeHtml(item) + '</div>';
+      statusBanner.textContent = "✓ 已获取【" + dictCfg.name + "】中“" + w.word + "”的词典释义" +
+        (embedUrl ? "，并在下方内嵌原站词典页" : "");
+      let listHtml = '<div class="dict-parsed-title">📖 ' + escapeHtml(dictCfg.name) + ' — ' + escapeHtml(w.word) + ' 词条释义：</div>';
+      entries.forEach(function (item, idx) {
+        listHtml += '<div class="dict-parsed-item">' + (idx + 1) + '. ' + escapeHtml(item) + '</div>';
       });
       parsedBox.innerHTML = listHtml;
-      if (showIframeToo) {
-        iframeWrap.style.display = "block";
-        iframeEl.src = targetUrl;
-      } else {
-        iframeWrap.style.display = "none";
-      }
+      if (embedUrl) { showFrame(embedUrl); } else { clearFrame(); }
     }
 
-    // Support deterministic custom/mock fetcher hook when injected in test harness
+    // The site renders entries client-side, so Voca shows the live page and says so plainly
+    // instead of inventing a "parsed" success it cannot substantiate.
+    function renderEmbedOnly() {
+      statusBanner.className = "dict-status-banner dict-status-info";
+      statusBanner.textContent = "ℹ 已内嵌【" + dictCfg.name + "】词条页面（该站释义由脚本渲染，Voca 不抓取其文本）";
+      parsedBox.innerHTML =
+        '<div class="dict-parsed-note"><div>下方为 <code>' + escapeHtml(embedUrl) + '</code> 的实时页面。' +
+        '若页面未显示，多为该站当日限流，可点右上角「↗ 浏览器打开源页面」。</div>' + localRefHtml() + '</div>';
+      showFrame(embedUrl);
+    }
+
+    // WordReference answers 200 with x-frame-options: SAMEORIGIN plus a CSP frame-ancestors
+    // allowlist that does not include Voca, and it has no CORS headers. Framing and fetching
+    // are both impossible, so the only honest state is "open it yourself" — never a green tick.
+    function renderOpenOnly(reason) {
+      clearFrame();
+      statusBanner.className = "dict-status-banner dict-status-warn";
+      statusBanner.textContent = "⚠ 【" + dictCfg.name + "】无法在 Voca 窗口内显示，仅能跳转到源站";
+      parsedBox.innerHTML =
+        '<div class="dict-parsed-note">' +
+          '<div class="dict-parsed-warn">' + escapeHtml(reason) + '</div>' +
+          '<div style="margin-top:6px;">• 源站地址：<code>' + escapeHtml(parseUrl) + '</code></div>' +
+          '<div style="margin-top:6px;">• 请点右上角 <strong>「↗ 浏览器打开源页面」</strong> 在新标签页查看全文。' +
+          '首次访问该站需通过其反爬校验，若提示 403/418 请稍后重试或更换网络。</div>' +
+          localRefHtml() +
+        '</div>';
+    }
+
     if (typeof window.__VOCA_ONLINE_DICT_FETCHER__ === "function") {
       Promise.resolve()
         .then(function() {
-          return window.__VOCA_ONLINE_DICT_FETCHER__(targetUrl, dictKey, w.word);
+          return window.__VOCA_ONLINE_DICT_FETCHER__(parseUrl, dictKey, w.word);
         })
         .then(function(res) {
           if (!res || res.ok === false) {
@@ -1412,8 +1537,10 @@ JS_ENGINE = r"""
           const parsed = parseOnlineDictionaryHtml(res.html || "", dictKey, w.word);
           if (parsed.notFound) {
             renderNotFoundState();
+          } else if (parsed.parseable === false || !parsed.entries.length) {
+            renderEmbedOnly();
           } else {
-            renderParsedSuccess(parsed.entries, false);
+            renderParsedSuccess(parsed.entries);
           }
         })
         .catch(function(err) {
@@ -1427,6 +1554,12 @@ JS_ENGINE = r"""
       return;
     }
 
+    if (!dictCfg.canFetch) {
+      renderOpenOnly(dictCfg.name + " 的响应头声明了 frame-ancestors 白名单与 SAMEORIGIN，且不开放跨域读取，" +
+                     "因此词条内容无法在 Voca 窗口内呈现。");
+      return;
+    }
+
     if (typeof AbortController !== "undefined") {
       currentDictAbortCtrl = new AbortController();
     }
@@ -1435,9 +1568,9 @@ JS_ENGINE = r"""
       if (currentDictAbortCtrl) {
         try { currentDictAbortCtrl.abort(); } catch (e) {}
       }
-    }, 4500);
+    }, 9000);
 
-    fetch(targetUrl, { method: "GET", mode: "cors", credentials: "omit", signal: signal })
+    fetch(parseUrl, { method: "GET", mode: "cors", credentials: "omit", signal: signal })
       .then(function(resp) {
         clearTimeout(timeoutId);
         if (resp.status === 404) {
@@ -1452,38 +1585,24 @@ JS_ENGINE = r"""
       .then(function(htmlText) {
         if (htmlText === null) return;
         const parsed = parseOnlineDictionaryHtml(htmlText, dictKey, w.word);
-        if (parsed.notFound) {
+        if (parsed.parseable === false) {
+          renderEmbedOnly();
+        } else if (parsed.notFound) {
           renderNotFoundState();
+        } else if (!parsed.entries.length) {
+          // Page answered but yielded no gloss and no explicit "missing" marker: say so
+          // rather than showing an empty box under a green tick.
+          renderEmbedOnly();
         } else {
-          renderParsedSuccess(parsed.entries, true);
+          renderParsedSuccess(parsed.entries);
         }
       })
-      .catch(function() {
+      .catch(function(err) {
         clearTimeout(timeoutId);
-        // Secondary reachability probe (no-cors) to distinguish CORS header restriction vs genuine offline/unreachable host
-        const probeCtrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-        const probeTimer = setTimeout(function() {
-          if (probeCtrl) {
-            try { probeCtrl.abort(); } catch (e) {}
-          }
-        }, 3500);
-        fetch(targetUrl, { method: "GET", mode: "no-cors", credentials: "omit", signal: probeCtrl ? probeCtrl.signal : undefined })
-          .then(function() {
-            clearTimeout(probeTimer);
-            // Host is reachable online; display embedded dictionary view + external open action
-            statusBanner.className = "dict-status-banner dict-status-ok";
-            statusBanner.textContent = "✓ 已连接【" + dictCfg.name + "】在线词典页面（如遇站点跨站嵌入保护，可点击右上角「↗ 浏览器打开源页面」）";
-            parsedBox.innerHTML =
-              '<div style="font-size:0.83rem; color:var(--text-secondary);">' +
-                '已连接 <code>' + escapeHtml(targetUrl) + '</code>，下方展示在线词典视图（本地释义参考：' + escapeHtml(w.cn) + '）。' +
-              '</div>';
-            iframeWrap.style.display = "block";
-            iframeEl.src = targetUrl;
-          })
-          .catch(function() {
-            clearTimeout(probeTimer);
-            renderFallbackFailure("当前运行环境无外网连接或目标词典服务器 (" + dictCfg.name + ") 无法访问。");
-          });
+        const why = err && /abort/i.test(err.name || "")
+          ? "请求超时或被取消"
+          : "跨域策略 (CORS) 拒绝读取，或该词典服务器当前无法访问";
+        renderFallbackFailure(why);
       });
   }
 
@@ -1586,7 +1705,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.3 自定义艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.4 自定义艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -1616,7 +1735,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.0.3 自定义艾宾浩斯背单词计划表",
+        title: "Voca v1.0.4 自定义艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -1628,7 +1747,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.3 离线背单词工坊";
+    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.4 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -1839,7 +1958,7 @@ JS_ENGINE = r"""
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(
-        "Voca v1.0.3 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
+        "Voca v1.0.4 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
         PAGE_W_PX / 2,
         PAGE_H_PX - 26
       );
@@ -1942,8 +2061,43 @@ JS_ENGINE = r"""
     };
   }
 
+  function isTouchShellUi() {
+    return !!(window.__VOCA_IS_TOUCH__ && window.__VOCA_IS_TOUCH__());
+  }
+
+  function showTouchExport(filename, text, mimeType) {
+    const box = document.getElementById("touchExportBox");
+    const area = document.getElementById("touchExportTextarea");
+    if (!box || !area) return false;
+    document.getElementById("touchExportName").textContent = filename;
+    document.getElementById("touchExportKind").textContent = mimeType || "text/plain";
+    area.value = text;
+    box.style.display = "block";
+    box.scrollIntoView({ block: "start" });
+    return true;
+  }
+
+  /* The shipped Android WebView installs no DownloadListener, so a[download] is a silent
+     no-op there. Fire it anyway (a real mobile browser still saves the file) and always
+     mirror text payloads into the copy-out box on the touch shell. */
   function downloadFileBlob(filename, contentData, mimeType) {
-    const blob = new Blob([contentData], { type: mimeType || "text/plain;charset=utf-8" });
+    const type = mimeType || "text/plain;charset=utf-8";
+    let outcome = "file";
+    if (isTouchShellUi()) {
+      const copyable = typeof contentData === "string" &&
+        /^(application\/json|text\/csv|text\/plain)/.test(type);
+      if (!copyable) {
+        showToast("Android 版无法保存该文件，请在 Windows 版导出；备份可改用「导出完整学习备份 (.json)」");
+        return "blocked";
+      }
+      if (contentData.length > 2000000) {
+        showToast("内容约 " + Math.round(contentData.length / 1024) + " KB，超出 Android 版可复制上限，请在 Windows 版导出");
+        return "blocked";
+      }
+      showTouchExport(filename, contentData, type);
+      outcome = "copy";
+    }
+    const blob = new Blob([contentData], { type: type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1954,6 +2108,13 @@ JS_ENGINE = r"""
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 200);
+    return outcome;
+  }
+
+  function announceExport(outcome, filename, desktopMsg) {
+    if (outcome === "blocked") return;
+    if (outcome === "copy") showToast("已生成 " + filename + "，请在「导出内容」框复制保存");
+    else showToast(desktopMsg);
   }
 
   function updateStorageDiagnostics() {
@@ -1963,7 +2124,7 @@ JS_ENGINE = r"""
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.3 · 内置词条 38,855 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.4 · 内置词条 38,855 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 
@@ -1997,10 +2158,14 @@ JS_ENGINE = r"""
       b.classList.toggle("active", b.dataset.layout === state.layoutMode);
     });
 
+    const touchShell = !!(window.__VOCA_IS_TOUCH__ && window.__VOCA_IS_TOUCH__());
     const clickHints = {
-      unfam_lr: "左键/轻触单词行：不会程度+1并发音 · 右键点击：不会程度-1",
-      left_sound_right_unfam: "点击左半部：仅发音 · 右半部：不会程度+1 · 右键：不会程度-1",
-      right_sound_left_unfam: "点击右半部：仅发音 · 左半部：不会程度+1 · 右键：不会程度-1",
+      unfam_lr: touchShell ? "轻触单词行：不会程度+1并发音 · 长按：不会程度-1"
+                           : "左键/轻触单词行：不会程度+1并发音 · 右键点击：不会程度-1",
+      left_sound_right_unfam: touchShell ? "点击左半部：仅发音 · 右半部：不会程度+1 · 长按：不会程度-1"
+                                         : "点击左半部：仅发音 · 右半部：不会程度+1 · 右键：不会程度-1",
+      right_sound_left_unfam: touchShell ? "点击右半部：仅发音 · 左半部：不会程度+1 · 长按：不会程度-1"
+                                         : "点击右半部：仅发音 · 左半部：不会程度+1 · 右键：不会程度-1",
       sound_only: "点击单词行：仅朗读发音（不改变不会程度）"
     };
     document.getElementById("clickRuleHint").textContent = clickHints[state.settings.rowClickMode] || clickHints.unfam_lr;
@@ -2137,6 +2302,12 @@ JS_ENGINE = r"""
 
     // Left-click handler on Word Rows (Requirement 2: Manages Unfamiliarity 不会程度 +1)
     function handleWordListLeftClick(e) {
+      // Android synthesises a click after a long press; swallowing that echo is what keeps
+      // "hold to lower" from immediately raising the same word back up again.
+      if (Date.now() < suppressClickUntil) {
+        if (e.stopPropagation) e.stopPropagation();
+        return;
+      }
       const actBtn = e.target.closest("[data-act]");
       if (actBtn) {
         e.stopPropagation();
@@ -2218,7 +2389,16 @@ JS_ENGINE = r"""
       if (e.target.closest("[data-act]")) return;
       const row = e.target.closest(".word-row");
       if (!row || !row.dataset.wid) return;
-      e.preventDefault();
+      if (e.preventDefault) e.preventDefault();
+
+      // On a touch device the WebView raises contextmenu for the same hold the long-press
+      // gesture owns. Honour it only when it is the sole signal for that hold; a genuine
+      // right-click from a mouse attached to the same device still works.
+      if (isTouchShell() && activeHold && activeHold.row === row &&
+          (Date.now() - activeHold.startedAt) < TOUCH_ECHO_MS) {
+        if (activeHold.consumedBy === "gesture") return;
+        activeHold.consumedBy = "contextmenu";
+      }
 
       const wid = row.dataset.wid;
       const w = wordLookupById[wid];
@@ -2236,10 +2416,90 @@ JS_ENGINE = r"""
       }
     }
 
+    // ---- Touch long press == desktop right click (不会程度 -1) ----
+    function clearLongPressVisual() {
+      if (activeHold && activeHold.row) activeHold.row.classList.remove("lp-arming");
+    }
+
+    // A released hold whose timer never fired must be disarmed. Without this, a quick
+    // tap (+1) would still be followed 480ms later by an unintended -1.
+    function cancelHoldTimer() {
+      if (activeHold && activeHold.timer) {
+        clearTimeout(activeHold.timer);
+        activeHold.timer = null;
+      }
+    }
+
+    function fireLongPress(hold) {
+      if (!hold || hold.consumedBy) return;
+      suppressClickUntil = Date.now() + 900;
+      handleWordListRightClick({ target: hold.row, preventDefault: function() {} });
+      // Claim the hold only AFTER the decrement: the shared handler reads this flag to
+      // drop the contextmenu echo, and setting it first would have made it skip the
+      // gesture itself.
+      hold.consumedBy = "gesture";
+      if (hold.row) {
+        hold.row.classList.remove("lp-arming");
+        hold.row.classList.add("lp-fired");
+        const fired = hold.row;
+        setTimeout(function() { fired.classList.remove("lp-fired"); }, 420);
+      }
+    }
+
+    function touchPoint(list) {
+      const t = list && list[0];
+      return t ? { x: t.clientX, y: t.clientY } : null;
+    }
+
+    function handleWordListTouchStart(e) {
+      lastTouchAt = Date.now();
+      if (e.touches && e.touches.length !== 1) return;
+      const row = e.target.closest(".word-row");
+      if (!row || !row.dataset.wid) return;
+      // ★ / ✕ / 📖 keep their own tap semantics; a hold on a button is not a -1 gesture.
+      if (e.target.closest("[data-act]")) return;
+      clearLongPressVisual();
+      activeHold = {
+        seq: ++holdSeq,
+        row: row,
+        point: touchPoint(e.touches),
+        startedAt: Date.now(),
+        consumedBy: null
+      };
+      row.classList.add("lp-arming");
+      const seq = activeHold.seq;
+      activeHold.timer = setTimeout(function() {
+        activeHold.timer = null;
+        if (activeHold && activeHold.seq === seq) fireLongPress(activeHold);
+      }, LONG_PRESS_MS);
+    }
+
+    function handleWordListTouchMove(e) {
+      if (!activeHold || !activeHold.row) return;
+      const p = touchPoint(e.touches);
+      const start = activeHold.point;
+      if (!p || !start) return;
+      if (Math.abs(p.x - start.x) > LONG_PRESS_SLOP || Math.abs(p.y - start.y) > LONG_PRESS_SLOP) {
+        // the finger is scrolling the list, not holding one row
+        cancelHoldTimer();
+        clearLongPressVisual();
+        activeHold.consumedBy = "cancelled";
+      }
+    }
+
+    function handleWordListTouchEnd() {
+      cancelHoldTimer();
+      clearLongPressVisual();
+    }
+
     ["learnListContainer", "notebookListContainer", "scrollListContent"].forEach(function(cid) {
       const el = document.getElementById(cid);
       el.addEventListener("click", handleWordListLeftClick);
       el.addEventListener("contextmenu", handleWordListRightClick);
+      el.addEventListener("touchstart", handleWordListTouchStart, { passive: true });
+      el.addEventListener("touchmove", handleWordListTouchMove, { passive: true });
+      el.addEventListener("touchend", handleWordListTouchEnd, { passive: true });
+      el.addEventListener("touchcancel", handleWordListTouchEnd, { passive: true });
     });
 
     document.getElementById("btnCheckinCurrentList").addEventListener("click", function() {
@@ -2333,17 +2593,6 @@ JS_ENGINE = r"""
       } else {
         showToast("不会程度已为最低 (0/5)");
       }
-    });
-
-    document.getElementById("cardBtnUnfamReset").addEventListener("click", function() {
-      const w = activeWords[cardCursor];
-      if (!w) return;
-      const rec = getRecord(w.id);
-      rec.unfam = 0;
-      playTone("down");
-      saveState();
-      renderImmersiveCard();
-      showToast("已重置该词不会程度为 0/5");
     });
 
     document.getElementById("cardBtnStar").addEventListener("click", function() {
@@ -2503,12 +2752,29 @@ JS_ENGINE = r"""
       renderSpellingStage();
     });
 
+    document.getElementById("spellBtnBackspace").addEventListener("click", spellBackspace);
+
     document.getElementById("scrollBtnToggle").addEventListener("click", function() {
       toggleAutoScroll(false);
     });
     const svp = document.getElementById("scrollViewport");
-    svp.addEventListener("mouseenter", function() { scrollPausedByHover = true; });
+    svp.addEventListener("mouseenter", function() {
+      // A tap also raises compatibility mouse events. Their matching mouseleave never
+      // comes, so trusting them on a touch device would freeze the stream permanently.
+      if (isTouchShell() || (Date.now() - lastTouchAt) < 900) return;
+      scrollPausedByHover = true;
+    });
     svp.addEventListener("mouseleave", function() { scrollPausedByHover = false; });
+    // The panel copy promises "悬停或触摸列表自动暂停". Hover only exists on a mouse, so
+    // press-to-pause is what makes the promise true on a phone (without this the
+    // auto-scrolling stream cannot be stopped with a finger at all).
+    svp.addEventListener("touchstart", function() {
+      lastTouchAt = Date.now();
+      scrollPausedByTouch = true;
+      scrollPausedByHover = false;
+    }, { passive: true });
+    svp.addEventListener("touchend", function() { scrollPausedByTouch = false; }, { passive: true });
+    svp.addEventListener("touchcancel", function() { scrollPausedByTouch = false; }, { passive: true });
 
     // Notebook & Mastered Events
     document.getElementById("nbSubTabGroup").addEventListener("click", function(e) {
@@ -2634,14 +2900,6 @@ JS_ENGINE = r"""
       saveState();
       refreshAllViews();
     });
-    document.getElementById("modalBtnResetUnfam").addEventListener("click", function() {
-      if (!currentModalWordId) return;
-      const rec = getRecord(currentModalWordId);
-      rec.unfam = 0;
-      document.getElementById("modalUnfamVal").textContent = "0";
-      saveState();
-      refreshAllViews();
-    });
     document.getElementById("modalBtnSaveEdit").addEventListener("click", function() {
       if (!currentModalWordId) return;
       const rec = getRecord(currentModalWordId);
@@ -2755,15 +3013,15 @@ JS_ENGINE = r"""
     document.getElementById("btnDownloadDirectPdf").addEventListener("click", function() {
       if (!lastPrintDocData) return;
       const res = generateMultiPagePdfBinary(lastPrintDocData);
-      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.3.pdf";
+      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.4.pdf";
       window.__LAST_GENERATED_PDF_INFO__ = {
         filename: safeName,
         pageCount: res.pageCount,
         totalRows: res.totalRows,
         byteLength: res.pdfBytes.byteLength
       };
-      downloadFileBlob(safeName, res.pdfBytes, "application/pdf");
-      showToast("✓ 已成功生成并导出 " + res.pageCount + " 页 PDF 文档 (" + safeName + ")");
+      announceExport(downloadFileBlob(safeName, res.pdfBytes, "application/pdf"), safeName,
+        "✓ 已成功生成并导出 " + res.pageCount + " 页 PDF 文档 (" + safeName + ")");
     });
 
     document.getElementById("btnTriggerBrowserPrint").addEventListener("click", function() {
@@ -2783,48 +3041,76 @@ JS_ENGINE = r"""
         "th, td { border: 1px solid #94A3B8; padding: 6px 8px; word-break: break-word; }" +
         "th { background: #F1F5F9; }" +
         "</style></head><body>" + lastPrintHtmlContent + "</body></html>";
-      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.3.html";
+      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.4.html";
       window.__LAST_GENERATED_HTML_INFO__ = {
         filename: safeHtmlName,
         byteLength: standalone.length
       };
-      downloadFileBlob(safeHtmlName, standalone, "text/html;charset=utf-8");
-      showToast("✓ 已下载独立 HTML 导出文件 (" + safeHtmlName + ")");
+      announceExport(downloadFileBlob(safeHtmlName, standalone, "text/html;charset=utf-8"), safeHtmlName,
+        "✓ 已下载独立 HTML 导出文件 (" + safeHtmlName + ")");
     });
 
     // Backup & Restore (Compatible with v1.0.0, v1.0.1, v1.0.2, v1.0.3)
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.3",
+        version: "1.0.4",
         exportedAt: new Date().toISOString(),
         state: state
       };
-      downloadFileBlob("voca_backup_v1.0.3_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8");
-      showToast("已导出完整本地学习备份 (.json)");
+      announceExport(downloadFileBlob("voca_backup_v1.0.4_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+        "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
+
+    function applyBackupJsonText(text, sourceLabel) {
+      try {
+        const parsed = JSON.parse(text);
+        const rawState = parsed.state || parsed;
+        if (rawState && typeof rawState === "object") {
+          state = migrateStateIfNeeded(rawState);
+          rebuildCustomBookCache();
+          applySettingsToDOM();
+          saveState();
+          refreshAllViews();
+          showToast("✓ 学习数据备份已完整恢复（" + sourceLabel + "）");
+          return true;
+        }
+      } catch (err) { /* fall through to the shared failure toast */ }
+      showToast("备份内容解析失败，请确认是完整的 .json 备份文本");
+      return false;
+    }
 
     document.getElementById("fileRestoreBackupJson").addEventListener("change", function(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(ev) {
-        try {
-          const parsed = JSON.parse(ev.target.result);
-          const rawState = parsed.state || parsed;
-          if (rawState && typeof rawState === "object") {
-            state = migrateStateIfNeeded(rawState);
-            rebuildCustomBookCache();
-            applySettingsToDOM();
-            saveState();
-            refreshAllViews();
-            showToast("✓ 学习数据备份已完整恢复（已无损升级至 v1.0.3）！");
-          }
-        } catch (err) {
-          showToast("备份文件解析失败，请确认格式正确");
-        }
-      };
+      reader.onload = function(ev) { applyBackupJsonText(ev.target.result, "来自文件 " + file.name); };
       reader.readAsText(file);
+    });
+
+    document.getElementById("btnParsePasteRestore").addEventListener("click", function() {
+      const box = document.getElementById("pasteRestoreTextarea");
+      const text = (box.value || "").trim();
+      if (!text) { showToast("请先粘贴备份 JSON 内容"); return; }
+      if (applyBackupJsonText(text, "来自粘贴内容")) box.value = "";
+    });
+
+    document.getElementById("btnCopyTouchExport").addEventListener("click", function() {
+      const box = document.getElementById("touchExportTextarea");
+      box.removeAttribute("readonly");
+      box.select();
+      box.setSelectionRange(0, box.value.length);
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      box.setAttribute("readonly", "readonly");
+      if (ok) showToast("✓ 已复制，可粘贴到备忘录保存");
+      else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(box.value).then(
+          function() { showToast("✓ 已复制到剪贴板"); },
+          function() { showToast("复制失败，请长按文本框手动全选"); });
+      } else {
+        showToast("复制失败，请长按文本框手动全选");
+      }
     });
 
     // CSV Export (Unfamiliarity retained, Mastery removed)
@@ -2841,8 +3127,8 @@ JS_ENGINE = r"""
       const csvContent = "\uFEFF" + rows.map(function(r) {
         return r.map(function(cell) { return '"' + String(cell || "").replace(/"/g, '""') + '"'; }).join(",");
       }).join("\r\n");
-      downloadFileBlob("voca_" + state.currentBook + "_export.csv", csvContent, "text/csv;charset=utf-8");
-      showToast("已导出当前词库 CSV 文件");
+      announceExport(downloadFileBlob("voca_" + state.currentBook + "_export.csv", csvContent, "text/csv;charset=utf-8"),
+        "词库 CSV", "已导出当前词库 CSV 文件");
     });
 
     // Settings Controls (Requirement 4: Persistent Online Dictionary Selection)
@@ -2899,10 +3185,7 @@ JS_ENGINE = r"""
           return;
         } else if (e.key === "Backspace") {
           e.preventDefault();
-          if (spellTyped.length > 0) {
-            spellTyped = spellTyped.slice(0, -1);
-            renderSpellingStage();
-          }
+          spellBackspace();
           return;
         } else if (e.key === "Enter") {
           e.preventDefault();
@@ -2949,8 +3232,11 @@ JS_ENGINE = r"""
   function bootVocaApp() {
     if (appBooted) return;
     appBooted = true;
+    // Windows kiosk convenience. Never on a touch shell: a phone WebView is already
+    // full-bleed and resizeTo there is meaningless (and would fight the user's own
+    // window on a small desktop window).
     try {
-      if (window.screen && window.screen.availWidth > 900 && window.outerWidth < window.screen.availWidth * 0.9) {
+      if (!isTouchShell() && window.screen && window.screen.availWidth > 900 && window.outerWidth < window.screen.availWidth * 0.9) {
         window.moveTo(0, 0);
         window.resizeTo(window.screen.availWidth, window.screen.availHeight);
       }
@@ -2984,4 +3270,5 @@ out_html_tmp = os.environ.get("VOCA_OUT_HTML", os.path.abspath(os.path.join(SCRI
 with open(out_html_tmp, "w", encoding="utf-8", newline="\n") as f:
     f.write(full_html)
 
-print("Assembled Voca_App_v103.html:", len(full_html), "bytes")
+print("Assembled %s: %d chars / %d bytes" % (
+    out_html_tmp, len(full_html), os.path.getsize(out_html_tmp)))

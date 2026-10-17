@@ -73,8 +73,8 @@ def build_rsrc_section(rsrc_rva: int) -> bytes:
     manifest_xml = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n'
         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">\r\n'
-        '  <assemblyIdentity version="1.0.3.0" processorArchitecture="amd64" name="Voca.Desktop.App" type="win32"/>\r\n'
-        '  <description>Voca v1.0.3 Offline Ebbinghaus Vocabulary Application</description>\r\n'
+        '  <assemblyIdentity version="1.0.4.0" processorArchitecture="amd64" name="Voca.Desktop.App" type="win32"/>\r\n'
+        '  <description>Voca v1.0.4 Offline Ebbinghaus Vocabulary Application</description>\r\n'
         '  <asmv3:application>\r\n'
         '    <asmv3:windowsSettings>\r\n'
         '      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>\r\n'
@@ -183,6 +183,7 @@ def build_voca_exe(out_path: str):
     rva_w_arg_prefix = add_wstr("--app=\"")
     rva_w_arg_mid = add_wstr("\" --start-maximized --high-dpi-support=1 --user-data-dir=\"")
     rva_w_arg_suffix = add_wstr("\\data\\profile\"")
+    rva_w_arg_tail = add_wstr(" --no-first-run --no-default-browser-check --disable-extensions --disable-sync")
 
     rdata_raw = iat_kernel32 + iat_shell32 + ilt_kernel32 + ilt_shell32 + idt + bytes(hn_buf) + bytes(str_buf)
 
@@ -243,6 +244,8 @@ _start:
     lea rsi, [rbx + {rva_dir_buf}]
     call copy_wstr
     lea rsi, [rbx + {rva_w_arg_suffix}]
+    call copy_wstr
+    lea rsi, [rbx + {rva_w_arg_tail}]
     call copy_wstr
 
     # 5. Try ShellExecuteW(NULL, L"open", L"msedge.exe", argsBuf, dirBuf, SW_SHOWMAXIMIZED=3)
@@ -356,7 +359,7 @@ copy_wstr:
         sect_align,
         file_align,
         6, 0,
-        1, 3,                   # Image Version 1.3 (v1.0.3)
+        1, 4,                   # Image Version 1.4 (v1.0.4)
         6, 0,
         0,
         size_of_image,
@@ -398,7 +401,7 @@ copy_wstr:
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "wb") as f:
         f.write(exe_bytes)
-    print(f"Built v1.0.3 Windows EXE (8-DPI icons + PerMonitorV2 manifest): {out_path} ({len(exe_bytes):,} bytes)")
+    print(f"Built v1.0.4 Windows EXE (8-DPI icons + PerMonitorV2 manifest): {out_path} ({len(exe_bytes):,} bytes)")
 
 if __name__ == "__main__":
     build_voca_exe(os.path.abspath(os.path.join(SCRIPT_DIR, "..", "windows", "Voca.exe")))

@@ -9,8 +9,13 @@ windows/data/profile/
 
 # Temporary build artifacts
 build_tmp/
+_build/
 *.tmp
 *.new
+*.o
+windows/WebView2Loader.dll
+windows/host_trace.log
+windows/voca_crash.log
 .DS_Store
 Thumbs.db
 .idea/

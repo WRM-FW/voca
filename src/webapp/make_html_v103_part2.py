@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 2 of Voca v1.0.3 HTML Application:
-- High-DPI 256x256 brand icon in sidebar (v1.0.3 badge).
+Generates Part 2 of Voca v1.0.4 HTML Application:
+- High-DPI 256x256 brand icon in sidebar (version badge).
 - Removed '英英模式' (en_en) button from #langModeGroup (retains 双语 / 只看英文 / 只看中文).
 - Removed all '掌握度' (mastery) UI elements, keeping only '不会程度' (unfamiliarity 0..5).
 - Redesigned '#dictModal' ("查看词典详细与编辑"):
@@ -30,8 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.0.3</span></div>
-        <div class="brand-sub">艾宾浩斯双平台背单词工坊</div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.0.4</span></div>
       </div>
     </div>
 
@@ -88,22 +87,22 @@ HTML_PART2_TEMPLATE = r"""
         <select id="listSelect" class="ctrl-select" title="选择当前 List 分组"></select>
 
         <!-- Requirement 5: Language Mode Switcher (双语 / 只看英文 / 只看中文; 英英模式已移除) -->
-        <div class="seg-group" id="langModeGroup">
-          <button class="seg-btn active" data-lang="bilingual">双语</button>
-          <button class="seg-btn" data-lang="en_only">只看英文</button>
-          <button class="seg-btn" data-lang="cn_only">只看中文</button>
+        <div class="seg-group" id="langModeGroup" role="group" aria-label="语言显示模式">
+          <button class="seg-btn active" data-lang="bilingual" aria-label="双语模式">双语</button>
+          <button class="seg-btn" data-lang="en_only" aria-label="只看英文模式">只看英文</button>
+          <button class="seg-btn" data-lang="cn_only" aria-label="只看中文模式">只看中文</button>
         </div>
       </div>
 
       <div class="header-right">
         <!-- View Switcher: List View vs Card View -->
-        <div class="seg-group" id="layoutModeGroup">
-          <button class="seg-btn active" data-layout="list">列表视图</button>
-          <button class="seg-btn" data-layout="card">沉浸卡片</button>
+        <div class="seg-group" id="layoutModeGroup" role="group" aria-label="列表 / 沉浸卡片切换">
+          <button class="seg-btn active" data-layout="list" aria-label="列表视图">列表视图</button>
+          <button class="seg-btn" data-layout="card" aria-label="沉浸卡片视图">沉浸卡片</button>
         </div>
 
         <!-- Requirement 2: Sort options based on Unfamiliarity (不会程度), Mastery removed -->
-        <select id="sortSelect" class="ctrl-select" title="当前List内部排序">
+        <select id="sortSelect" class="ctrl-select" title="当前List内部排序" aria-label="当前 List 内部排序">
           <option value="initial">初始排列</option>
           <option value="az">按字母 A→Z</option>
           <option value="random">随机打乱</option>
@@ -111,13 +110,17 @@ HTML_PART2_TEMPLATE = r"""
           <option value="easy_first">不会程度从低到高</option>
         </select>
 
-        <button class="btn btn-sm" id="quickThemeBtn" title="切换显示主题 (晨曦白 / 纯黑OLED / 羊皮纸)">主题: 晨曦白</button>
+        <button class="btn btn-sm" id="quickThemeBtn" title="切换显示主题 (晨曦白 / 纯黑OLED / 羊皮纸)" aria-label="切换显示主题">主题: 晨曦白</button>
       </div>
     </header>
 
     <main class="page-container">
       <!-- ==================== VIEW 1: LEARN & LIST STUDIO ==================== -->
       <section class="view-section active" id="view-learn">
+        <div class="m-only m-view-head">
+          <h2>📚 单词学习</h2>
+          <p>轻触单词行加深不会程度，长按降低。</p>
+        </div>
         <div class="mode-hint-banner" id="modeFirstTimeBanner">
           <span id="modeFirstTimeText">💡 提示：点击遮罩区域即可发音或窥显隐藏内容。</span>
           <button class="btn btn-sm" id="btnDismissModeBanner">我知道了</button>
@@ -157,6 +160,12 @@ HTML_PART2_TEMPLATE = r"""
             <button class="btn btn-sm" id="btnOpenMasteredDrawer">熟词恢复 (<span id="inlineMasteredCnt">0</span>)</button>
             <button class="btn btn-sm" id="btnPrintCurrentList">🖨️ 导出本组 PDF</button>
           </div>
+        </div>
+
+        <!-- Touch-only gesture explainer: -1 has always been right-click, which a
+             finger cannot perform. The long-press handler in the engine makes it real. -->
+        <div class="m-only m-gesture-hint">
+          👆 轻触单词行 = 不会程度 +1 并发音 · <strong>长按单词行 = 不会程度 −1</strong> · 点 ★ / ✕ / 📖 图标操作
         </div>
 
         <!-- Subview A: Classic List View -->
@@ -209,7 +218,6 @@ HTML_PART2_TEMPLATE = r"""
               <div class="card-unfam-controls">
                 <button class="btn btn-sm" id="cardBtnUnfamDown" title="降低不会程度 (-1)">不会程度 -1</button>
                 <button class="btn btn-sm btn-primary" id="cardBtnUnfamUp" title="加深不会程度 (+1)">不会程度 +1</button>
-                <button class="btn btn-sm" id="cardBtnUnfamReset" title="重置不会程度为 0">重置不会度</button>
               </div>
             </div>
           </div>
@@ -218,6 +226,10 @@ HTML_PART2_TEMPLATE = r"""
 
       <!-- ==================== VIEW 2: CUSTOMIZABLE EBBINGHAUS PLAN MATRIX ==================== -->
       <section class="view-section" id="view-plan">
+        <div class="m-only m-view-head">
+          <h2>📅 艾宾浩斯计划表</h2>
+          <p>每天一张日程卡，点 List 标签直接跳转背词。</p>
+        </div>
         <div class="stat-card" style="margin-bottom:16px; padding:18px 20px;">
           <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:12px;">
             <div>
@@ -285,6 +297,10 @@ HTML_PART2_TEMPLATE = r"""
           </div>
         </div>
 
+        <div class="m-only m-plan-legend">
+          📇 手机视图按天展开：复习 1~5 的间隔天数见上方「当前生效配置」。左右滑动列表不会截断，点标签跳转。
+        </div>
+
         <div class="matrix-table-wrap">
           <table class="matrix-table">
             <thead>
@@ -306,6 +322,10 @@ HTML_PART2_TEMPLATE = r"""
 
       <!-- ==================== VIEW 3: SPECIALIZED TRAINING (拼词 + 滚动) ==================== -->
       <section class="view-section" id="view-train">
+        <div class="m-only m-view-head">
+          <h2>⚡ 专项强化训练</h2>
+          <p>拼词模式可点字母卡片或 ⌫ 删除；滚动模式手指按住列表即暂停。</p>
+        </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px;">
           <div class="seg-group" id="trainSubModeGroup">
             <button class="seg-btn active" data-tmode="spell">🔤 拼词模式 (5卡片点选+键盘)</button>
@@ -327,7 +347,7 @@ HTML_PART2_TEMPLATE = r"""
           <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px;">
             <span style="font-size:0.82rem; font-weight:700; color:var(--text-muted);" id="spellProgressText">拼词挑战 1 / 15</span>
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-              <label style="font-size:0.78rem; color:var(--text-secondary); display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
+              <label class="check-label" style="font-size:0.78rem; color:var(--text-secondary); display:inline-flex; gap:4px;">
                 <input type="checkbox" id="spellAutoAdvanceToggle" checked> 自动下一词
               </label>
               <button class="btn btn-sm" id="spellBtnAddHard" title="加深该词不会程度 (+1)">+1 不会程度</button>
@@ -344,14 +364,17 @@ HTML_PART2_TEMPLATE = r"""
 
           <div class="spell-slots" id="spellSlotsBox"></div>
 
-          <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:6px;">
-            请点选下方 5 个字母卡片，或直接使用键盘输入字母（退格键删除，回车键确认）：
+          <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;">
+            请点选下方 5 个字母卡片，或使用键盘输入字母（⌫ / 退格键删除，确认键提交）：
           </div>
           <div class="five-cards-row" id="spellFiveCardsBox"></div>
 
-          <div style="display:flex; justify-content:center; gap:10px; margin-top:14px;">
-            <button class="btn" id="spellBtnPrev">← 上一词</button>
-            <button class="btn btn-primary" id="spellBtnSubmit">确认 / 下一词 (Enter) →</button>
+          <div class="spell-key-row">
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+              <button class="btn" id="spellBtnPrev">← 上一词</button>
+              <button class="btn btn-primary" id="spellBtnSubmit">确认 / 下一词</button>
+            </div>
+            <button type="button" class="btn" id="spellBtnBackspace" title="删除已输入的最后一个字母（等同退格键）" aria-label="删除上一个字母">⌫</button>
           </div>
         </div>
 
@@ -360,7 +383,8 @@ HTML_PART2_TEMPLATE = r"""
           <div class="stat-card" style="margin-bottom:12px; display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
             <div>
               <span style="font-weight:800;">📜 自动循环滚动记忆流</span>
-              <span style="font-size:0.80rem; color:var(--text-muted); margin-left:6px;">悬停或触摸列表自动暂停，支持左/右键调节不会程度、标星或查在线词典</span>
+              <span class="d-only" style="font-size:0.80rem; color:var(--text-muted); margin-left:6px;">悬停列表自动暂停，支持左/右键调节不会程度、标星或查在线词典</span>
+              <span class="m-only m-inline" style="font-size:0.80rem; color:var(--text-muted); margin-left:6px;">触摸列表自动暂停，支持轻触/长按调节不会程度、标星或查在线词典</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <label style="font-size:0.82rem; font-weight:600;">速度:
@@ -375,7 +399,7 @@ HTML_PART2_TEMPLATE = r"""
             </div>
           </div>
 
-          <div id="scrollViewport" style="max-height:540px; overflow-y:auto; border:1px solid var(--border-color); border-radius:16px; background:var(--bg-surface);">
+          <div id="scrollViewport" class="scroll-viewport">
             <div id="scrollListContent"></div>
           </div>
         </div>
@@ -383,6 +407,10 @@ HTML_PART2_TEMPLATE = r"""
 
       <!-- ==================== VIEW 4: NOTEBOOK & MASTERED (生词本与熟词表) ==================== -->
       <section class="view-section" id="view-notebook">
+        <div class="m-only m-view-head">
+          <h2>⭐ 生词本与熟词表</h2>
+          <p>生词本里的中文释义会与主词库联动；长按单词行降低不会程度。</p>
+        </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
           <div class="seg-group" id="nbSubTabGroup">
             <button class="seg-btn active" data-nbtab="starred">★ 生词本 (<span id="nbStarCountTab">0</span>)</button>
@@ -410,12 +438,20 @@ HTML_PART2_TEMPLATE = r"""
           💡 <strong>生词本联动机制</strong>：在生词本中修改单词的中文释义，主词库中的释义会同步更新；若将单词移出生词本，其释义将自动恢复为词典原始释义。
         </div>
 
+        <div class="m-only m-gesture-hint">
+          👆 长按单词行 = 不会程度 −1（等效桌面右键）
+        </div>
+
         <div id="notebookListContainer" class="word-list-wrap"></div>
       </section>
 
       <!-- ==================== VIEW 5: OFFLINE DATA, IMPORT/EXPORT, PDF & MIGRATION GUIDE ==================== -->
       <section class="view-section" id="view-data">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px; margin-bottom:18px;">
+        <div class="m-only m-view-head">
+          <h2>📥 词库导入与 PDF 导出</h2>
+          <p>导入外部词库、导出多页 PDF、备份与恢复学习数据。</p>
+        </div>
+        <div class="panel-grid" style="margin-bottom:18px;">
           <!-- Card 1: Custom Lexicon Import -->
           <div class="stat-card" style="padding:18px;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📥 外部自定义词库导入</h3>
@@ -452,9 +488,10 @@ HTML_PART2_TEMPLATE = r"""
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">💾 本地数据持久化备份与恢复</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
               所有学习进度、自定义计划参数、不会程度、生词本、熟词表、在线词典偏好及自定义词库均实时保存在本地双引擎（LocalStorage + IndexedDB）中，完全兼容 v1.0.0 / v1.0.1 / v1.0.2 备份文件。
+              <span class="m-only"><br>Android 版当前内核不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.3
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.4
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -464,13 +501,28 @@ HTML_PART2_TEMPLATE = r"""
               </label>
               <button class="btn btn-sm" id="btnExportLexiconCsv">导出当前词库 CSV</button>
             </div>
+            <textarea id="pasteRestoreTextarea" rows="4" class="m-only" placeholder="Android 上若文件选择无效，把备份 .json 的完整内容粘贴到这里，再点下方按钮恢复。" style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.82rem; margin:10px 0 8px;"></textarea>
+            <button class="btn btn-sm m-only" id="btnParsePasteRestore">从粘贴内容恢复备份</button>
+          </div>
+
+          <!-- The Android WebView in this build has no DownloadListener, so an anchor
+               click never writes a file. On the touch shell exports land here instead. -->
+          <div class="stat-card m-only" id="touchExportBox" style="padding:18px; display:none;">
+            <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📤 导出内容（长按复制保存）</h3>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; white-space:normal;">
+              文件名：<strong id="touchExportName"></strong> · 类型 <span id="touchExportKind"></span>。
+              当前 Android 版无法直接把文件写入存储，请点「复制到剪贴板」后粘贴到备忘录或文件管理器保存；
+              备份 JSON 可在上方「从粘贴内容恢复备份」原样贴回。
+            </p>
+            <textarea id="touchExportTextarea" rows="8" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.78rem; margin-bottom:10px;"></textarea>
+            <button class="btn btn-sm" id="btnCopyTouchExport">📋 复制到剪贴板</button>
           </div>
         </div>
 
-        <!-- Card 4: Comprehensive Data Storage Paths, v1.0.2 -> v1.0.3 Upgrade & Migration Guide -->
+        <!-- Card 4: Comprehensive Data Storage Paths, Upgrade & Cross-Platform Migration Guide -->
         <div class="stat-card" id="dataMigrationGuideCard" style="padding:20px; line-height:1.7;">
-          <h3 style="font-size:1.12rem; font-weight:800; margin-bottom:12px;">📂 v1.0.2 → v1.0.3 版本升级、数据存储路径与跨平台迁移说明</h3>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; font-size:0.83rem; color:var(--text-secondary);">
+          <h3 style="font-size:1.12rem; font-weight:800; margin-bottom:12px;">📂 版本升级、数据存储路径与跨平台迁移说明</h3>
+          <div class="panel-grid-inner" style="font-size:0.83rem; color:var(--text-secondary);">
             <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
               <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">1. 用户数据实际存放位置及相对路径</div>
               <p>• <strong>Windows 平台</strong>（参照位置：解压后的 <code>windows/</code> 目录，即 <code>Voca.exe</code> 所在同级文件夹）：<br>
@@ -483,11 +535,11 @@ HTML_PART2_TEMPLATE = r"""
             </div>
 
             <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
-              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">2. v1.0.2 升级至 v1.0.3 数据保留与跨平台迁移</div>
-              <p>• <strong>升级前准备与数据自动迁移机制</strong>：升级前建议先点击上方「⬇ 导出完整学习备份 (.json)」保存一份备份。v1.0.3 启动时会自动检测 v1.0.2 存档（Schema v3 → v4），自动清理已废弃的「掌握度 (`mastery`)」与「英英模式 (`en_en`)」字段，同时 <strong>100% 无损保留</strong>所有单词的「不会程度 (`unfam`)」、生词本、熟词表、自定义释义、笔记、艾宾浩斯计划表参数与打卡记录。</p>
+              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">2. 升级到 v1.0.4 的数据保留与跨平台迁移</div>
+              <p>• <strong>升级前准备与数据自动迁移机制</strong>：升级前建议先点击上方「⬇ 导出完整学习备份 (.json)」保存一份备份。v1.0.4 未改变存档结构（仍为 Schema v4），v1.0.0 ~ v1.0.3 的存档可直接读取，删除「重置不会度」只移除界面按钮、不影响任何已保存的不会程度数值；更早的 v1.0.2 及以前存档（Schema v3）启动时仍会自动迁移，清理已废弃的「掌握度 (`mastery`)」与「英英模式 (`en_en`)」字段，同时 <strong>100% 无损保留</strong>所有单词的「不会程度 (`unfam`)」、生词本、熟词表、自定义释义、笔记、艾宾浩斯计划表参数与打卡记录。</p>
               <p style="margin-top:6px;">• <strong>已支持的迁移方式</strong>：<br>
                 1) <strong>通用 JSON 备份迁移（推荐，支持 Windows ⇄ Android 互传）</strong>：在旧版或原设备导出 <code>.json</code> 备份，在新版或新设备点击「⬆ 从备份文件恢复数据」即可一键迁移并验证。<br>
-                2) <strong>Windows 同平台升级/迁移</strong>：将旧版 <code>windows/data/profile/</code> 文件夹复制到 v1.0.3 的 <code>windows/data/profile/</code> 下即可直接继承全部数据。</p>
+                2) <strong>Windows 同平台升级/迁移</strong>：将旧版 <code>windows/data/profile/</code> 文件夹复制到新版的 <code>windows/data/profile/</code> 下即可直接继承全部数据。</p>
               <p style="margin-top:6px; color:var(--amber-mark);">• <strong>明确的实际限制（不支持项）</strong>：不支持云端账号自动同步；且因操作系统权限与底层 LevelDB 格式差异，<strong>不支持</strong>将 Windows 的 <code>./data/profile/</code> 目录直接拷贝至 Android 手机恢复。</p>
             </div>
 
@@ -502,7 +554,11 @@ HTML_PART2_TEMPLATE = r"""
 
       <!-- ==================== VIEW 6: SETTINGS & HELP ==================== -->
       <section class="view-section" id="view-settings">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px;">
+        <div class="m-only m-view-head">
+          <h2>⚙️ 偏好设置与帮助</h2>
+          <p>词典来源、点击行为、主题与全局文字大小，均实时持久保存。</p>
+        </div>
+        <div class="panel-grid panel-grid-loose">
           <!-- Preferences -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
             <h3 style="font-size:1.1rem; font-weight:800;">⚙️ 学习与词典偏好设置</h3>
@@ -510,17 +566,18 @@ HTML_PART2_TEMPLATE = r"""
             <!-- Requirement 4: Persistent Online Dictionary Selection Setting -->
             <label style="font-size:0.86rem; font-weight:700; color:var(--brand-primary);">📖 在线词典查询来源选择（用于「查看词典详细与编辑」弹窗，重启后持久生效）
               <select id="settingOnlineDict" class="ctrl-select" style="width:100%; margin-top:6px;">
-                <option value="eudic" selected>欧路词典 (https://dict.eudic.net/dicts/en/@word@)</option>
-                <option value="wordreference">WordReference 英汉词典 (https://www.wordreference.com/enzh/@word@)</option>
+                <option value="eudic" selected>欧路词典 (dict.eudic.net — 窗口内直接显示释义)</option>
+                <option value="iciba">爱词霸英汉词典 (iciba.com — 窗口内直接显示页面)</option>
+                <option value="wordreference">WordReference 英汉 (wordreference.com — 仅能跳转源站，见弹窗说明)</option>
               </select>
             </label>
 
             <!-- Requirement 2: Row Click Behavior based on Unfamiliarity (不会程度) -->
             <label style="font-size:0.86rem; font-weight:600;">单词行鼠标/触控点击行为设置（管理「不会程度」）
               <select id="settingRowClickMode" class="ctrl-select" style="width:100%; margin-top:6px;">
-                <option value="unfam_lr" selected>1. 不会程度模式：左键/轻触加深不会程度(+1)并发音 · 右键降低不会程度(-1)</option>
-                <option value="left_sound_right_unfam">2. 分区模式 A：点击左半部仅发音，右半部加深不会程度(+1) · 右键降低(-1)</option>
-                <option value="right_sound_left_unfam">3. 分区模式 B：点击右半部仅发音，左半部加深不会程度(+1) · 右键降低(-1)</option>
+                <option value="unfam_lr" selected>1. 不会程度模式：左键/轻触加深不会程度(+1)并发音 · 右键/长按降低不会程度(-1)</option>
+                <option value="left_sound_right_unfam">2. 分区模式 A：点击左半部仅发音，右半部加深不会程度(+1) · 右键/长按降低(-1)</option>
+                <option value="right_sound_left_unfam">3. 分区模式 B：点击右半部仅发音，左半部加深不会程度(+1) · 右键/长按降低(-1)</option>
                 <option value="sound_only">4. 纯发音模式：点击仅朗读发音（不改变不会程度）</option>
               </select>
             </label>
@@ -559,27 +616,27 @@ HTML_PART2_TEMPLATE = r"""
               </select>
             </label>
 
-            <label style="font-size:0.86rem; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <label class="check-label" style="font-size:0.86rem; font-weight:600; display:flex; gap:8px;">
               <input type="checkbox" id="settingSoundFxToggle" checked> 开启多邻国风格微交互合成音效 (Web Audio)
             </label>
           </div>
 
           <!-- Shortcuts & Architecture Info -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:12px; white-space:normal;">
-            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.3)</h3>
+            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.4)</h3>
             <div style="font-size:0.83rem; color:var(--text-secondary); line-height:1.7;">
               <div>• <strong>左键/点击单词行</strong>：加深该词不会程度 (+1，上限 5/5) 并朗读发音</div>
-              <div>• <strong>右键点击单词行</strong>：降低该词不会程度 (-1，下限 0/5)</div>
-              <div>• <strong>点击 📖 按钮</strong>：打开「查看词典详细与编辑」弹窗，自动调用所选在线词典（欧路词典 / WordReference）查询当前单词</div>
-              <div>• <strong>Space (空格键)</strong>：朗读当前卡片单词发音</div>
-              <div>• <strong>J / ← 与 K / →</strong>：沉浸卡片模式下切换上一词 / 下一词</div>
-              <div>• <strong>1 / 2 / 3 键</strong>：快速切换 双语 / 只看英文 / 只看中文 模式</div>
+              <div>• <strong>右键点击单词行</strong>：降低该词不会程度 (-1，下限 0/5)；触屏可长按同一行</div>
+              <div>• <strong>点击 📖 按钮</strong>：打开「查看词典详细与编辑」弹窗，自动调用所选在线词典（欧路词典 / 爱词霸 / WordReference）查询当前单词</div>
+              <div class="d-only">• <strong>Space (空格键)</strong>：朗读当前卡片单词发音</div>
+              <div class="d-only">• <strong>J / ← 与 K / →</strong>：沉浸卡片模式下切换上一词 / 下一词</div>
+              <div class="d-only">• <strong>1 / 2 / 3 键</strong>：快速切换 双语 / 只看英文 / 只看中文 模式</div>
             </div>
             <div style="border-top:1px solid var(--border-color); padding-top:12px; font-size:0.82rem; color:var(--text-muted);">
-              <strong>字体、词库与在线词典声明 (v1.0.3)</strong>：<br>
+              <strong>字体、词库与在线词典声明 (v1.0.4)</strong>：<br>
               1) <strong>跨平台内嵌字体</strong>：内置 <strong>Inter</strong> 与 <strong>Noto Sans CJK SC</strong> (SIL Open Font License 1.1) WOFF2 字体包。<br>
               2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>38,855</strong> 条词条，源自开源词典 <strong>ECDICT</strong>（MIT License）。<br>
-              3) <strong>在线词典集成</strong>：支持按需实时查询 <strong>欧路词典 (dict.eudic.net)</strong> 与 <strong>WordReference 英汉词典 (wordreference.com)</strong>，在线词典网页内容版权归各词典平台所有。
+              3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 因其响应头声明 <code>frame-ancestors</code> 白名单且不开放跨域读取，只能在「查看词典详细与编辑」弹窗里一键跳转到源站查看。三家词典的网页内容版权归各自平台所有。
             </div>
           </div>
         </div>
@@ -624,6 +681,7 @@ HTML_PART2_TEMPLATE = r"""
             <span style="font-size:0.80rem; font-weight:800; color:var(--text-primary);">🌐 在线词典查询来源：</span>
             <div class="seg-group" id="modalDictSourceGroup">
               <button type="button" class="seg-btn active" data-dict="eudic" id="modalBtnSourceEudic">欧路词典</button>
+              <button type="button" class="seg-btn" data-dict="iciba" id="modalBtnSourceIciba">爱词霸</button>
               <button type="button" class="seg-btn" data-dict="wordreference" id="modalBtnSourceWR">WordReference 英汉</button>
             </div>
           </div>
@@ -645,8 +703,9 @@ HTML_PART2_TEMPLATE = r"""
         <!-- Parsed Online Dictionary Content Box (Shown when HTML/API response is parsed or when displaying honest fallback diagnostics) -->
         <div class="dict-parsed-entries" id="modalDictParsedContent"></div>
 
-        <!-- Live Online Dictionary Embedded View (Automatically hidden when offline or unreachable so blank/failed pages are never disguised as normal results) -->
-        <div class="dict-iframe-wrap" id="modalDictIframeWrap" style="display:none;">
+        <!-- Live Online Dictionary Embedded View. Hidden by default in CSS; only sources whose
+             framing capability was actually verified get a frame shown at all. -->
+        <div class="dict-iframe-wrap" id="modalDictIframeWrap">
           <iframe id="modalOnlineDictIframe" title="在线词典详情视图" referrerpolicy="no-referrer"></iframe>
         </div>
       </div>
@@ -669,7 +728,6 @@ HTML_PART2_TEMPLATE = r"""
           <span>不会程度：<strong id="modalUnfamVal">0</strong>/5</span>
           <button class="btn btn-sm" id="modalBtnUnfamDown" title="降低不会程度 (-1)">-1</button>
           <button class="btn btn-sm" id="modalBtnUnfamUp" title="加深不会程度 (+1)">+1</button>
-          <button class="btn btn-sm" id="modalBtnResetUnfam">重置不会度</button>
         </div>
         <button class="btn btn-primary btn-sm" id="modalBtnSaveEdit">💾 保存修改并加入生词本</button>
       </div>

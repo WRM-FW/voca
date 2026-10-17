@@ -110,7 +110,16 @@ def make_crisp_icon_at_size(target_size: int) -> Image.Image:
     rgba.putalpha(mask)
     return rgba
 
-all_sizes = [512, 256, 192, 128, 64, 48, 40, 32, 24, 16]
+# 20/28/36 are the icon sizes Windows asks for at 125%/175%/225% display scaling; the
+# favicon ladder in index.html needs one frame per shell-requested size or the taskbar
+# bitmap comes back resampled and soft.
+all_sizes = [512, 256, 192, 128, 64, 48, 40, 36, 32, 28, 24, 20, 16]
+
+if im_raw.size != (2048, 2048):
+    print("  WARNING: assets/icons/master_icon.png is %dx%d, not the original 2048x2048 artwork." % im_raw.size)
+    print("           Small frames rendered from it are measurably softer than the committed ones")
+    print("           (max channel delta 1..6 at 16-256px). Only run this step with the")
+    print("           full-resolution source image available.")
 png_bytes_map = {}
 dib_bytes_map = {}
 
@@ -214,7 +223,12 @@ print(f"  Generated NotoSansCJKsc-Full.woff2 ({os.path.getsize(cjk_out_p):,} byt
 print("[3/3] Saving embedded_assets.json...")
 embedded_assets = {
     "icon_16_b64": base64.b64encode(png_bytes_map[16]).decode("ascii"),
+    "icon_20_b64": base64.b64encode(png_bytes_map[20]).decode("ascii"),
+    "icon_24_b64": base64.b64encode(png_bytes_map[24]).decode("ascii"),
+    "icon_28_b64": base64.b64encode(png_bytes_map[28]).decode("ascii"),
     "icon_32_b64": base64.b64encode(png_bytes_map[32]).decode("ascii"),
+    "icon_36_b64": base64.b64encode(png_bytes_map[36]).decode("ascii"),
+    "icon_40_b64": base64.b64encode(png_bytes_map[40]).decode("ascii"),
     "icon_48_b64": base64.b64encode(png_bytes_map[48]).decode("ascii"),
     "icon_64_b64": base64.b64encode(png_bytes_map[64]).decode("ascii"),
     "icon_128_b64": base64.b64encode(png_bytes_map[128]).decode("ascii"),

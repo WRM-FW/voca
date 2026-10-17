@@ -1,8 +1,8 @@
 # 第三方资源、字体、词库与品牌资产授权核查清单 (THIRD_PARTY_NOTICES)
 
-本文件对 Voca v1.0.3 仓库中包含的自有代码、构建产物、内置词库、内嵌字体、应用图标及外部在线服务逐项区分，说明其许可证状态与公开边界。
+本文件对 Voca v1.0.4 仓库中包含的自有代码、构建产物、内置词库、内嵌字体、应用图标及外部在线服务逐项区分，说明其许可证状态与公开边界。
 
-各项结论的核查方式（二进制解析、逐文件比对、真机实测）见 `docs/05_Voca_v1.0.3_Windows宿主机真机复验报告_20261017.md`。
+各项结论的核查方式（二进制解析、逐文件比对、真机实测）见 `docs/05`（v1.0.3 真机复验）、`docs/06`（图标根因）、`docs/07`（在线词典取证）与 `docs/08`（v1.0.4 双平台验收）。
 
 ---
 
@@ -34,19 +34,32 @@
 
 ---
 
+### 5. WebView2 SDK 与运行时（v1.0.4 新增）
+- **来源**：`third_party/webview2/` 内的 `WebView2.h`、`WebView2EnvironmentOptions.h` 与 `runtimes/win-x64/WebView2Loader.dll`，取自 NuGet 包 `Microsoft.Web.WebView2`（Microsoft Corporation）。
+- **许可证**：**BSD 3-Clause**，全文见 `third_party/webview2/LICENSE.txt`，已按条款保留版权声明与免责条款。
+- **分发方式**：头文件仅用于编译；`WebView2Loader.dll`（165,968 字节）**必须与 `Voca.exe` 同目录随 Windows 发布包分发**。运行时本体（`EmbeddedBrowserWebView.dll`）由系统已安装的 **Microsoft Edge WebView2 Runtime** 提供，本仓库不打包、不复制该运行时。
+- **依赖说明**：缺少 WebView2 Runtime 时 `Voca.exe` 会退回 `msedge --app` 模式启动，功能不丢失但任务栏图标会重新变软。
+
+---
+
 ## 二、受第三方服务条款约束的部分（不构成开源授权）
 
-### 5. 在线词典查询服务（欧路词典 & WordReference 英汉词典）
+### 6. 在线词典查询服务（欧路词典、爱词霸、WordReference）
 - **调用地址**：
-  - 欧路词典：`https://dict.eudic.net/dicts/en/@word@`
-  - WordReference 英汉词典：`https://www.wordreference.com/enzh/@word@`
+  - 欧路词典：解析与内嵌均用 `https://dict.eudic.net/mdicts/en/@word@`
+  - 爱词霸：`https://www.iciba.com/word?w=@word@`
+  - WordReference 英汉词典：`https://www.wordreference.com/enzh/@word@`（仅跳转，不在应用内加载）
+  - 其中 `@word@` 由客户端 `encodeURIComponent` 编码后替换。
 - **授权与边界说明**：
-  - Voca **未在代码库或安装包中抓取、打包或分发**欧路词典或 WordReference 的任何受版权保护词库数据；
-  - 软件仅在用户主动打开「查看词典详细与编辑」弹窗时，由客户端向上述公开网页地址发起实时查询展示；
-  - 在线词典返回的网页内容、词条释义与例句版权分别归属于 **欧路软件 (Eudic.net)** 与 **WordReference.com LLC**，受其各自网站服务条款约束，不得用于批量爬虫抓取或商业售卖。
+  - Voca **未在代码库或安装包中抓取、缓存或分发**任何一家的词库数据；
+  - 仅在用户主动打开「查看词典详细与编辑」弹窗时，由客户端向上述公开地址发起实时请求展示；
+  - 返回内容的版权归各平台所有，受其服务条款约束，**不得用于批量爬虫抓取或商业售卖**；
+  - 三家均为公开查询页，Voca 不绕过其登录、付费或反爬机制。
 - **2026-10-17 真机实测到的服务侧限制（影响功能，非授权问题）**：
-  - 欧路词典返回 `x-frame-options: SAMEORIGIN`，浏览器会拒绝把该页面渲染进 Voca 的内嵌 `<iframe>`（实测 `net::ERR_BLOCKED_BY_RESPONSE`）；同时该站点响应头带 `access-control-allow-origin: *`，因此 Voca 通过 `fetch` 解析出的**文本释义可正常显示**，只有内嵌视图不可用。
-  - WordReference 对本机请求返回 **HTTP 418（curl）/ 403 Forbidden（浏览器内嵌框）**，属站点反爬策略；Voca 当前的状态检测把这种被拦截的连接报成绿色「已连接」横幅，属**已知缺陷**，详见 `README.md` 第七节与 `docs/05`。
+  - 欧路 `/dicts/en/` 带 `x-frame-options: SAMEORIGIN` → 内嵌必被浏览器拒绝（`net::ERR_BLOCKED_BY_RESPONSE`），且释义中部分汉字被替换为 `<img>`；改用 `/mdicts/en/`（无该头、带 `access-control-allow-origin: *`、释义完整）后内嵌与解析都可用。
+  - 爱词霸无 `X-Frame-Options` 可内嵌，但释义由脚本渲染，服务端 HTML 中无文本可解析 —— 因此 Voca 只显示页面、不声称解析成功。
+  - **WordReference 200 响应同时带 `x-frame-options: SAMEORIGIN` 与 CSP `frame-ancestors 'self' https://wordreference.com … <第三方白名单>`，且无 CORS 头**；首次访问还需通过 Anubis JS 反爬挑战。因此其词条内容**无法**在 Voca 窗口内呈现，只能一键跳转源站。Voca 不引入第三方代理来绕过该限制。
+  - 逐条响应头取证与修复细节见 `docs/07_Voca_v1.0.4_在线词典可用性实测与修复报告_20261017.md`。
 
 ---
 

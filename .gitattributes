@@ -11,7 +11,12 @@
 *.sqlite binary
 *.apk binary
 *.exe binary
+*.dll binary
 *.zip binary
+
+# Vendored Microsoft SDK headers keep their upstream bytes; normalising them would make
+# a checkout differ from the NuGet package they came from.
+third_party/webview2/include/*.h binary
 
 *.html text eol=lf
 *.py   text eol=lf

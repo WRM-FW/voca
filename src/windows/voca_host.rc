@@ -1,0 +1,12 @@
+/* Voca v1.0.4 native host resources.
+ * Compiled by windres (MinGW) or rc (MSVC) into Voca.exe.
+ *
+ * Unlike the pre-1.0.4 launcher, this icon is not cosmetic: the host window reads
+ * these frames back at runtime with LoadImageW(size) so the taskbar button gets the
+ * exact pixel size the shell asks for at the current display scale. */
+#include <windows.h>
+
+/* Single source of truth for the artwork: the generated multi-frame icon in assets/. */
+1 ICON "../../assets/voca.ico"
+
+1 24 "voca_host.exe.manifest"

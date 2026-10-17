@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Voca v1.0.3 Android APK Builder (Pure Python AXML + ARSC + Dalvik DEX + APK v1/v2 Signer).
-Upgrades in v1.0.3:
-1. Updates AndroidManifest.xml versionCode=4, versionName="1.0.3".
+Voca v1.0.4 Android APK Builder (Pure Python AXML + ARSC + Dalvik DEX + APK v1/v2 Signer).
+Version constants for the current release:
+1. AndroidManifest.xml versionCode=5, versionName="1.0.4".
 2. Adds `<uses-permission android:name="android.permission.INTERNET" />` so Android WebView can query online dictionaries (Eudic & WordReference) when online, while core vocabulary features remain 100% offline.
 3. Embeds crisp centered 192x192 rounded-rectangle V+Book icon (`res/drawable/ic_launcher.png`).
 4. Signs with both JAR v1 and APK Signature Scheme v2 (`0x7109871a`).
@@ -315,7 +315,7 @@ def build_android_manifest_axml_v103() -> bytes:
     ]
     extra_strings = [
         "android", "http://schemas.android.com/apk/res/android", "", "manifest",
-        "package", "com.voca.app", "1.0.3", "uses-sdk", "uses-permission",
+        "package", "com.voca.app", "1.0.4", "uses-sdk", "uses-permission",
         "android.permission.INTERNET", "application", "Voca",
         "activity", "com.voca.app.MainActivity", "intent-filter", "action",
         "android.intent.action.MAIN", "category", "android.intent.category.LAUNCHER",
@@ -359,8 +359,8 @@ def build_android_manifest_axml_v103() -> bytes:
     nodes = [
         make_start_ns(2),
         make_start_el(2, "manifest", [
-            make_attr(NS_ANDROID, "versionCode", None, 0x10, 4),
-            make_attr(NS_ANDROID, "versionName", "1.0.3", 0x03, s_idx["1.0.3"]),
+            make_attr(NS_ANDROID, "versionCode", None, 0x10, 5),
+            make_attr(NS_ANDROID, "versionName", "1.0.4", 0x03, s_idx["1.0.4"]),
             make_attr(NO_IDX, "package", "com.voca.app", 0x03, s_idx["com.voca.app"]),
         ]),
         make_start_el(5, "uses-permission", [
@@ -432,7 +432,7 @@ def build_signed_apk_v103(apk_path: str, html_content: bytes):
         subprocess.run(["openssl", "x509", "-in", cert_pem, "-outform", "DER", "-out", cert_der], check=True)
         subprocess.run(["openssl", "pkey", "-in", key_pem, "-pubout", "-outform", "DER", "-out", pub_der], check=True)
 
-        mf_header = "Manifest-Version: 1.0\r\nCreated-By: 1.0.3 (Voca Builder)\r\n\r\n"
+        mf_header = "Manifest-Version: 1.0\r\nCreated-By: 1.0.4 (Voca Builder)\r\n\r\n"
         mf_sections = []
         sf_sections = []
         for fname, fbytes, _ in files_to_pack:
@@ -445,7 +445,7 @@ def build_signed_apk_v103(apk_path: str, html_content: bytes):
         manifest_mf = (mf_header + "".join(mf_sections)).encode("utf-8")
         mf_main_b64 = base64.b64encode(hashlib.sha256(manifest_mf).digest()).decode("ascii")
         cert_sf = (
-            "Signature-Version: 1.0\r\nCreated-By: 1.0.3 (Voca Builder)\r\n"
+            "Signature-Version: 1.0\r\nCreated-By: 1.0.4 (Voca Builder)\r\n"
             f"SHA-256-Digest-Manifest: {mf_main_b64}\r\nX-Android-APK-Signed: 2\r\n\r\n" +
             "".join(sf_sections)
         ).encode("utf-8")
@@ -537,4 +537,4 @@ def build_signed_apk_v103(apk_path: str, html_content: bytes):
         with open(apk_path, "wb") as f:
             f.write(bytes(local_records) + apk_sig_block + bytes(cd_records) + final_eocd)
 
-    print(f"Built v1.0.3 signed APK: {apk_path} ({os.path.getsize(apk_path):,} bytes)")
+    print(f"Built v1.0.4 signed APK: {apk_path} ({os.path.getsize(apk_path):,} bytes)")
