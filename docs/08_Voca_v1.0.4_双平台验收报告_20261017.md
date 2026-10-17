@@ -178,6 +178,24 @@
 
 APK 载荷共 11 个条目：`AndroidManifest.xml`、`resources.arsc`、`classes.dex`、`res/drawable/ic_launcher.png`、`assets/index.html`、3 个 WOFF2 字体、`META-INF/{MANIFEST.MF,CERT.SF,CERT.RSA}`。
 
+### 6.2.1 Release 资产下载往返校验（已执行）
+
+从 GitHub Release 把三个资产重新下载回本地并逐个比对：
+
+- 三个资产文件（`Voca_v1.0.4_Windows_x64.zip`、`Voca_v1.0.4_release.apk`、`Voca_v1.0.4_source.zip`）下载回来的 **SHA-256 与上传前逐一相同**。
+- 下载包内部件再比对（这些值与文档内容无关，因此可长期引用）：
+
+| 下载包内文件 | SHA-256（前 24 位） | 结论 |
+| :--- | :--- | :--- |
+| `Voca_v1.0.4_Windows_x64.zip` → `Voca.exe` | `b1240d4856d30d3cc94ae815` | = 真机跑过启动、图标像素比对与词典实测的那个二进制 |
+| 同上 → `WebView2Loader.dll` | `462b36fd1be6ca9f7563466a` | 与构建产物一致 |
+| 同上 → `windows/app/index.html` | `c624adc24c908b443ae954c4` | 与构建产物一致 |
+| 同上 → `windows/voca.ico` | `7a30cd86e9c7883e8a48335e` | 与构建产物一致 |
+| `Voca_v1.0.4_release.apk` → `assets/index.html` | `c624adc24c908b443ae954c4` | **与 Windows 侧逐字节相同** |
+| `Voca_v1.0.4_source.zip` | 91 个条目 | 与 `v1.0.4` 标签的 git 树文件数一致，不含编译产物 |
+
+即：**发布出去的 Windows 可执行文件就是本次实测的那一个**，不是重新构建的近似品。（ZIP 自身的哈希会随 `docs/` 内容变动，故不在此固定其字面值。）
+
 **APK 的 SHA-256 不是稳定值**：签名证书每次构建在临时目录现生成后即销毁。本轮实测两次连续构建：条目列表相同（11 项），**唯一有差异的条目是 `META-INF/CERT.RSA`**，其余 10 项（含 `classes.dex` 与 `assets/index.html`）逐字节相同。字节数随证书 DER 长度在 3,507,805 / 3,507,806 之间浮动。除 APK 外，`index.html`、`Voca.exe`、`WebView2Loader.dll`、`voca.ico` 的哈希在两次完整构建之间完全复现。
 
 ### 6.3 v1.0.3 → v1.0.4 数据兼容
@@ -200,7 +218,6 @@ APK 载荷共 11 个条目：`AndroidManifest.xml`、`resources.arsc`、`classes
 | Linux 下的一键构建 | **未验证** | 本轮全程在 Windows Git Bash 执行。 |
 | `VOCA_BUILD_ASSETS=1` 资产重生成 | **未验证（且已知会退化）** | 需要上游 OTF/TTC 源；且 `assets/icons/master_icon.png` 只有 512px，重裁会让 16/20/24px 小帧变糊。 |
 | `scripts/run_e2e_v103.py` Selenium 端到端 | **未运行** | 本轮改用 Node 内置 WebSocket 直连 CDP，未安装 WebDriver。 |
-| Release 资产上传后的下载往返校验 | **待发布后执行** | v1.0.4 尚未推送。 |
 
 ---
 
