@@ -106,3 +106,29 @@ fetch(targetUrl, { method:"GET", mode:"no-cors", ... })
 3. **未测试**：欧路/爱词霸对高频访问的限流与验证码；`file://` 源下个别浏览器对跨站 cookie 的限制是否影响爱词霸脚本渲染。
 4. **未测试**：WordReference 在已存在 `nginx_wr_human` cookie 的情况下，顶层跳转能否稳定直达词条。
 5. 词典弹窗 `Esc` 关闭在 v1.0.4 仍未实现（v1.0.3 已知问题，未列入本次范围）。
+
+---
+
+## 更正（2026-10-17 晚，v1.0.5）：本文第 16 行与第 28 行关于 WordReference 的结论是错的
+
+本文当时把 `x-frame-options: SAMEORIGIN` + CSP `frame-ancestors` 记在了 `www.wordreference.com/enzh/<w>` 的 200 响应上，并据此断言"词条内容在纯客户端架构下不可能出现在 Voca 窗口内"。复查发现那是**静态资源的响应头**（`favicon.ico` 等确实带这两个头），不是词典文档本身的。
+
+用**非 headless** 引擎重测（`_verify/wr_headers_test.mjs`、`_verify/wr_iframe_deep.mjs`）：
+
+| 场景 | 实测 |
+| :--- | :--- |
+| 顶层导航 `enzh/area` | 418（Anubis 质询）→ JS 解题 → **200，标题 `area - WordReference.com 英汉词典`，正文 13,931 字符** |
+| 该 200 文档的响应头 | **无 `x-frame-options`、无 CSP**（`favicon.ico` 才有） |
+| 同站页面内的 iframe 嵌 `enzh/abandon` | 通过，正文 5,062 字符，可读 |
+| **`file://` 页面内的 iframe** 嵌 `enzh/run` | 帧能加载并渲染，但**永远停在 Anubis 质询页**（"正在确认你是不是机器人！/ 加载中…"），跨站子帧拿不到验证 cookie |
+| `fetch()` 该 URL | `TypeError: Failed to fetch`（无 CORS 头，符合预期） |
+| headless 引擎（本文当时的测量环境） | 418 → **403**，页面标题就是 `403 Forbidden` |
+
+所以真正的故障原因有两条，且都不是"站点白名单禁止内嵌"：
+
+1. **本文当时的测量是在 headless Chromium 里做的，WR 直接返回 403**，于是所有关于 200 响应头的记录都取自错误页面或静态资源。
+2. **WR 的 Anubis 人机验证只在顶层框架能通过**；嵌进 `file://` 页面的 iframe 会卡在验证页。
+
+v1.0.5 据此改为：由原生宿主开一个 Voca 自己的**顶层 WebView2 窗口**（`Voca.DictWindow`）加载 WR 页面，并用 WebView2 消息通道回执确认窗口真的打开了，才把弹窗标成成功。实测 `pattern` / `sunrise` / `consumer` 三个词都在该窗口里拿到了"主要翻译"中英对照与例句。数据与截图见 `docs/09` 第二节。
+
+第 57 行"改为诚实的 warn 态"这一步本身是对的（当时确实只能承认拿不到内容），只是给出的原因错了。

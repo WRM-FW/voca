@@ -1,5 +1,5 @@
 /*
- * Voca v1.0.4 Windows host: native Win32 window + WebView2.
+ * Voca v1.0.5 Windows host: native Win32 window + WebView2.
  *
  * Why this exists. Since v1.0.0 Voca.exe was only a launcher that opened
  * `msedge.exe --app=...`. In that mode the taskbar button icon is produced by
@@ -42,8 +42,18 @@ typedef void *VocaDpiContext;
 
 static const wchar_t *kAppUserModelId = L"Voca.Offline.WordTrainer.v1";
 static const wchar_t *kWindowClassName = L"Voca.MainWindow";
+static const wchar_t *kDictClassName   = L"Voca.DictWindow";
+
+/* WordReference runs an Anubis JS proof-of-work gate. It passes for a top-level frame
+   but never completes inside our iframe (third-party cookies), so dictionary lookups that
+   need it open in this second, Voca-owned WebView2 window instead of the system browser. */
+static HWND          g_dict_window   = NULL;
+static ICoreWebView2Controller *g_dict_controller = NULL;
+static ICoreWebView2           *g_dict_webview    = NULL;
+static wchar_t       g_dict_uri[4096] = L"";
 
 static HWND          g_main_window   = NULL;
+static HINSTANCE     g_instance      = NULL;
 static ICoreWebView2Controller *g_controller = NULL;
 static ICoreWebView2           *g_webview    = NULL;
 /* The runtime does not keep its own reference to the environment across the
@@ -51,7 +61,8 @@ static ICoreWebView2           *g_webview    = NULL;
    callback crashes inside EmbeddedBrowserWebView.dll. Hold it for the app's
    lifetime and drop it on WM_DESTROY. */
 static ICoreWebView2Environment *g_environment = NULL;
-static HICON         g_icon_small = NULL, g_icon_big = NULL, g_icon_dpi_small = NULL;
+static HICON         g_icon_small = NULL, g_icon_big = NULL;
+static HICON         g_dict_icon_small = NULL, g_dict_icon_big = NULL;
 static wchar_t       g_log_path[MAX_PATH] = L"";
 static wchar_t       g_crash_path[MAX_PATH] = L"";
 static void Stage(const wchar_t *what, long code) {
@@ -147,7 +158,7 @@ static long IconPx(HICON h) {
     return w;
 }
 
-static void ApplyWindowIcons(HWND hwnd) {
+static void ApplyWindowIconsInto(HWND hwnd, HICON *slot_small, HICON *slot_big) {
     wchar_t ico[MAX_PATH];
     _snwprintf_s(ico, MAX_PATH, _TRUNCATE, L"%s\\app\\voca.ico", g_root_dir);
     if (GetFileAttributesW(ico) == INVALID_FILE_ATTRIBUTES)
@@ -165,12 +176,11 @@ static void ApplyWindowIcons(HWND hwnd) {
     if (!hb) hb = hs;
     if (!hs) hs = hb;
 
-    /* Replacing an icon we set earlier is safe to leak only across a DPI change;
-       free the previous one so repeated WM_DPICHANGED does not accumulate GDI objects. */
-    if (g_icon_dpi_small && g_icon_dpi_small != hs) DestroyIcon(g_icon_dpi_small);
-    if (g_icon_small && g_icon_small != hs && g_icon_small != g_icon_dpi_small) DestroyIcon(g_icon_small);
-    if (g_icon_big && g_icon_big != hb) DestroyIcon(g_icon_big);
-    g_icon_dpi_small = hs; g_icon_small = hs; g_icon_big = hb;
+    /* Each window owns its own slots so a DPI change frees the right handles. */
+    if (*slot_small && *slot_small != hs) DestroyIcon(*slot_small);
+    if (*slot_big && *slot_big != hb && *slot_big != hs) DestroyIcon(*slot_big);
+    *slot_small = hs;
+    *slot_big   = hb;
 
     /* Setting ICON_SMALL2 after ICON_BIG makes DefWindowProc leave both slots on the small icon. */
     SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hs);
@@ -179,6 +189,11 @@ static void ApplyWindowIcons(HWND hwnd) {
     Stage(L"icons_set", (long)((small_px << 16) | (big_px & 0xFFFF)));
     Stage(L"icons_readback", (long)((IconPx((HICON)SendMessageW(hwnd, WM_GETICON, ICON_SMALL, 0)) << 8)
                                     | (IconPx((HICON)SendMessageW(hwnd, WM_GETICON, ICON_BIG, 0)) & 0xFF)));
+}
+
+static void ApplyWindowIcons(HWND hwnd) {
+    if (hwnd == g_main_window) ApplyWindowIconsInto(hwnd, &g_icon_small, &g_icon_big);
+    else ApplyWindowIconsInto(hwnd, &g_dict_icon_small, &g_dict_icon_big);
 }
 
 /* WebView2 needs a file URL; file:// paths must use forward slashes. */
@@ -259,7 +274,7 @@ static void MigrateLegacyWebStorage(const wchar_t *udf) {
     if (DirExists(legacy_idb) && !DirExists(eb_idb)) CopyTree(legacy_idb, eb_idb);
 
     f = _wfopen(done, L"w");
-    if (f) { fwprintf(f, L"voca 1.0.4: legacy web storage mirrored into EBWebView\n"); fclose(f); }
+    if (f) { fwprintf(f, L"voca 1.0.5: legacy web storage mirrored into EBWebView\n"); fclose(f); }
 }
 
 /* Always data\profile, so the path documented for users never changed. */
@@ -316,6 +331,36 @@ static ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandlerVtbl env_vtbl =
 };
 static struct { ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandlerVtbl *lpVtbl; } g_env_handler = { &env_vtbl };
 
+static HRESULT STDMETHODCALLTYPE Nw_QueryInterface(ICoreWebView2NewWindowRequestedEventHandler *self,
+                                                   REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) ||
+        IsEqualGUID(riid, &IID_ICoreWebView2NewWindowRequestedEventHandler)) {
+        *pp = (void *)self;
+        return S_OK;
+    }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Nw_AddRef(ICoreWebView2NewWindowRequestedEventHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Nw_Release(ICoreWebView2NewWindowRequestedEventHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Nw_Invoke(ICoreWebView2NewWindowRequestedEventHandler *self,
+                                           ICoreWebView2 *sender,
+                                           ICoreWebView2NewWindowRequestedEventArgs *args) {
+    (void)self; (void)sender;
+    LPWSTR uri = NULL;
+    if (FAILED(args->lpVtbl->get_Uri(args, &uri)) || !uri) return S_OK;
+    Stage(L"new-window", 0);
+    /* Handled without supplying a CoreWebView2: we route the target into our own window. */
+    args->lpVtbl->put_Handled(args, TRUE);
+    PostMessageW(g_main_window, WM_APP + 8, 0, (LPARAM)uri);   /* ownership moves to the handler */
+    return S_OK;
+}
+static ICoreWebView2NewWindowRequestedEventHandlerVtbl nw_vtbl = {
+    Nw_QueryInterface, Nw_AddRef, Nw_Release, Nw_Invoke
+};
+static struct { ICoreWebView2NewWindowRequestedEventHandlerVtbl *lpVtbl; } g_new_window_handler = { &nw_vtbl };
+
 static HRESULT STDMETHODCALLTYPE Ctl_QueryInterface(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self,
                                                          REFIID riid, void **pp) {
     if (!pp) return E_POINTER;
@@ -347,6 +392,10 @@ static HRESULT STDMETHODCALLTYPE Ctl_Invoke(ICoreWebView2CreateCoreWebView2Contr
     g_controller->lpVtbl->get_CoreWebView2(g_controller, &g_webview);
     Stage(L"c4-got", (long)(g_webview != NULL));
     if (g_webview) {
+        EventRegistrationToken tok;
+        g_webview->lpVtbl->add_NewWindowRequested(
+            g_webview, (ICoreWebView2NewWindowRequestedEventHandler*)&g_new_window_handler, &tok);
+        Stage(L"nw-registered", 0);
         wchar_t url[MAX_PATH + 32];
         HtmlFileUrl(url, MAX_PATH + 32);
         Stage(L"c5-navigate", 0);
@@ -368,6 +417,112 @@ static HRESULT CreateWebView(ICoreWebView2Environment *env, HWND hwnd) {
     return env->lpVtbl->CreateCoreWebView2Controller(
         env, hwnd, (ICoreWebView2CreateCoreWebView2ControllerCompletedHandler*)&g_ctl_handler);
 }
+
+/* -------------------------------------------------- secondary dictionary window */
+
+static void DictWindow_PostAck(const wchar_t *uri);
+
+static HRESULT STDMETHODCALLTYPE Dctl_QueryInterface(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self,
+                                                     REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) ||
+        IsEqualGUID(riid, &IID_ICoreWebView2CreateCoreWebView2ControllerCompletedHandler)) {
+        *pp = (void *)self;
+        return S_OK;
+    }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Dctl_AddRef(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Dctl_Release(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Dctl_Invoke(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self,
+                                             HRESULT result, ICoreWebView2Controller *controller) {
+    (void)self;
+    Stage(L"dict-ctl", (long)result);
+    if (FAILED(result) || !controller || !g_dict_window) return S_OK;
+    g_dict_controller = controller;
+    controller->lpVtbl->AddRef(controller);
+    RECT rc; GetClientRect(g_dict_window, &rc);
+    controller->lpVtbl->put_Bounds(controller, rc);
+    g_dict_controller->lpVtbl->get_CoreWebView2(g_dict_controller, &g_dict_webview);
+    if (g_dict_webview && g_dict_uri[0]) {
+        g_dict_webview->lpVtbl->Navigate(g_dict_webview, g_dict_uri);
+        DictWindow_PostAck(g_dict_uri);
+        g_dict_uri[0] = 0;
+    }
+    return S_OK;
+}
+static ICoreWebView2CreateCoreWebView2ControllerCompletedHandlerVtbl dctl_vtbl = {
+    Dctl_QueryInterface, Dctl_AddRef, Dctl_Release, Dctl_Invoke
+};
+static struct { ICoreWebView2CreateCoreWebView2ControllerCompletedHandlerVtbl *lpVtbl; } g_dict_ctl_handler = { &dctl_vtbl };
+
+static LRESULT CALLBACK DictWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+    switch (msg) {
+    case WM_CREATE:
+        g_dict_window = hwnd;
+        ApplyWindowIcons(hwnd);
+        return 0;
+    case WM_SIZE:
+        if (g_dict_controller) { RECT rc; GetClientRect(hwnd, &rc); g_dict_controller->lpVtbl->put_Bounds(g_dict_controller, rc); }
+        return 0;
+    case WM_DPICHANGED: {
+        RECT *r = (RECT *)lp;
+        SetWindowPos(hwnd, NULL, r->left, r->top, r->right - r->left, r->bottom - r->top, SWP_NOZORDER | SWP_NOACTIVATE);
+        ApplyWindowIcons(hwnd);
+        return 0;
+    }
+    case WM_DESTROY:
+        if (g_dict_webview)   { g_dict_webview->lpVtbl->Release(g_dict_webview);     g_dict_webview = NULL; }
+        if (g_dict_controller) { g_dict_controller->lpVtbl->Release(g_dict_controller); g_dict_controller = NULL; }
+        if (g_dict_icon_small) { DestroyIcon(g_dict_icon_small); g_dict_icon_small = NULL; }
+        if (g_dict_icon_big && g_dict_icon_big != g_dict_icon_small) { DestroyIcon(g_dict_icon_big); }
+        g_dict_icon_big = NULL;
+        g_dict_window = NULL;
+        return 0;
+    }
+    return DefWindowProcW(hwnd, msg, wp, lp);
+}
+
+static void DictWindow_PostAck(const wchar_t *uri) {
+    if (!g_webview) return;
+    wchar_t json[4300];
+    wchar_t esc[4096];
+    size_t j = 0;
+    for (size_t i = 0; uri[i] && j + 2 < 4096; ++i) {
+        if (uri[i] == L'"' || uri[i] == L'\\') esc[j++] = L'\\';
+        esc[j++] = uri[i];
+    }
+    esc[j] = 0;
+    _snwprintf_s(json, 4300, _TRUNCATE, L"{\"voca\":\"dict-window\",\"uri\":\"%s\"}", esc);
+    g_webview->lpVtbl->PostWebMessageAsJson(g_webview, json);
+}
+
+static void DictWindow_Show(const wchar_t *uri) {
+    if (!uri || !uri[0]) return;
+    UINT dpi = g_main_window ? WindowDpi(g_main_window) : 96;
+    if (!g_dict_window) {
+        int w = MulDiv(1100, dpi, 96), h = MulDiv(820, dpi, 96);
+        g_dict_window = CreateWindowExW(0, kDictClassName,
+            L"Voca · 在线词典窗口 (WordReference)", WS_OVERLAPPEDWINDOW,
+            CW_USEDEFAULT, CW_USEDEFAULT, w, h, NULL, NULL, g_instance, NULL);
+        if (!g_dict_window) return;
+    }
+    ShowWindow(g_dict_window, SW_SHOWNORMAL);
+    UpdateWindow(g_dict_window);
+    SetForegroundWindow(g_dict_window);
+    if (g_dict_webview) {
+        g_dict_webview->lpVtbl->Navigate(g_dict_webview, uri);
+        DictWindow_PostAck(uri);
+        return;
+    }
+    wcscpy_s(g_dict_uri, 4096, uri);
+    if (g_environment && !g_dict_controller)
+        g_environment->lpVtbl->CreateCoreWebView2Controller(
+            g_environment, g_dict_window,
+            (ICoreWebView2CreateCoreWebView2ControllerCompletedHandler*)&g_dict_ctl_handler);
+}
+
 
 static HRESULT StartWebView2(HWND hwnd) {
     HMODULE loader = LoadLibraryExW(L"WebView2Loader.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -422,6 +577,10 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         FallbackToEdgeShell((HRESULT)(LONG_PTR)lp);
         DestroyWindow(hwnd);
         return 0;
+    case WM_APP + 8:
+        DictWindow_Show((const wchar_t *)lp);
+        CoTaskMemFree((void *)lp);
+        return 0;
     case WM_SIZE:
         if (g_controller) {
             RECT rc; GetClientRect(hwnd, &rc);
@@ -442,6 +601,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         DestroyWindow(hwnd);
         return 0;
     case WM_DESTROY:
+        if (g_dict_window) { DestroyWindow(g_dict_window); g_dict_window = NULL; }
         if (g_webview)      { g_webview->lpVtbl->Release(g_webview); g_webview = NULL; }
         if (g_environment)  { g_environment->lpVtbl->Release(g_environment); g_environment = NULL; }
         if (g_controller)   { g_controller->lpVtbl->Release(g_controller); g_controller = NULL; }
@@ -453,6 +613,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
     (void)hPrev; (void)cmd; (void)show;
+    g_instance = hInstance;
 
     HMODULE u = GetModuleHandleW(L"user32.dll");
     FARPROC dpi_ctx = u ? GetProcAddress(u, "SetProcessDpiAwarenessContext") : NULL;
@@ -491,6 +652,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
     }
     RegisterClassExW(&wc);
 
+    WNDCLASSEXW dc = wc;
+    dc.lpfnWndProc   = DictWndProc;
+    dc.lpszClassName = kDictClassName;
+    RegisterClassExW(&dc);
+
     UINT dpi0 = 96;
     {
         HMODULE sh = LoadLibraryW(L"shcore.dll");
@@ -502,7 +668,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
 
     g_main_window = CreateWindowExW(
         0, kWindowClassName,
-        L"Voca v1.0.4 — 离线艾宾浩斯背单词工坊 (Windows & Android)",
+        L"Voca v1.0.5 — 离线艾宾浩斯背单词工坊 (Windows & Android)",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, w, h,
         NULL, NULL, hInstance, NULL);

@@ -1,4 +1,4 @@
-/* Voca v1.0.4 native host resources.
+/* Voca v1.0.5 native host resources.
  * Compiled by windres (MinGW) or rc (MSVC) into Voca.exe.
  *
  * Unlike the pre-1.0.4 launcher, this icon is not cosmetic: the host window reads

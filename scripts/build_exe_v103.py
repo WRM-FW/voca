@@ -73,8 +73,8 @@ def build_rsrc_section(rsrc_rva: int) -> bytes:
     manifest_xml = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n'
         '<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">\r\n'
-        '  <assemblyIdentity version="1.0.4.0" processorArchitecture="amd64" name="Voca.Desktop.App" type="win32"/>\r\n'
-        '  <description>Voca v1.0.4 Offline Ebbinghaus Vocabulary Application</description>\r\n'
+        '  <assemblyIdentity version="1.0.5.0" processorArchitecture="amd64" name="Voca.Desktop.App" type="win32"/>\r\n'
+        '  <description>Voca v1.0.5 Offline Ebbinghaus Vocabulary Application</description>\r\n'
         '  <asmv3:application>\r\n'
         '    <asmv3:windowsSettings>\r\n'
         '      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>\r\n'
@@ -359,7 +359,7 @@ copy_wstr:
         sect_align,
         file_align,
         6, 0,
-        1, 4,                   # Image Version 1.4 (v1.0.4)
+        1, 5,                   # Image Version 1.5 (v1.0.5)
         6, 0,
         0,
         size_of_image,
@@ -401,7 +401,7 @@ copy_wstr:
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "wb") as f:
         f.write(exe_bytes)
-    print(f"Built v1.0.4 Windows EXE (8-DPI icons + PerMonitorV2 manifest): {out_path} ({len(exe_bytes):,} bytes)")
+    print(f"Built v1.0.5 Windows EXE (8-DPI icons + PerMonitorV2 manifest): {out_path} ({len(exe_bytes):,} bytes)")
 
 if __name__ == "__main__":
     build_voca_exe(os.path.abspath(os.path.join(SCRIPT_DIR, "..", "windows", "Voca.exe")))

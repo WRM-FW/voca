@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Voca v1.0.4 Windows native host builder.
+Voca v1.0.5 Windows native host builder.
 
 Builds Voca.exe from src/windows/voca_host.c (Win32 + WebView2) with its icon and
 PerMonitorV2 manifest compiled from src/windows/voca_host.rc, and stages the
@@ -75,7 +75,7 @@ def build(cc=None, windres=None):
 
 
 if __name__ == "__main__":
-    print("[host] Building Voca v1.0.4 native WebView2 host ...")
+    print("[host] Building Voca v1.0.5 native WebView2 host ...")
     try:
         exe, dll = build()
     except subprocess.CalledProcessError as e:

@@ -2,7 +2,37 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.0.5] - 2026-10-17
+
+Windows-only release. **Android development is paused indefinitely** and is not part of this version: no 1.0.5 APK is built or published, and `build_all.sh` now skips the Android steps unless `VOCA_ANDROID=1` is set.
+
+### Added
+- **Sort selector in the word-learning header.** `#sortSelect` moved out of the far-right cluster to sit between the 双语/只看英文/只看中文 group and the 列表视图/沉浸卡片 group, so the reading order is 显示语言 → 排列顺序 → 视图形态. Options are 初始序列 / 随机序列 / 字母升序 A→Z / 不会的单词排前面, plus the pre-existing 易掌握的单词排前面 (kept — it was already shipped and removing it would take a working feature away).
+- **Voca's own dictionary window (`Voca.DictWindow`).** The native host now handles WebView2's `NewWindowRequested` and routes the target into a second top-level Voca-owned WebView2 window that shares the user data folder, instead of dumping the user into the system browser. It acks each open back to the page over `PostWebMessageAsJson`, so the modal only reports success once the window really exists.
+
+### Fixed
+- **WordReference 英汉 now actually returns entries inside Voca.** The v1.0.4 conclusion that "the site's `frame-ancestors` allowlist forbids embedding" was **wrong and has been retracted**: that measurement was taken in headless Chromium, where the site answers 403, and the headers recorded belonged to `favicon.ico`, not the dictionary document. Re-measured in a non-headless engine, the 200 document carries no framing header at all; the real blocker is that Anubis' JS proof-of-work only completes in a **top-level** frame — an iframe under `file://` sits on "正在确认你是不是机器人" forever, and `fetch()` is CORS-blocked. Opening the page in Voca's own top-level window passes it: `pattern`, `sunrise` and `consumer` each returned the 主要翻译 中英对照 with examples, and the single window re-navigates per lookup rather than piling up windows.
+- **An unknown `intraSort` value left the sort control blank.** It is now validated on load against the five known values and falls back to `initial`.
+
+### Changed
+- Version stamped `1.0.5` throughout the shared frontend and the Windows build (title, sidebar badge, `state.appVersion`, PDF/HTML export headers and filenames, backup filename, window title, `assemblyIdentity`, `Image Version` 1.5). `schemaVersion` stays at `4`.
+- `build_all.sh`: the APK build and its deep verification moved behind `VOCA_ANDROID=1`; the Windows icon step no longer depends on the APK builder; the legacy-launcher fallback path had a missing `VOCA_OUT_EXE` and now works.
+- `src/android/app/src/main/assets/index.html` is no longer refreshed by default, so the Android tree stays consistent with the last shipped 1.0.4 APK.
+
+### Verification (1.0.5)
+See `docs/09_Voca_v1.0.5_Windows验收报告_20261017.md`. Headline numbers: all five sort modes verified by ordering the live list and by driving 不会程度 through the real click path; header measured at 1600/1400/1200/1024/900 px with zero horizontal overflow; WordReference verified end-to-end **in the shipped `Voca.exe`** via CDP plus native window enumeration; window icons re-checked after the `ApplyWindowIcons` refactor and still pixel-identical (24×24 small, 48×48 big, delta `0.0000`); a backup → wipe → restore round trip preserved every field.
+
+### Known Issues (1.0.5)
+1. The dictionary window is a plain browser surface: no back/forward buttons in our chrome (Alt+← works), and closing it requires the user to reopen it on the next lookup.
+2. WordReference still needs a few seconds of proof-of-work on the first lookup of a session; if the site is rate-limiting, the window may show its challenge or a 403 page.
+3. Everything inherited from 1.0.4 that this round did not touch: no `Esc`-to-close on the modal, `voca.db` phonetics follow ECDICT's notation, `Voca.exe` is unsigned.
+4. Android: unverified on any device, no file download/chooser/print support, `targetSdkVersion=28`, ephemeral signing key. Paused, not fixed.
+5. Icon/DPI evidence still covers 150% on a single monitor only.
+
+---
+
 ## [1.0.4] - 2026-10-17
+
 
 ### Added
 - **Native Windows host (`src/windows/voca_host.c`)**: Voca.exe is now a real Win32 window hosting an embedded WebView2 control instead of a launcher that opens `msedge.exe --app=...`. Built by `scripts/build_host_v104.py` (gcc + windres) from `src/windows/voca_host.rc` / `voca_host.exe.manifest`. The host declares `PerMonitorV2`, sets its own `AppUserModelID` (`Voca.Offline.WordTrainer.v1`), and **re-picks the icon frame for the current DPI on `WM_DPICHANGED`**. If the WebView2 runtime is missing it falls back to the old Edge launch and says why.

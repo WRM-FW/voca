@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 2 of Voca v1.0.4 HTML Application:
+Generates Part 2 of Voca v1.0.5 HTML Application:
 - High-DPI 256x256 brand icon in sidebar (version badge).
 - Removed '英英模式' (en_en) button from #langModeGroup (retains 双语 / 只看英文 / 只看中文).
 - Removed all '掌握度' (mastery) UI elements, keeping only '不会程度' (unfamiliarity 0..5).
@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.0.4</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.0.5</span></div>
       </div>
     </div>
 
@@ -95,20 +95,20 @@ HTML_PART2_TEMPLATE = r"""
       </div>
 
       <div class="header-right">
+        <!-- Reading order: 显示语言 → 排列顺序 → 视图形态. -->
+        <select id="sortSelect" class="ctrl-select" title="当前 List 内部排序" aria-label="当前 List 内部排序">
+          <option value="initial">初始序列</option>
+          <option value="random">随机序列</option>
+          <option value="az">字母升序 A→Z</option>
+          <option value="hard_first">不会的单词排前面</option>
+          <option value="easy_first">易掌握的单词排前面</option>
+        </select>
+
         <!-- View Switcher: List View vs Card View -->
         <div class="seg-group" id="layoutModeGroup" role="group" aria-label="列表 / 沉浸卡片切换">
           <button class="seg-btn active" data-layout="list" aria-label="列表视图">列表视图</button>
           <button class="seg-btn" data-layout="card" aria-label="沉浸卡片视图">沉浸卡片</button>
         </div>
-
-        <!-- Requirement 2: Sort options based on Unfamiliarity (不会程度), Mastery removed -->
-        <select id="sortSelect" class="ctrl-select" title="当前List内部排序" aria-label="当前 List 内部排序">
-          <option value="initial">初始排列</option>
-          <option value="az">按字母 A→Z</option>
-          <option value="random">随机打乱</option>
-          <option value="hard_first">不会程度从高到低</option>
-          <option value="easy_first">不会程度从低到高</option>
-        </select>
 
         <button class="btn btn-sm" id="quickThemeBtn" title="切换显示主题 (晨曦白 / 纯黑OLED / 羊皮纸)" aria-label="切换显示主题">主题: 晨曦白</button>
       </div>
@@ -491,7 +491,7 @@ HTML_PART2_TEMPLATE = r"""
               <span class="m-only"><br>Android 版当前内核不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.4
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.5
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -535,8 +535,8 @@ HTML_PART2_TEMPLATE = r"""
             </div>
 
             <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
-              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">2. 升级到 v1.0.4 的数据保留与跨平台迁移</div>
-              <p>• <strong>升级前准备与数据自动迁移机制</strong>：升级前建议先点击上方「⬇ 导出完整学习备份 (.json)」保存一份备份。v1.0.4 未改变存档结构（仍为 Schema v4），v1.0.0 ~ v1.0.3 的存档可直接读取，删除「重置不会度」只移除界面按钮、不影响任何已保存的不会程度数值；更早的 v1.0.2 及以前存档（Schema v3）启动时仍会自动迁移，清理已废弃的「掌握度 (`mastery`)」与「英英模式 (`en_en`)」字段，同时 <strong>100% 无损保留</strong>所有单词的「不会程度 (`unfam`)」、生词本、熟词表、自定义释义、笔记、艾宾浩斯计划表参数与打卡记录。</p>
+              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">2. 升级到 v1.0.5 的数据保留与跨平台迁移</div>
+              <p>• <strong>升级前准备与数据自动迁移机制</strong>：升级前建议先点击上方「⬇ 导出完整学习备份 (.json)」保存一份备份。v1.0.5 未改变存档结构（仍为 Schema v4），v1.0.0 ~ v1.0.4 的存档可直接读取，删除「重置不会度」只移除界面按钮、不影响任何已保存的不会程度数值；更早的 v1.0.2 及以前存档（Schema v3）启动时仍会自动迁移，清理已废弃的「掌握度 (`mastery`)」与「英英模式 (`en_en`)」字段，同时 <strong>100% 无损保留</strong>所有单词的「不会程度 (`unfam`)」、生词本、熟词表、自定义释义、笔记、艾宾浩斯计划表参数与打卡记录。</p>
               <p style="margin-top:6px;">• <strong>已支持的迁移方式</strong>：<br>
                 1) <strong>通用 JSON 备份迁移（推荐，支持 Windows ⇄ Android 互传）</strong>：在旧版或原设备导出 <code>.json</code> 备份，在新版或新设备点击「⬆ 从备份文件恢复数据」即可一键迁移并验证。<br>
                 2) <strong>Windows 同平台升级/迁移</strong>：将旧版 <code>windows/data/profile/</code> 文件夹复制到新版的 <code>windows/data/profile/</code> 下即可直接继承全部数据。</p>
@@ -568,7 +568,7 @@ HTML_PART2_TEMPLATE = r"""
               <select id="settingOnlineDict" class="ctrl-select" style="width:100%; margin-top:6px;">
                 <option value="eudic" selected>欧路词典 (dict.eudic.net — 窗口内直接显示释义)</option>
                 <option value="iciba">爱词霸英汉词典 (iciba.com — 窗口内直接显示页面)</option>
-                <option value="wordreference">WordReference 英汉 (wordreference.com — 仅能跳转源站，见弹窗说明)</option>
+                <option value="wordreference">WordReference 英汉 (wordreference.com — 在 Voca 词典窗口中打开)</option>
               </select>
             </label>
 
@@ -623,7 +623,7 @@ HTML_PART2_TEMPLATE = r"""
 
           <!-- Shortcuts & Architecture Info -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:12px; white-space:normal;">
-            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.4)</h3>
+            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.5)</h3>
             <div style="font-size:0.83rem; color:var(--text-secondary); line-height:1.7;">
               <div>• <strong>左键/点击单词行</strong>：加深该词不会程度 (+1，上限 5/5) 并朗读发音</div>
               <div>• <strong>右键点击单词行</strong>：降低该词不会程度 (-1，下限 0/5)；触屏可长按同一行</div>
@@ -633,10 +633,10 @@ HTML_PART2_TEMPLATE = r"""
               <div class="d-only">• <strong>1 / 2 / 3 键</strong>：快速切换 双语 / 只看英文 / 只看中文 模式</div>
             </div>
             <div style="border-top:1px solid var(--border-color); padding-top:12px; font-size:0.82rem; color:var(--text-muted);">
-              <strong>字体、词库与在线词典声明 (v1.0.4)</strong>：<br>
+              <strong>字体、词库与在线词典声明 (v1.0.5)</strong>：<br>
               1) <strong>跨平台内嵌字体</strong>：内置 <strong>Inter</strong> 与 <strong>Noto Sans CJK SC</strong> (SIL Open Font License 1.1) WOFF2 字体包。<br>
               2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>38,855</strong> 条词条，源自开源词典 <strong>ECDICT</strong>（MIT License）。<br>
-              3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 因其响应头声明 <code>frame-ancestors</code> 白名单且不开放跨域读取，只能在「查看词典详细与编辑」弹窗里一键跳转到源站查看。三家词典的网页内容版权归各自平台所有。
+              3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 部署了 Anubis 人机验证：它只放行顶层页面，嵌进本弹窗会一直停在验证页，因此 Voca 会在自己的「在线词典窗口」里以顶层页面打开它（不弹到系统浏览器）。三家词典的网页内容版权归各自平台所有。
             </div>
           </div>
         </div>
@@ -687,7 +687,7 @@ HTML_PART2_TEMPLATE = r"""
           </div>
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <button type="button" class="btn btn-sm" id="modalBtnReloadDict">🔄 重新查询</button>
-            <a class="btn btn-sm" id="modalDictExternalLink" href="https://dict.eudic.net/dicts/en/abandon" target="_blank" rel="noopener noreferrer">↗ 浏览器打开源页面</a>
+            <a class="btn btn-sm" id="modalDictExternalLink" href="https://dict.eudic.net/dicts/en/abandon" target="_blank" rel="noopener noreferrer">↗ 词典窗口打开源页面</a>
           </div>
         </div>
 

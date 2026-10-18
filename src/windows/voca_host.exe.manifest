@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
-  <assemblyIdentity version="1.0.4.0" processorArchitecture="amd64" name="Voca.Desktop.Host" type="win32"/>
-  <description>Voca v1.0.4 Offline Ebbinghaus Vocabulary Application</description>
+  <assemblyIdentity version="1.0.5.0" processorArchitecture="amd64" name="Voca.Desktop.Host" type="win32"/>
+  <description>Voca v1.0.5 Offline Ebbinghaus Vocabulary Application</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>

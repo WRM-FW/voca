@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 3 of Voca v1.0.4 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
+Generates Part 3 of Voca v1.0.5 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
 Upgrades in v1.0.3:
 1. Removed '掌握度' (mastery) across state, UI, sorting, immersive card, spelling, CSV, and PDF exports; retained '不会程度' (unfam 0..5) with left-click (+1) and right-click (-1).
 2. Removed '英英模式' (en_en) from language modes, hints, rendering, and keyboard shortcuts; auto-migrates legacy 'en_en' state to 'bilingual'.
@@ -78,15 +78,47 @@ JS_ENGINE = r"""
       key: "wordreference",
       name: "WordReference 英汉词典",
       parseUrl: "https://www.wordreference.com/enzh/@word@",
+      // Measured 2026-10-17: the 200 document carries no framing header, but Anubis answers
+      // the first request with a 418 JS proof-of-work that never completes when the embedder
+      // is a file:// page. A top-level frame does pass — hence Voca's own second window.
       embedUrl: "",
       canEmbed: false,
       canFetch: false,
+      wantsDictWindow: true,
     }
   };
 
+  /* The native host acks every dictionary-window it opens over the WebView2 message
+     channel; without that ack we must not claim the content was displayed. */
+  const dictWindowAcks = { seen: 0 };
+  let dictQuerySeq = 0;
+  (function installDictWindowAckListener() {
+    const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+    if (!wv || typeof wv.addEventListener !== "function") return;
+    wv.addEventListener("message", function(ev) {
+      let data = ev && ev.data;
+      if (typeof data === "string") { try { data = JSON.parse(data); } catch (e) { return; } }
+      if (data && data.voca === "dict-window") dictWindowAcks.seen++;
+    });
+  })();
+
+  function openInVocaDictWindow(url) {
+    const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+    if (!wv || typeof wv.addEventListener !== "function") return Promise.resolve(false);
+    const before = dictWindowAcks.seen;
+    try { window.open(url, "_blank"); } catch (e) { return Promise.resolve(false); }
+    return new Promise(function(resolve) {
+      const t0 = Date.now();
+      const poll = setInterval(function() {
+        if (dictWindowAcks.seen > before) { clearInterval(poll); resolve(true); }
+        else if (Date.now() - t0 > 3000) { clearInterval(poll); resolve(false); }
+      }, 120);
+    });
+  }
+
   const defaultState = {
     schemaVersion: 4,
-    appVersion: "1.0.4",
+    appVersion: "1.0.5",
     currentBook: "cet4",
     currentListIndex: 0,
     langMode: "bilingual",      // bilingual | en_only | cn_only (en_en removed in v1.0.3)
@@ -219,6 +251,11 @@ JS_ENGINE = r"""
     if (merged.intraSort === "mastery_asc") {
       merged.intraSort = "hard_first";
     }
+    // An unknown value would leave #sortSelect showing nothing.
+    const validIntraSorts = ["initial", "random", "az", "hard_first", "easy_first"];
+    if (validIntraSorts.indexOf(merged.intraSort) === -1) {
+      merged.intraSort = "initial";
+    }
 
     // 6. Migrate legacy Book IDs
     const bookMigrationMap = {
@@ -260,7 +297,7 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.4";
+    merged.appVersion = "1.0.5";
     return merged;
   }
 
@@ -1409,6 +1446,7 @@ JS_ENGINE = r"""
 
   function queryOnlineDictionaryForModal(w) {
     if (!w) return;
+    const myQuery = ++dictQuerySeq;
     if (currentDictAbortCtrl) {
       try { currentDictAbortCtrl.abort(); } catch (e) {}
     }
@@ -1499,23 +1537,35 @@ JS_ENGINE = r"""
       statusBanner.textContent = "ℹ 已内嵌【" + dictCfg.name + "】词条页面（该站释义由脚本渲染，Voca 不抓取其文本）";
       parsedBox.innerHTML =
         '<div class="dict-parsed-note"><div>下方为 <code>' + escapeHtml(embedUrl) + '</code> 的实时页面。' +
-        '若页面未显示，多为该站当日限流，可点右上角「↗ 浏览器打开源页面」。</div>' + localRefHtml() + '</div>';
+        '若页面未显示，多为该站当日限流，可点右上角「↗ 词典窗口打开源页面」。</div>' + localRefHtml() + '</div>';
       showFrame(embedUrl);
     }
 
-    // WordReference answers 200 with x-frame-options: SAMEORIGIN plus a CSP frame-ancestors
-    // allowlist that does not include Voca, and it has no CORS headers. Framing and fetching
-    // are both impossible, so the only honest state is "open it yourself" — never a green tick.
+    function renderDictWindowOpened(url) {
+      clearFrame();
+      statusBanner.className = "dict-status-banner dict-status-ok";
+      statusBanner.textContent = "✓ 已在 Voca 词典窗口中打开【" + dictCfg.name + "】“" + w.word + "”";
+      parsedBox.innerHTML =
+        '<div class="dict-parsed-note">' +
+          '<div>该站的反爬校验只放行顶层页面，无法嵌进本弹窗，所以释义显示在刚打开的 ' +
+          '<strong>Voca · 在线词典窗口</strong>（可与本窗口并排，关闭它不影响学习）。</div>' +
+          '<div style="margin-top:6px;">• 源站地址：<code>' + escapeHtml(url) + '</code></div>' +
+          '<div style="margin-top:6px;">• 首次访问需数秒通过验证；若窗口内仍是「正在确认你是不是机器人」，请稍候或在窗口中刷新一次。</div>' +
+          localRefHtml() +
+        '</div>';
+    }
+
     function renderOpenOnly(reason) {
       clearFrame();
       statusBanner.className = "dict-status-banner dict-status-warn";
-      statusBanner.textContent = "⚠ 【" + dictCfg.name + "】无法在 Voca 窗口内显示，仅能跳转到源站";
+      statusBanner.textContent = "⚠ 【" + dictCfg.name + "】无法嵌进本弹窗，需在词典窗口或浏览器中打开";
       parsedBox.innerHTML =
         '<div class="dict-parsed-note">' +
           '<div class="dict-parsed-warn">' + escapeHtml(reason) + '</div>' +
           '<div style="margin-top:6px;">• 源站地址：<code>' + escapeHtml(parseUrl) + '</code></div>' +
-          '<div style="margin-top:6px;">• 请点右上角 <strong>「↗ 浏览器打开源页面」</strong> 在新标签页查看全文。' +
-          '首次访问该站需通过其反爬校验，若提示 403/418 请稍后重试或更换网络。</div>' +
+          '<div style="margin-top:6px;">• 点右上角 <strong>「↗ 词典窗口打开源页面」</strong> 查看全文：在 Voca.exe（原生宿主）里' +
+          '会打开 Voca 自己的词典窗口，在普通浏览器里则是新开一个标签页。' +
+          '首次访问该站需通过其人机验证，若提示 403/418 请稍候重试或更换网络。</div>' +
           localRefHtml() +
         '</div>';
     }
@@ -1555,8 +1605,16 @@ JS_ENGINE = r"""
     }
 
     if (!dictCfg.canFetch) {
-      renderOpenOnly(dictCfg.name + " 的响应头声明了 frame-ancestors 白名单与 SAMEORIGIN，且不开放跨域读取，" +
-                     "因此词条内容无法在 Voca 窗口内呈现。");
+      if (!dictCfg.wantsDictWindow) {
+        renderOpenOnly(dictCfg.name + " 不开放跨域读取，也不允许被嵌入。");
+        return;
+      }
+      openInVocaDictWindow(parseUrl).then(function(ok) {
+        if (myQuery !== dictQuerySeq) return;
+        if (ok) renderDictWindowOpened(parseUrl);
+        else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用 v1.0.5 的 Voca.exe（原生 WebView2 宿主），" +
+                            "或点右上角「↗ 词典窗口打开源页面」。");
+      });
       return;
     }
 
@@ -1705,7 +1763,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.4 自定义艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.5 自定义艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -1735,7 +1793,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.0.4 自定义艾宾浩斯背单词计划表",
+        title: "Voca v1.0.5 自定义艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -1747,7 +1805,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.4 离线背单词工坊";
+    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.5 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -1958,7 +2016,7 @@ JS_ENGINE = r"""
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(
-        "Voca v1.0.4 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
+        "Voca v1.0.5 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
         PAGE_W_PX / 2,
         PAGE_H_PX - 26
       );
@@ -2124,7 +2182,7 @@ JS_ENGINE = r"""
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.4 · 内置词条 38,855 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.5 · 内置词条 38,855 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 
@@ -3013,7 +3071,7 @@ JS_ENGINE = r"""
     document.getElementById("btnDownloadDirectPdf").addEventListener("click", function() {
       if (!lastPrintDocData) return;
       const res = generateMultiPagePdfBinary(lastPrintDocData);
-      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.4.pdf";
+      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.5.pdf";
       window.__LAST_GENERATED_PDF_INFO__ = {
         filename: safeName,
         pageCount: res.pageCount,
@@ -3041,7 +3099,7 @@ JS_ENGINE = r"""
         "th, td { border: 1px solid #94A3B8; padding: 6px 8px; word-break: break-word; }" +
         "th { background: #F1F5F9; }" +
         "</style></head><body>" + lastPrintHtmlContent + "</body></html>";
-      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.4.html";
+      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.5.html";
       window.__LAST_GENERATED_HTML_INFO__ = {
         filename: safeHtmlName,
         byteLength: standalone.length
@@ -3054,11 +3112,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.4",
+        version: "1.0.5",
         exportedAt: new Date().toISOString(),
         state: state
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.4_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.0.5_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 

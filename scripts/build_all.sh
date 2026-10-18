@@ -21,7 +21,7 @@ if [ -z "$PY" ]; then
 fi
 echo "  using interpreter: $PY ($("$PY" -c 'import sys;print(sys.executable)'))"
 
-echo "[1/5] Building Voca v1.0.4 multi-DPI Win32 icons and cross-platform WOFF2 font subsets..."
+echo "[1/5] Building Voca v1.0.5 multi-DPI Win32 icons and cross-platform WOFF2 font subsets..."
 # Regenerating assets needs the original OpenType sources (Debian/Ubuntu: fonts-inter,
 # fonts-noto-cjk) at the absolute paths hardcoded in build_assets_v103.py.
 # assets/ already ships the generated WOFF2 subsets and icon frames, so this step is opt-in.
@@ -31,7 +31,7 @@ else
   echo "  skipped (set VOCA_BUILD_ASSETS=1 to regenerate assets/fonts and assets/icons from system OpenType sources)"
 fi
 
-echo "[2/5] Assembling Voca v1.0.4 offline frontend..."
+echo "[2/5] Assembling Voca v1.0.5 offline frontend..."
 VOCA_EMBEDDED_ASSETS="$ROOT_DIR/assets/embedded_assets.json" \
 VOCA_CORE233_JSON="$ROOT_DIR/windows/data/voca_lexicon.json" \
 VOCA_PACK_JSON="$ROOT_DIR/src/lexicon/v103_lexicon_payload.json" \
@@ -39,22 +39,38 @@ VOCA_OUT_HTML="$ROOT_DIR/windows/app/index.html" \
 PYTHONPATH="$ROOT_DIR/src/webapp" "$PY" "$ROOT_DIR/src/webapp/make_html_v103_part3.py"
 
 cp "$ROOT_DIR/windows/app/index.html" "$ROOT_DIR/src/webapp/index.html"
-cp "$ROOT_DIR/windows/app/index.html" "$ROOT_DIR/src/android/app/src/main/assets/index.html"
 
-echo "[3/5] Assembling the Windows icon resource and the Android v1.0.4 signed APK..."
+# Android development is paused from v1.0.5 on: the shipped shell has no
+# DownloadListener / file chooser / print channel and no device was ever available to
+# verify it. Set VOCA_ANDROID=1 to build the APK again, which also refreshes the
+# Android asset copy of the frontend.
+if [ "${VOCA_ANDROID:-0}" = "1" ]; then
+  cp "$ROOT_DIR/windows/app/index.html" "$ROOT_DIR/src/android/app/src/main/assets/index.html"
+fi
+
+echo "[3/5] Building the Windows icon resource..."
 # Paths go through the environment rather than shell interpolation so the script also
 # works under MSYS/Git Bash, where $ROOT_DIR is a POSIX-style path Python cannot open.
 VOCA_ASSETS_DIR="$ROOT_DIR/assets" \
 VOCA_OUT_ICO="$ROOT_DIR/windows/voca.ico" \
-VOCA_OUT_APK="$ROOT_DIR/android/Voca_v1.0.4_release.apk" \
-VOCA_APP_HTML="$ROOT_DIR/windows/app/index.html" \
+VOCA_OUT_EXE="$ROOT_DIR/windows/Voca.exe" \
 PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
 import os
-import build_exe_v103, build_apk_v103
+import build_exe_v103
 build_exe_v103.create_ico_file(os.environ['VOCA_OUT_ICO'])
+"
+
+if [ "${VOCA_ANDROID:-0}" = "1" ]; then
+  echo "[3a/5] Building the Android signed APK..."
+  VOCA_OUT_APK="$ROOT_DIR/android/Voca_v1.0.4_release.apk" \
+  VOCA_APP_HTML="$ROOT_DIR/windows/app/index.html" \
+  PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
+import os
+import build_apk_v103
 with open(os.environ['VOCA_APP_HTML'], 'rb') as f:
     build_apk_v103.build_signed_apk_v103(os.environ['VOCA_OUT_APK'], f.read())
 "
+fi
 
 echo "[3b/5] Building the native Win32 + WebView2 host (Voca.exe) ..."
 # Voca.exe is a real window from 1.0.4 on. The pre-1.0.4 build here was a hand-assembled
@@ -62,18 +78,22 @@ echo "[3b/5] Building the native Win32 + WebView2 host (Voca.exe) ..."
 # pins it to 16x16, which is why the icon stayed soft no matter what we shipped in .rsrc.
 if ! "$PY" "$ROOT_DIR/scripts/build_host_v104.py"; then
   echo "  WARNING: native host build failed - falling back to the legacy msedge --app launcher." >&2
-  VOCA_ASSETS_DIR="$ROOT_DIR/assets" PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
-import build_exe_v103
+  VOCA_ASSETS_DIR="$ROOT_DIR/assets" VOCA_OUT_EXE="$ROOT_DIR/windows/Voca.exe" PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
+import os, build_exe_v103
 build_exe_v103.build_voca_exe(os.environ['VOCA_OUT_EXE'])
 "
 fi
 
-echo "[4/5] Running AOSP binary & cryptographic verification..."
-VOCA_VERIFY_APK="$ROOT_DIR/android/Voca_v1.0.4_release.apk" \
-PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
+if [ "${VOCA_ANDROID:-0}" = "1" ]; then
+  echo "[4/5] Running AOSP binary & cryptographic verification..."
+  VOCA_VERIFY_APK="$ROOT_DIR/android/Voca_v1.0.4_release.apk" \
+  PYTHONPATH="$ROOT_DIR/scripts" "$PY" -c "
 import os
 import verify_apk_deep
 verify_apk_deep.verify_apk_file(os.environ['VOCA_VERIFY_APK'])
 "
+else
+  echo "[4/5] Android build skipped (paused since v1.0.5). Re-enable with VOCA_ANDROID=1."
+fi
 
-echo "Voca v1.0.4 reproducible build and verification completed successfully."
+echo "Voca v1.0.5 reproducible build and verification completed successfully."
