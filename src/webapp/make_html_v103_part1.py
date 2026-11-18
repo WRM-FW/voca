@@ -31,7 +31,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
+<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows)</title>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
      Any scale without its own declared frame gets resampled and looks soft. -->
@@ -2352,7 +2352,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
    phone chrome. Shell is now chosen by what the primary pointing device IS:
 
      ui-mobile  -> primary pointer is coarse (finger), or hover is impossible and the
-                   device is touch-capable, or a legacy Android WebView that predates
+                   device is touch-capable, or a legacy mobile WebView that predates
                    the (pointer:)/(hover:) media features is a touch device in a narrow
                    window.
      ui-desktop -> fine pointer with hover (mouse / trackpad / WebView2 on Windows),
@@ -2373,7 +2373,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
   function isTouchShell() {
     if (mq("(pointer: coarse)")) return true;
     if (mq("(hover: none)") && touchCapable()) return true;
-    /* Android WebView older than Chrome 39 understands neither (pointer:) nor (hover:). */
+    /* Mobile WebViews older than Chrome 39 understand neither (pointer:) nor (hover:). */
     var narrow = Math.min(window.innerWidth || 4000, (window.screen && window.screen.width) || 4000) <= 900;
     if (/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "") && touchCapable() && narrow) return true;
     return false;

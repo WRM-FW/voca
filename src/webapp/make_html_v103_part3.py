@@ -665,49 +665,21 @@ JS_ENGINE = r"""
     }
   }
 
-  // v1.0.8: the user sets only the number of Lists. The software derives the
-  // day count from the fixed Ebbinghaus intervals (+1/+2/+4/+7/+15 days):
-  // a day never carries more than 5 Lists in total (new + reviews due), new
-  // Lists are paced at at most 2 per day, and a new List is only placed when
-  // every one of its future review days still stays within the same cap.
+  // v1.0.8: the user sets only the number of Lists. The schedule is the
+  // canonical Ebbinghaus table (corrected per the user's own reference
+  // table): exactly ONE new List per day — List i is learned on Day i —
+  // and every List is reviewed at +1/+2/+4/+7/+15 days after its learn
+  // day. Total days = N + 15 (the last List's final review). No daily
+  // caps and no pacing: at full load a day carries 1 new + 5 reviews.
   function computeCustomEbbinghausSchedule() {
     const N = currentLists.length || Math.max(1, parseInt(state.planListCount, 10) || 15);
     const intervals = [1, 2, 4, 7, 15];
-    const MAX_PER_DAY = 5;
-    const MAX_NEW_PER_DAY = 2;
 
     const dayNewMap = {};
-    const dueCount = {};
-    let nextList = 1;
-    let day = 0;
-    let learnDays = 0;
-    while (nextList <= N && day < 3650) {
-      day++;
-      const dueToday = dueCount[day] || 0;
-      let canAdd = Math.min(MAX_NEW_PER_DAY, MAX_PER_DAY - dueToday, N - nextList + 1);
-      let add = 0;
-      while (add < canAdd) {
-        let fits = true;
-        for (let gi = 0; gi < intervals.length; gi++) {
-          if ((dueCount[day + intervals[gi]] || 0) + add + 1 > MAX_PER_DAY) { fits = false; break; }
-        }
-        if (!fits) break;
-        add++;
-      }
-      if (add > 0) {
-        dayNewMap[day] = [];
-        for (let k = 0; k < add; k++) {
-          dayNewMap[day].push(nextList++);
-          learnDays = day;
-          for (let gi = 0; gi < intervals.length; gi++) {
-            const fd = day + intervals[gi];
-            dueCount[fd] = (dueCount[fd] || 0) + 1;
-          }
-        }
-      }
-    }
+    for (let i = 1; i <= N; i++) dayNewMap[i] = [i];
+    const learnDays = N;
+    const D = N > 0 ? N + intervals[intervals.length - 1] : 0;
 
-    const D = N > 0 ? learnDays + intervals[intervals.length - 1] : 0;
     const rows = [];
     for (let d = 1; d <= D; d++) {
       const revCols = intervals.map(function(gap) {
@@ -1120,7 +1092,7 @@ JS_ENGINE = r"""
     const bookTotal = getBookWords(state.currentBook).length;
     const avgWords = Math.ceil(bookTotal / N);
     document.getElementById("planFormulaSummary").textContent =
-      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 软件按艾宾浩斯间隔自动排期，共 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学，每天新学+复习不超过 5 个 List）· 复习间隔：" +
+      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 软件按艾宾浩斯间隔自动排期，共 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学，每天新学 1 个 List）· 复习间隔：" +
       intervals.map(function(g) { return "+" + g + "天"; }).join(", ");
 
     document.getElementById("planTotalDaysSpan").textContent = String(D);
@@ -2177,7 +2149,7 @@ JS_ENGINE = r"""
     return true;
   }
 
-  /* The shipped Android WebView installs no DownloadListener, so a[download] is a silent
+  /* Some embedded WebViews install no download handler, so a[download] is a silent
      no-op there. Fire it anyway (a real mobile browser still saves the file) and always
      mirror text payloads into the copy-out box on the touch shell. */
   function downloadFileBlob(filename, contentData, mimeType) {
@@ -2187,11 +2159,11 @@ JS_ENGINE = r"""
       const copyable = typeof contentData === "string" &&
         /^(application\/json|text\/csv|text\/plain)/.test(type);
       if (!copyable) {
-        showToast("Android 版无法保存该文件，请在 Windows 版导出；备份可改用「导出完整学习备份 (.json)」");
+        showToast("当前环境无法保存该文件；备份可改用「导出完整学习备份 (.json)」");
         return "blocked";
       }
       if (contentData.length > 2000000) {
-        showToast("内容约 " + Math.round(contentData.length / 1024) + " KB，超出 Android 版可复制上限，请在 Windows 版导出");
+        showToast("内容约 " + Math.round(contentData.length / 1024) + " KB，超出可复制上限，请改用文件导出");
         return "blocked";
       }
       showTouchExport(filename, contentData, type);
@@ -2392,7 +2364,7 @@ JS_ENGINE = r"""
 
     // Left-click handler on Word Rows (Requirement 2: Manages Unfamiliarity 不会程度 +1)
     function handleWordListLeftClick(e) {
-      // Android synthesises a click after a long press; swallowing that echo is what keeps
+      // Mobile browsers synthesise a click after a long press; swallowing that echo is what keeps
       // "hold to lower" from immediately raising the same word back up again.
       if (Date.now() < suppressClickUntil) {
         if (e.stopPropagation) e.stopPropagation();

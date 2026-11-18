@@ -235,7 +235,7 @@ HTML_PART2_TEMPLATE = r"""
             <div>
               <h2 style="font-size:1.22rem; font-weight:800;" id="planHeaderTitle">艾宾浩斯遗忘曲线学习计划表</h2>
               <p style="font-size:0.84rem; color:var(--text-muted); margin-top:4px; white-space:normal;">
-                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔（+1/+2/+4/+7/+15 天）自动排期，每天新学与复习合计不超过 5 个 List。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
+                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔自动排期：每天新学 1 个 List，每个 List 在 +1/+2/+4/+7/+15 天各复习一次，共 N+15 天。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
               </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
@@ -472,7 +472,7 @@ HTML_PART2_TEMPLATE = r"""
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">💾 本地数据持久化备份与恢复</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
               学习进度保存在本地（LocalStorage + IndexedDB）。换设备或重装前，先导出一份 JSON 备份。
-              <span class="m-only"><br>Android 版当前内核不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
+              <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
               存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.8
@@ -485,17 +485,17 @@ HTML_PART2_TEMPLATE = r"""
               </label>
               <button class="btn btn-sm" id="btnExportLexiconCsv">导出当前词库 CSV</button>
             </div>
-            <textarea id="pasteRestoreTextarea" rows="4" class="m-only" placeholder="Android 上若文件选择无效，把备份 .json 的完整内容粘贴到这里，再点下方按钮恢复。" style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.82rem; margin:10px 0 8px;"></textarea>
+            <textarea id="pasteRestoreTextarea" rows="4" class="m-only" placeholder="若文件选择无效，把备份 .json 的完整内容粘贴到这里，再点下方按钮恢复。" style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.82rem; margin:10px 0 8px;"></textarea>
             <button class="btn btn-sm m-only" id="btnParsePasteRestore">从粘贴内容恢复备份</button>
           </div>
 
-          <!-- The Android WebView in this build has no DownloadListener, so an anchor
+          <!-- Some embedded WebViews install no download handler, so an anchor
                click never writes a file. On the touch shell exports land here instead. -->
           <div class="stat-card m-only" id="touchExportBox" style="padding:18px; display:none;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📤 导出内容（长按复制保存）</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; white-space:normal;">
               文件名：<strong id="touchExportName"></strong> · 类型 <span id="touchExportKind"></span>。
-              当前 Android 版无法直接把文件写入存储，请点「复制到剪贴板」后粘贴到备忘录或文件管理器保存；
+              当前环境无法直接把文件写入存储时，请点「复制到剪贴板」后粘贴到备忘录或文件管理器保存；
               备份 JSON 可在上方「从粘贴内容恢复备份」原样贴回。
             </p>
             <textarea id="touchExportTextarea" rows="8" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.78rem; margin-bottom:10px;"></textarea>
