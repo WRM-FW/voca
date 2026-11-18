@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.1.0</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.1.1</span></div>
       </div>
     </div>
 
@@ -47,7 +47,7 @@ HTML_PART2_TEMPLATE = r"""
       </button>
       <button class="nav-btn" data-tab="train" id="navBtnTrain">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        <span>专项强化训练</span>
+        <span>强化训练</span>
         <span class="nav-pill">拼词</span>
       </button>
       <button class="nav-btn" data-tab="notebook" id="navBtnNotebook">
@@ -292,7 +292,7 @@ HTML_PART2_TEMPLATE = r"""
       <!-- ==================== VIEW 3: SPECIALIZED TRAINING (拼词) ==================== -->
       <section class="view-section" id="view-train">
         <div class="m-only m-view-head">
-          <h2>⚡ 专项强化训练</h2>
+          <h2>⚡ 强化训练</h2>
           <p>点字母卡片组词，也可直接用键盘输入；⌫ 删除上一字母。</p>
         </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px;">
@@ -475,7 +475,7 @@ HTML_PART2_TEMPLATE = r"""
               <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.1.0
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.1.1
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>

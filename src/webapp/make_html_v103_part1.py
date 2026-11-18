@@ -31,7 +31,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.1.0 — 离线艾宾浩斯背单词工坊 (Windows)</title>
+<title>Voca v1.1.1 — 离线艾宾浩斯背单词工坊 (Windows)</title>
 <script src="voca_auto_import.js"></script>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
@@ -370,6 +370,81 @@ html, body {
   width: 82px;
   text-align: center;
 }
+
+
+/* v1.1.1: modern thin scrollbars everywhere (the chunky OS bars read as
+   dated next to the rest of the UI). Theme-aware via color-mix on the
+   muted text colour, rounded, and they fade into the surface. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 42%, transparent) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 38%, transparent);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 62%, transparent);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* v1.1.1: custom dropdowns replace the native <select> popup (which the OS
+   renders outside the app's theme). The native select stays in the DOM as
+   the value store — hidden — so every existing handler keeps working. */
+select.cd-native { display: none !important; }
+.cd-wrap { position: relative; display: inline-block; max-width: 100%; }
+.cd-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; max-width: 100%;
+  padding: 7px 30px 7px 12px;
+  font: inherit; font-size: 0.86rem; font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.cd-btn:hover { border-color: var(--accent); }
+.cd-btn:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.cd-btn .cd-label { overflow: hidden; text-overflow: ellipsis; }
+.cd-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 1200;
+  min-width: 100%; max-width: min(78vw, 340px);
+  max-height: 264px; overflow-y: auto; overscroll-behavior: contain;
+  padding: 5px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+  opacity: 0; transform: translateY(-4px); pointer-events: none;
+  transition: opacity .13s ease, transform .13s ease;
+}
+.cd-wrap.cd-open .cd-menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.cd-menu::-webkit-scrollbar { width: 8px; }
+.cd-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 10px;
+  font-size: 0.86rem; font-weight: 550;
+  color: var(--text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cd-item:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.cd-item.active { color: var(--accent); font-weight: 700; }
+.cd-item.active::after { content: "✓"; font-size: 0.8rem; }
+.cd-wrap.cd-align-right .cd-menu { left: auto; right: 0; }
 
 .ctrl-input-num:focus, .ctrl-select:focus {
   outline: 2px solid var(--brand-primary);

@@ -933,7 +933,14 @@ JS_ENGINE = r"""
       );
     });
 
-    if (state.intraSort === "az") {
+    if (state.intraSort === "initial") {
+      // v1.1.1 fix: "initial" used to fall through with NO sort, silently
+      // showing the plan-split order — with a randomly split plan that made
+      // the "initial sequence" a shuffled one (the user: the app forgets
+      // the true initial sequence). It now sorts by the word's position in
+      // the book (w.seq), which is the one true initial sequence.
+      filtered.sort(function(a, b) { return (a.seq || 0) - (b.seq || 0); });
+    } else if (state.intraSort === "az") {
       filtered.sort(function(a, b) { return a.word.localeCompare(b.word); });
     } else if (state.intraSort === "random") {
       // v1.0.9: session-level salt — the old fixed seed made "random" identical
@@ -2137,7 +2144,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.1.0 艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.1.1 艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -2167,7 +2174,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.1.0 艾宾浩斯背单词计划表",
+        title: "Voca v1.1.1 艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -2179,7 +2186,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.1.0 离线背单词工坊";
+    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.1.1 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -2595,6 +2602,7 @@ JS_ENGINE = r"""
   }
 
   function refreshAllViews() {
+    syncCustomDropdowns();
     renderLearnView();
     renderEbbinghausPlan();
     renderNotebookView();
@@ -2608,6 +2616,108 @@ JS_ENGINE = r"""
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+
+  /* v1.1.1: custom dropdowns. Native <select> popups are rendered by the OS
+     outside the app theme (chunky list, OS scrollbar, can overflow small
+     windows). Each select.ctrl-select (except the disabled book display)
+     gets a themed button + menu; the native select stays in the DOM hidden
+     as the value store, so all existing change handlers and programmatic
+     value sets keep working — refreshAllViews re-syncs the labels. */
+  const customDropdowns = [];
+  function closeAllCustomDropdowns(except) {
+    let closedAny = false;
+    customDropdowns.forEach(function(d) {
+      if (d !== except && d.wrap.classList.contains("cd-open")) { d.wrap.classList.remove("cd-open"); closedAny = true; }
+    });
+    return closedAny;
+  }
+  function syncOneCustomDropdown(d) {
+    const sel = d.select;
+    const opt = sel.options[sel.selectedIndex];
+    d.label.textContent = opt ? opt.textContent : "";
+    d.menu.querySelectorAll(".cd-item").forEach(function(item) {
+      item.classList.toggle("active", item.dataset.value === sel.value);
+    });
+  }
+  function rebuildCustomDropdownMenu(d) {
+    d.menu.innerHTML = "";
+    Array.prototype.forEach.call(d.select.options, function(opt) {
+      const item = document.createElement("div");
+      item.className = "cd-item";
+      item.textContent = opt.textContent;
+      item.dataset.value = opt.value;
+      item.addEventListener("click", function() {
+        if (d.select.value !== opt.value) {
+          d.select.value = opt.value;
+          d.select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        d.wrap.classList.remove("cd-open");
+        syncOneCustomDropdown(d);
+      });
+      d.menu.appendChild(item);
+    });
+    syncOneCustomDropdown(d);
+  }
+  function enhanceOneCustomDropdown(sel) {
+    if (!sel || sel.dataset.cdEnhanced) return;
+    sel.dataset.cdEnhanced = "1";
+    const wrap = document.createElement("span");
+    wrap.className = "cd-wrap";
+    if (sel.style && sel.style.width) wrap.style.width = sel.style.width;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cd-btn";
+    if (sel.title) btn.title = sel.title;
+    btn.setAttribute("aria-label", sel.getAttribute("aria-label") || sel.title || "选择");
+    const label = document.createElement("span");
+    label.className = "cd-label";
+    btn.appendChild(label);
+    const menu = document.createElement("div");
+    menu.className = "cd-menu";
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
+    sel.classList.add("cd-native");
+    const d = { select: sel, wrap: wrap, btn: btn, label: label, menu: menu };
+    customDropdowns.push(d);
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const willOpen = !wrap.classList.contains("cd-open");
+      closeAllCustomDropdowns(d);
+      if (willOpen) {
+        rebuildCustomDropdownMenu(d);
+        wrap.classList.remove("cd-align-right");
+        wrap.classList.add("cd-open");
+        const r = menu.getBoundingClientRect();
+        if (r.right > window.innerWidth - 8) wrap.classList.add("cd-align-right");
+      } else {
+        wrap.classList.remove("cd-open");
+      }
+    });
+    menu.addEventListener("click", function(e) { e.stopPropagation(); });
+    new MutationObserver(function() { rebuildCustomDropdownMenu(d); }).observe(sel, { childList: true });
+    sel.addEventListener("change", function() { syncOneCustomDropdown(d); });
+    rebuildCustomDropdownMenu(d);
+  }
+  function enhanceCustomDropdowns() {
+    document.querySelectorAll("select.ctrl-select").forEach(function(sel) {
+      if (sel.id === "bookSelect") return;
+      enhanceOneCustomDropdown(sel);
+    });
+    document.addEventListener("click", function(e) {
+      if (e.target && e.target.closest && e.target.closest(".cd-wrap")) return;
+      closeAllCustomDropdowns(null);
+    });
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && closeAllCustomDropdowns(null)) e.stopPropagation();
+    }, true);
+  }
+  function syncCustomDropdowns() {
+    customDropdowns.forEach(syncOneCustomDropdown);
   }
 
   // ==================== 11. EVENT LISTENERS ====================
@@ -3416,11 +3526,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.1.0",
+        version: "1.1.1",
         exportedAt: new Date().toISOString(),
         state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.1.0_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.1.1_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 
@@ -3629,6 +3739,7 @@ JS_ENGINE = r"""
     });
     rebuildCustomBookCache();
     applySettingsToDOM();
+    enhanceCustomDropdowns();
     bindEvents();
     refreshAllViews();
     applyAgentAutoImports();

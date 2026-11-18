@@ -1,5 +1,5 @@
 /*
- * Voca v1.1.0 Windows host: native Win32 window + WebView2.
+ * Voca v1.1.1 Windows host: native Win32 window + WebView2.
  *
  * Why this exists. Since v1.0.0 Voca.exe was only a launcher that opened
  * `msedge.exe --app=...`. In that mode the taskbar button icon is produced by
@@ -1038,7 +1038,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
 
     g_main_window = CreateWindowExW(
         0, kWindowClassName,
-        L"Voca v1.1.0 — 离线艾宾浩斯背单词工坊 (Windows)",
+        L"Voca v1.1.1 — 离线艾宾浩斯背单词工坊 (Windows)",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, w, h,
         NULL, NULL, hInstance, NULL);

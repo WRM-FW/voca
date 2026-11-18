@@ -2,6 +2,21 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.1.1] - 2026-11-18
+
+A bug fix for the "initial sequence", a rename, and a UI modernisation pass over the app's dropdowns and scrollbars.
+
+### Fixed — the in-list "initial sequence" was not the book's initial sequence
+- `getSortedActiveWords` had no branch for `initial`: it fell through unsorted, i.e. it displayed the plan-split order. With a plan split in the default random sequence, picking 初始序列 in a List showed that shuffled split order — the app effectively forgot the true initial sequence. "Initial" now sorts by the word's position in the book (`w.seq`). Verified against the lexicon payload: with a randomly split 30-day plan, the List's words under 初始序列 come out strictly in book order. (Plan-level splitting is unchanged: the sequence chosen in Settings still decides how the book is cut into Lists; the in-list 初始序列 now always means book order inside the List.)
+
+### Changed — 专项强化训练 renamed to 强化训练
+- The training view is now labelled 强化训练 in the sidebar and the view heading (it only ever contained the spelling trainer).
+
+### Changed — custom dropdowns and modern scrollbars
+- Native `<select>` popups are rendered by the OS outside the app theme — chunky rows, an OS scrollbar, and popups that can overflow a narrow window. All `ctrl-select` dropdowns (in-list sequence, plan book & sequence, List picker, plan day picker, notebook sort, training source, and the Settings selects for accent / theme / font size / phonetic display) are now custom dropdowns in the app's own theme: a rounded button mirroring the current value and a card-style menu with a check mark on the active item, max-height with a thin scrollbar, right-edge alignment when near the window edge, and close on outside click / Esc. The native select remains in the DOM hidden as the value store, so every existing handler, programmatic value set and option rebuild (observed via MutationObserver) keeps working unchanged. The disabled book display in the top bar is unchanged.
+- Scrollbars across the app are now thin (10px), rounded and theme-tinted via `color-mix`, on both the standard `scrollbar-*` properties and `::-webkit-scrollbar`, replacing the chunky default bars.
+
+
 ## [1.1.0] - 2026-11-18
 
 WordReference now shows its original web page inside the dictionary modal (native-host overlay view), the two record-based sequences are removed from plan level (and "easy first" everywhere), and the whole book can be exported in one document.
