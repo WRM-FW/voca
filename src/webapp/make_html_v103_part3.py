@@ -16,20 +16,11 @@ from make_html_v103_part1 import HTML_PART1
 from make_html_v103_part2 import HTML_PART2
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CORE233_PATH = os.environ.get("VOCA_CORE233_JSON", os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", "windows", "data", "voca_lexicon.json")))
-if not os.path.exists(CORE233_PATH):
-    alt_c = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", "windows", "data", "voca_lexicon.json"))
-    if os.path.exists(alt_c):
-        CORE233_PATH = alt_c
-
 PACK_PATH = os.environ.get("VOCA_PACK_JSON", os.path.abspath(os.path.join(SCRIPT_DIR, "..", "lexicon", "v103_lexicon_payload.json")))
 if not os.path.exists(PACK_PATH):
     alt_p = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "lexicon", "v103_lexicon_payload.json"))
     if os.path.exists(alt_p):
         PACK_PATH = alt_p
-
-with open(CORE233_PATH, "r", encoding="utf-8") as f:
-    core233_json_str = f.read()
 
 with open(PACK_PATH, "r", encoding="utf-8") as f:
     v103_pack_json_str = f.read()
@@ -138,7 +129,6 @@ JS_ENGINE = r"""
     },
     settings: {
       onlineDict: "eudic",      // eudic | iciba | wordreference
-      rowClickMode: "unfam_lr", // unfam_lr | left_sound_right_unfam | right_sound_left_unfam | sound_only
       accent: "en-US",
       phoneticDisplay: "both",  // both | us | uk | hide
       theme: "daylight",        // daylight | oled | paper
@@ -158,17 +148,11 @@ JS_ENGINE = r"""
   let cardHeadwordPeeked = false;
   let cardMeaningPeeked = false;
 
-  let currentTrainSubMode = "spell";
   let spellList = [];
   let spellCursor = 0;
   let spellTyped = "";
   let spellFiveOptions = [];
 
-  let scrollFrameId = null;
-  let scrollLastTick = 0;
-  let scrollRunning = false;
-  let scrollPausedByHover = false;
-  let scrollPausedByTouch = false;
 
   // Touch devices have no hover, so the long press that lowers 不会程度 needs its own
   // gesture record. One record per physical hold, tagged with who consumed it, so the
@@ -233,18 +217,15 @@ JS_ENGINE = r"""
     }
 
     // 4. Migrate legacy Row Click Modes (from mastery-based v1.0.1/v1.0.2 to unfam-based v1.0.3)
-    const clickModeMap = {
-      mastery_lr: "unfam_lr",
-      both: "unfam_lr",
-      left_sound_right_mark: "left_sound_right_unfam",
-      right_sound_left_mark: "right_sound_left_unfam"
-    };
-    if (clickModeMap[merged.settings.rowClickMode]) {
-      merged.settings.rowClickMode = clickModeMap[merged.settings.rowClickMode];
+    // v1.0.8: the core233 book was removed; park its users on cet4. Learning
+    // records are headword-keyed, so their progress carries over.
+    if (merged.currentBook === "core233") {
+      merged.currentBook = "cet4";
     }
-    const validClickModes = ["unfam_lr", "left_sound_right_unfam", "right_sound_left_unfam", "sound_only"];
-    if (validClickModes.indexOf(merged.settings.rowClickMode) === -1) {
-      merged.settings.rowClickMode = "unfam_lr";
+    // v1.0.8: row-click behaviour is fixed (no user-selectable modes) and the
+    // Australian accent option was removed; normalise both legacy values.
+    if (merged.settings.accent === "en-AU") {
+      merged.settings.accent = "en-US";
     }
 
     // 5. Migrate legacy Intra-List Sort ('mastery_asc' -> 'hard_first')
@@ -297,7 +278,7 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.7";
+    merged.appVersion = "1.0.8";
     return merged;
   }
 
@@ -609,21 +590,16 @@ JS_ENGINE = r"""
   }
 
   function rebuildCustomBookCache() {
-    CORE233_VOCAB.forEach(function(w) {
-      w.v1_id = w.id;
-      wordLookupById[w.id] = w;
-    });
     (state.customWords || []).forEach(function(w) {
       wordLookupById[w.id] = w;
     });
-    bookCache["core233"] = CORE233_VOCAB.slice();
-    bookCache["custom"] = (state.customWords || []).length > 0 ? state.customWords.slice() : CORE233_VOCAB.slice(0, 20);
+    bookCache["custom"] = (state.customWords || []).slice();
   }
 
   function getBookWords(bookId) {
     if (bookCache[bookId]) return bookCache[bookId].slice();
     const pairs = VOCA_PACK.bookMap[bookId];
-    if (!pairs) return CORE233_VOCAB.slice();
+    if (!pairs) return [];
     const list = new Array(pairs.length);
     for (let i = 0; i < pairs.length; i++) {
       list[i] = hydrateUniqueWord(pairs[i][0], pairs[i][1], bookId);
@@ -645,7 +621,6 @@ JS_ENGINE = r"""
       });
     }
     addPool(getBookWords(state.currentBook));
-    addPool(CORE233_VOCAB);
     addPool(state.customWords || []);
     return result;
   }
@@ -690,92 +665,61 @@ JS_ENGINE = r"""
     }
   }
 
+  // v1.0.8: the user sets only the number of Lists. The software derives the
+  // day count from the fixed Ebbinghaus intervals (+1/+2/+4/+7/+15 days):
+  // a day never carries more than 5 Lists in total (new + reviews due), new
+  // Lists are paced at at most 2 per day, and a new List is only placed when
+  // every one of its future review days still stays within the same cap.
   function computeCustomEbbinghausSchedule() {
     const N = currentLists.length || Math.max(1, parseInt(state.planListCount, 10) || 15);
-    const D = Math.max(1, Math.min(730, parseInt(state.planCycleDays, 10) || (N + 15)));
-
-    let learnDays = N;
-    if (D <= N) {
-      if (D === 1) {
-        learnDays = 1;
-      } else if (D <= 4) {
-        learnDays = D - 1;
-      } else {
-        const tailReserve = Math.max(1, Math.min(15, Math.floor(D * 0.30)));
-        learnDays = Math.max(1, D - tailReserve);
-      }
-    }
-
-    const tailDays = Math.max(0, D - learnDays);
-
-    let intervals = [1, 2, 4, 7, 15];
-    if (tailDays === 15) {
-      intervals = [1, 2, 4, 7, 15];
-    } else if (tailDays >= 5) {
-      const baseCurve = [1, 2, 4, 7, 15];
-      const scaled = [];
-      for (let i = 0; i < 5; i++) {
-        let val = Math.max(1, Math.round((baseCurve[i] * tailDays) / 15));
-        if (i === 4) val = tailDays;
-        if (i > 0 && val <= scaled[i - 1]) {
-          val = scaled[i - 1] + 1;
-        }
-        scaled.push(val);
-      }
-      scaled[4] = tailDays;
-      for (let i = 3; i >= 0; i--) {
-        if (scaled[i] >= scaled[i + 1]) {
-          scaled[i] = Math.max(1, scaled[i + 1] - 1);
-        }
-      }
-      intervals = scaled;
-    } else if (tailDays >= 1) {
-      intervals = [1, 2, 4, 7, 15];
-    } else {
-      intervals = [0, 1, 2, 4, 7];
-    }
+    const intervals = [1, 2, 4, 7, 15];
+    const MAX_PER_DAY = 5;
+    const MAX_NEW_PER_DAY = 2;
 
     const dayNewMap = {};
-    for (let d = 1; d <= D; d++) dayNewMap[d] = [];
-
-    const basePerDay = Math.floor(N / learnDays);
-    const extraDays = N % learnDays;
-    let nextListNum = 1;
-    for (let d = 1; d <= learnDays; d++) {
-      const countToday = basePerDay + (d <= extraDays ? 1 : 0);
-      for (let k = 0; k < countToday; k++) {
-        if (nextListNum <= N) {
-          dayNewMap[d].push(nextListNum++);
+    const dueCount = {};
+    let nextList = 1;
+    let day = 0;
+    let learnDays = 0;
+    while (nextList <= N && day < 3650) {
+      day++;
+      const dueToday = dueCount[day] || 0;
+      let canAdd = Math.min(MAX_NEW_PER_DAY, MAX_PER_DAY - dueToday, N - nextList + 1);
+      let add = 0;
+      while (add < canAdd) {
+        let fits = true;
+        for (let gi = 0; gi < intervals.length; gi++) {
+          if ((dueCount[day + intervals[gi]] || 0) + add + 1 > MAX_PER_DAY) { fits = false; break; }
+        }
+        if (!fits) break;
+        add++;
+      }
+      if (add > 0) {
+        dayNewMap[day] = [];
+        for (let k = 0; k < add; k++) {
+          dayNewMap[day].push(nextList++);
+          learnDays = day;
+          for (let gi = 0; gi < intervals.length; gi++) {
+            const fd = day + intervals[gi];
+            dueCount[fd] = (dueCount[fd] || 0) + 1;
+          }
         }
       }
     }
 
+    const D = N > 0 ? learnDays + intervals[intervals.length - 1] : 0;
     const rows = [];
     for (let d = 1; d <= D; d++) {
-      const newLists = dayNewMap[d] || [];
-      const revCols = [[], [], [], [], []];
-      for (let sIdx = 0; sIdx < 5; sIdx++) {
-        const gap = intervals[sIdx];
-        if (gap === 0 && sIdx === 0 && D === 1) {
-          revCols[sIdx] = newLists.slice();
-        } else if (gap >= 1 && d - gap >= 1 && d - gap <= learnDays) {
-          revCols[sIdx] = (dayNewMap[d - gap] || []).slice();
-        }
-      }
-      rows.push({
-        day: d,
-        newLists: newLists,
-        revCols: revCols
+      const revCols = intervals.map(function(gap) {
+        return (dayNewMap[d - gap] || []).slice();
       });
+      rows.push({ day: d, newLists: (dayNewMap[d] || []).slice(), revCols: revCols });
     }
 
-    return {
-      N: N,
-      D: D,
-      learnDays: learnDays,
-      intervals: intervals,
-      rows: rows
-    };
+    // Keep the legacy field in sync as a derived value (stats tag, exports).
+    state.planCycleDays = D;
+
+    return { N: N, D: D, learnDays: learnDays, intervals: intervals, rows: rows };
   }
 
   function getEffectiveCnDef(w) {
@@ -900,7 +844,7 @@ JS_ENGINE = r"""
     document.getElementById("statBookProgress").textContent = pct + "%";
     document.getElementById("statBookSub").textContent = "当前词书 " + bookPool.length + " 词 · 已熟 " + masteredInBook + " 词";
     document.getElementById("statStarredTotal").textContent = String(totalStarred);
-    document.getElementById("statPlanConfigTag").textContent = currentLists.length + "组/" + state.planCycleDays + "天";
+    document.getElementById("statPlanConfigTag").textContent = currentLists.length + "组/" + computeCustomEbbinghausSchedule().D + "天";
     document.getElementById("statPlanCheckins").textContent = completedListsCount + " / " + currentLists.length + " 组";
 
     document.getElementById("pillActiveCount").textContent = String(remainInList);
@@ -1158,15 +1102,12 @@ JS_ENGINE = r"""
     const intervals = sched.intervals;
 
     const nInput = document.getElementById("planListCountInput");
-    const dInput = document.getElementById("planCycleDaysInput");
     if (nInput && document.activeElement !== nInput) nInput.value = String(state.planListCount);
-    if (dInput && document.activeElement !== dInput) dInput.value = String(state.planCycleDays);
     document.getElementById("planOrderModeSelect").value = state.planOrderMode;
 
     document.querySelectorAll("#planPresetPills .preset-pill-btn").forEach(function(btn) {
       const bn = parseInt(btn.dataset.n, 10);
-      const bd = parseInt(btn.dataset.d, 10);
-      btn.classList.toggle("active", bn === state.planListCount && bd === state.planCycleDays);
+      btn.classList.toggle("active", bn === state.planListCount);
     });
 
     for (let sIdx = 0; sIdx < 5; sIdx++) {
@@ -1179,7 +1120,7 @@ JS_ENGINE = r"""
     const bookTotal = getBookWords(state.currentBook).length;
     const avgWords = Math.ceil(bookTotal / N);
     document.getElementById("planFormulaSummary").textContent =
-      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 学习周期 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学）· 艾宾浩斯复习间隔：" +
+      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 软件按艾宾浩斯间隔自动排期，共 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学，每天新学+复习不超过 5 个 List）· 复习间隔：" +
       intervals.map(function(g) { return "+" + g + "天"; }).join(", ");
 
     document.getElementById("planTotalDaysSpan").textContent = String(D);
@@ -1367,62 +1308,6 @@ JS_ENGINE = r"""
       playTone("down");
       renderSpellingStage();
     }
-  }
-
-  function renderAutoScrollList() {
-    const pool = getTrainingPool().slice(0, 150);
-    const box = document.getElementById("scrollListContent");
-    let html = "";
-    pool.forEach(function(w, idx) {
-      const rec = getRecord(w.id);
-      html +=
-        '<div class="word-row" data-wid="' + w.id + '" data-unfam="' + (rec.unfam || 0) + '">' +
-          '<div class="w-idx">' + (idx + 1) + '</div>' +
-          '<div class="w-head-col">' +
-            '<div class="w-word">' + escapeHtml(w.word) + ' ' + makeUnfamBadgeHtml(rec.unfam || 0) + '</div>' +
-            '<div class="w-ipa">' + escapeHtml(getPhoneticString(w)) + '</div>' +
-          '</div>' +
-          '<div class="w-meaning-col">' +
-            '<div class="w-cn">' + escapeHtml(getEffectiveCnDef(w)) + '</div>' +
-          '</div>' +
-          '<div class="w-actions">' +
-            '<button class="icon-btn' + (rec.starred ? ' starred' : '') + '" data-act="star" data-wid="' + w.id + '" aria-label="加入或移出生词本">★</button>' +
-            '<button class="icon-btn" data-act="dict" data-wid="' + w.id + '" aria-label="查看词典详情与编辑">📖</button>' +
-          '</div>' +
-        '</div>';
-    });
-    box.innerHTML = html;
-  }
-
-  function toggleAutoScroll(forceStop) {
-    const btn = document.getElementById("scrollBtnToggle");
-    if (scrollRunning || forceStop) {
-      scrollRunning = false;
-      if (scrollFrameId !== null) { cancelAnimationFrame(scrollFrameId); scrollFrameId = null; }
-      scrollLastTick = 0;
-      btn.textContent = "▶ 开启自动滚动";
-      return;
-    }
-    scrollRunning = true;
-    btn.textContent = "⏸ 暂停自动滚动";
-    const vp = document.getElementById("scrollViewport");
-    scrollLastTick = 0;
-    // One step per real animation frame instead of setInterval(35ms): no competing
-    // timers on a mid-range WebView, and the speed is expressed as px per tick-normalised
-    // frame so 60Hz and 120Hz screens drift at the same rate.
-    scrollFrameId = requestAnimationFrame(function step(ts) {
-      if (!scrollRunning) { scrollFrameId = null; return; }
-      scrollFrameId = requestAnimationFrame(step);
-      if (document.hidden) { scrollLastTick = ts; return; }
-      const dt = scrollLastTick ? Math.min(120, ts - scrollLastTick) : 16;
-      scrollLastTick = ts;
-      if (scrollPausedByHover || scrollPausedByTouch) return;
-      const spd = parseInt(document.getElementById("scrollSpeedSelect").value, 10) || 2;
-      vp.scrollTop += spd * (dt / 35);
-      if (vp.scrollTop + vp.clientHeight >= vp.scrollHeight - 2) {
-        vp.scrollTop = 0;
-      }
-    });
   }
 
   // ==================== 8. NOTEBOOK (生词本) & MASTERED (熟词表) ====================
@@ -1613,7 +1498,6 @@ JS_ENGINE = r"""
     const pageUrl = dictCfg.embedUrl && dictCfg.embedUrl !== dictCfg.parseUrl ? parseUrl : parseUrl;
 
     document.getElementById("modalActiveDictBadge").textContent = dictCfg.name;
-    document.getElementById("modalDictUrlCode").textContent = parseUrl;
     document.getElementById("modalDictExternalLink").href = parseUrl;
 
     document.querySelectorAll("#modalDictSourceGroup .seg-btn").forEach(function(btn) {
@@ -1827,6 +1711,9 @@ JS_ENGINE = r"""
 
     document.getElementById("modalDictWord").textContent = w.word;
     document.getElementById("modalDictIpa").textContent = getPhoneticString(w);
+    // v1.0.8: the local lexicon entry renders instantly, before any network result.
+    document.getElementById("modalLocalCn").textContent = getEffectiveCnDef(w);
+    document.getElementById("modalLocalEx").textContent = w.ex_en ? (w.ex_en + (w.ex_cn ? "（" + w.ex_cn + "）" : "")) : "（暂无例句）";
     document.getElementById("modalEditCnInput").value = getEffectiveCnDef(w);
     document.getElementById("modalEditNoteInput").value = rec.note || "";
     document.getElementById("modalUnfamVal").textContent = String(rec.unfam || 0);
@@ -1901,7 +1788,7 @@ JS_ENGINE = r"""
     const N = sched.N;
     const D = sched.D;
     const intervals = sched.intervals;
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 自定义 List 数: " + N + " 组 · 自定义学习周期: " + D + " 天 · 复习间隔: " + intervals.map(function(g) { return "+" + g + "天"; }).join("/");
+    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · List 数: " + N + " 组 · 总周期: " + D + " 天（软件按艾宾浩斯自动排期） · 复习间隔: " + intervals.map(function(g) { return "+" + g + "天"; }).join("/");
 
     const headers = [
       "天数",
@@ -2337,7 +2224,7 @@ JS_ENGINE = r"""
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.7 · 内置词条 " + (VOCA_PACK.totalRows || 0).toLocaleString("en-US") + " 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.8 · 内置词条 " + (VOCA_PACK.totalRows || 0).toLocaleString("en-US") + " 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 
@@ -2356,8 +2243,6 @@ JS_ENGINE = r"""
 
     document.getElementById("bookSelect").value = state.currentBook;
     document.getElementById("sortSelect").value = state.intraSort;
-    document.getElementById("settingOnlineDict").value = state.settings.onlineDict || "eudic";
-    document.getElementById("settingRowClickMode").value = state.settings.rowClickMode || "unfam_lr";
     document.getElementById("settingAccentMode").value = state.settings.accent;
     document.getElementById("settingPhoneticDisplay").value = state.settings.phoneticDisplay;
     document.getElementById("settingThemeSelect").value = theme;
@@ -2372,16 +2257,9 @@ JS_ENGINE = r"""
     });
 
     const touchShell = !!(window.__VOCA_IS_TOUCH__ && window.__VOCA_IS_TOUCH__());
-    const clickHints = {
-      unfam_lr: touchShell ? "轻触单词行：不会程度+1并发音 · 长按：不会程度-1"
-                           : "左键/轻触单词行：不会程度+1并发音 · 右键点击：不会程度-1",
-      left_sound_right_unfam: touchShell ? "点击左半部：仅发音 · 右半部：不会程度+1 · 长按：不会程度-1"
-                                         : "点击左半部：仅发音 · 右半部：不会程度+1 · 右键：不会程度-1",
-      right_sound_left_unfam: touchShell ? "点击右半部：仅发音 · 左半部：不会程度+1 · 长按：不会程度-1"
-                                         : "点击右半部：仅发音 · 左半部：不会程度+1 · 右键：不会程度-1",
-      sound_only: "点击单词行：仅朗读发音（不改变不会程度）"
-    };
-    document.getElementById("clickRuleHint").textContent = clickHints[state.settings.rowClickMode] || clickHints.unfam_lr;
+    document.getElementById("clickRuleHint").textContent = touchShell
+      ? "轻触单词行：不会程度+1并发音 · 长按：不会程度-1"
+      : "左键/轻触单词行：不会程度+1并发音 · 右键点击：不会程度-1";
   }
 
   function refreshAllViews() {
@@ -2389,7 +2267,6 @@ JS_ENGINE = r"""
     renderEbbinghausPlan();
     renderNotebookView();
     initSpellingSession(false);
-    renderAutoScrollList();
     updateStorageDiagnostics();
   }
 
@@ -2412,7 +2289,6 @@ JS_ENGINE = r"""
         btn.classList.toggle("active", btn.dataset.tab === tabId);
       });
       if (tabId !== "train") {
-        toggleAutoScroll(true);
       }
       refreshAllViews();
     }
@@ -2575,32 +2451,20 @@ JS_ENGINE = r"""
       if (!w) return;
       const rec = getRecord(wid);
 
-      const rect = row.getBoundingClientRect();
-      const isLeftHalf = (e.clientX - rect.left) < (rect.width / 2);
-      const mode = state.settings.rowClickMode || "unfam_lr";
-
       speakText(w.word);
 
-      if (mode === "unfam_lr" || mode === "left_sound_right_unfam" || mode === "right_sound_left_unfam") {
-        let shouldIncUnfam = true;
-        if (mode === "left_sound_right_unfam" && isLeftHalf) shouldIncUnfam = false;
-        if (mode === "right_sound_left_unfam" && !isLeftHalf) shouldIncUnfam = false;
-
-        if (shouldIncUnfam) {
-          if ((rec.unfam || 0) < 5) {
-            rec.unfam = (rec.unfam || 0) + 1;
-            saveState();
-            updateRowUnfamDOM(row, rec);
-            // v1.0.7: explain the row-click contract once, where it happens.
-            if (!state.modeHintsShown.rowClick) {
-              state.modeHintsShown.rowClick = true;
-              saveState();
-              showToast("💡 点单词行 = 不会程度 +1 并发音，右键/长按可 −1；点击行为可在「偏好设置与帮助」中切换（此提示仅首次显示）。");
-            }
-          } else {
-            showToast("「" + w.word + "」不会程度已达上限 (5/5)");
-          }
+      if ((rec.unfam || 0) < 5) {
+        rec.unfam = (rec.unfam || 0) + 1;
+        saveState();
+        updateRowUnfamDOM(row, rec);
+        // v1.0.7: explain the row-click contract once, where it happens.
+        if (!state.modeHintsShown.rowClick) {
+          state.modeHintsShown.rowClick = true;
+          saveState();
+          showToast("💡 点单词行 = 不会程度 +1 并发音，右键/长按可 −1（此提示仅首次显示）。");
         }
+      } else {
+        showToast("「" + w.word + "」不会程度已达上限 (5/5)");
       }
     }
 
@@ -2712,7 +2576,7 @@ JS_ENGINE = r"""
       clearLongPressVisual();
     }
 
-    ["learnListContainer", "notebookListContainer", "scrollListContent"].forEach(function(cid) {
+    ["learnListContainer", "notebookListContainer"].forEach(function(cid) {
       const el = document.getElementById(cid);
       el.addEventListener("click", handleWordListLeftClick);
       el.addEventListener("contextmenu", handleWordListRightClick);
@@ -2846,30 +2710,27 @@ JS_ENGINE = r"""
     // Custom Ebbinghaus Plan Events
     function applyCustomPlanInputs() {
       const rawN = document.getElementById("planListCountInput").value;
-      const rawD = document.getElementById("planCycleDaysInput").value;
-      const clean = sanitizePlanParams(rawN, rawD);
+      const clean = sanitizePlanParams(rawN, 0);
       state.planListCount = clean.n;
-      state.planCycleDays = clean.d;
       document.getElementById("planListCountInput").value = String(clean.n);
-      document.getElementById("planCycleDaysInput").value = String(clean.d);
-      if (state.planActiveDay > clean.d) {
+      buildListsForCurrentBook();
+      const sched = computeCustomEbbinghausSchedule();
+      if (state.planActiveDay > sched.D) {
         state.planActiveDay = 1;
       }
       saveState();
       refreshAllViews();
       playTone("success");
-      showToast("✓ 已应用自定义计划：" + clean.n + " 个 List · " + clean.d + " 天周期（学习记录已无损保留）");
+      showToast("✓ 已应用计划：" + clean.n + " 个 List · 软件自动排期共 " + sched.D + " 天（学习记录已无损保留）");
     }
 
     document.getElementById("btnApplyCustomPlan").addEventListener("click", applyCustomPlanInputs);
     document.getElementById("planListCountInput").addEventListener("change", applyCustomPlanInputs);
-    document.getElementById("planCycleDaysInput").addEventListener("change", applyCustomPlanInputs);
 
     document.getElementById("planPresetPills").addEventListener("click", function(e) {
       const btn = e.target.closest(".preset-pill-btn");
       if (!btn) return;
       document.getElementById("planListCountInput").value = btn.dataset.n;
-      document.getElementById("planCycleDaysInput").value = btn.dataset.d;
       applyCustomPlanInputs();
     });
 
@@ -2916,22 +2777,8 @@ JS_ENGINE = r"""
       openPrintPreviewModal("自定义艾宾浩斯学习计划表", built.html, built.docData);
     });
 
-    // Specialized Training Sub-modes
-    document.getElementById("trainSubModeGroup").addEventListener("click", function(e) {
-      const btn = e.target.closest(".seg-btn");
-      if (!btn) return;
-      currentTrainSubMode = btn.dataset.tmode;
-      document.querySelectorAll("#trainSubModeGroup .seg-btn").forEach(function(b) {
-        b.classList.toggle("active", b.dataset.tmode === currentTrainSubMode);
-      });
-      document.getElementById("trainPanelSpell").style.display = currentTrainSubMode === "spell" ? "block" : "none";
-      document.getElementById("trainPanelScroll").style.display = currentTrainSubMode === "scroll" ? "block" : "none";
-      toggleAutoScroll(true);
-    });
-
     document.getElementById("trainSourceSelect").addEventListener("change", function() {
       initSpellingSession(true);
-      renderAutoScrollList();
     });
 
     document.getElementById("spellFiveCardsBox").addEventListener("click", function(e) {
@@ -2973,28 +2820,6 @@ JS_ENGINE = r"""
     });
 
     document.getElementById("spellBtnBackspace").addEventListener("click", spellBackspace);
-
-    document.getElementById("scrollBtnToggle").addEventListener("click", function() {
-      toggleAutoScroll(false);
-    });
-    const svp = document.getElementById("scrollViewport");
-    svp.addEventListener("mouseenter", function() {
-      // A tap also raises compatibility mouse events. Their matching mouseleave never
-      // comes, so trusting them on a touch device would freeze the stream permanently.
-      if (isTouchShell() || (Date.now() - lastTouchAt) < 900) return;
-      scrollPausedByHover = true;
-    });
-    svp.addEventListener("mouseleave", function() { scrollPausedByHover = false; });
-    // The panel copy promises "悬停或触摸列表自动暂停". Hover only exists on a mouse, so
-    // press-to-pause is what makes the promise true on a phone (without this the
-    // auto-scrolling stream cannot be stopped with a finger at all).
-    svp.addEventListener("touchstart", function() {
-      lastTouchAt = Date.now();
-      scrollPausedByTouch = true;
-      scrollPausedByHover = false;
-    }, { passive: true });
-    svp.addEventListener("touchend", function() { scrollPausedByTouch = false; }, { passive: true });
-    svp.addEventListener("touchcancel", function() { scrollPausedByTouch = false; }, { passive: true });
 
     // Notebook & Mastered Events
     document.getElementById("nbSubTabGroup").addEventListener("click", function(e) {
@@ -3277,11 +3102,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.7",
+        version: "1.0.8",
         exportedAt: new Date().toISOString(),
         state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.7_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.0.8_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 
@@ -3355,21 +3180,6 @@ JS_ENGINE = r"""
     });
 
     // Settings Controls (Requirement 4: Persistent Online Dictionary Selection)
-    document.getElementById("settingOnlineDict").addEventListener("change", function(e) {
-      const val = e.target.value;
-      if (VALID_ONLINE_DICTS.indexOf(val) !== -1) {
-        state.settings.onlineDict = val;
-        applySettingsToDOM();
-        saveState();
-        const dictName = ONLINE_DICT_SOURCES[val].name;
-        showToast("✓ 已切换默认在线词典为：" + dictName + "（已持久保存）");
-      }
-    });
-    document.getElementById("settingRowClickMode").addEventListener("change", function(e) {
-      state.settings.rowClickMode = e.target.value;
-      applySettingsToDOM();
-      saveState();
-    });
     document.getElementById("settingAccentMode").addEventListener("change", function(e) {
       state.settings.accent = e.target.value;
       saveState();
@@ -3413,7 +3223,7 @@ JS_ENGINE = r"""
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       const trainViewActive = document.getElementById("view-train").classList.contains("active");
-      if (trainViewActive && currentTrainSubMode === "spell") {
+      if (trainViewActive) {
         if (/^[a-zA-Z]$/.test(e.key)) {
           e.preventDefault();
           handleSpellCharInput(e.key);
@@ -3500,7 +3310,7 @@ JS_ENGINE = r"""
 full_html = (
     HTML_PART1 +
     HTML_PART2 +
-    "\n<script>\nconst CORE233_VOCAB = " + core233_json_str + ";\n" +
+    "\n<script>\n" +
     "const VOCA_PACK = " + v103_pack_json_str + ";\n" +
     JS_ENGINE +
     "\n</script>\n</body>\n</html>\n"

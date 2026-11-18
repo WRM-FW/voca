@@ -2,6 +2,43 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.0.8] - 2026-11-18
+
+Windows-only release. **Android remains paused** (see 1.0.5). A content + interaction release: adds the CET-4 complete word list as a built-in book, removes several low-value options and modes, and rebuilds the study plan around the Ebbinghaus curve.
+
+### Added
+- **New built-in book: 四级完整词表 (CET-4 · 4,449 words, id `cet4full`)** — the full 4,449-word CET-4 list from the user's study set, in the source list's own order. With the plan order mode set to 原序版本， the in-app lists reproduce the source order page by page; the default shuffle mode behaves as for every other book. Of the list's 4,441 unique headwords, 4,424 already existed in the lexicon and keep their ECDICT definitions and examples; three source truncations (inser, accommodatio, systematic(al)) map to insert / accommodation / systematic; eight duplicated rows in the source map to the same entry under distinct sequence numbers.
+- **14 new lexicon words**, each with a bilingual example written for this release: o'clock, a.m., aero, etc., Jew, esp., eleventh, AI, meter, Brazil, dramatization, quickly, Portugal, Brazilian. Lexicon totals: 43,304 book rows (was 38,855), 14,956 unique words (was 14,942), example coverage still 100%.
+- **Dictionary modal: instant local entry.** The modal now shows the word's local lexicon definition and example immediately at the top, before (and regardless of) the online result; the raw query-URL line was removed.
+
+### Changed — plan system rebuilt around the Ebbinghaus curve
+- The user now sets **only the number of Lists**. The day count is **computed by the software** from the fixed Ebbinghaus intervals (+1/+2/+4/+7/+15 days): new Lists are paced (at most 2/day) so that **no day ever carries more than 5 Lists in total (new + reviews due)**, verified by lookahead over each new List's five future review days. The cycle-days input and the N/D preset combos are gone; presets now set the List count only. Example: 15 Lists over the CET-4 book now schedule to 33 days with a maximum daily load of exactly 5. `planCycleDays` remains in the archive as a derived value kept in sync by the scheduler.
+
+### Removed
+- **Auto-scroll training mode** （自动滚动模式）: the training view is spelling-only; its timers, panel, speed control and event wiring were deleted.
+- **Row-click behaviour setting**: clicking a word row now has one fixed behaviour — left-click/tap = unfamiliarity +1 with pronunciation, right-click/long-press = −1. The four-mode selector and the alternative code paths were deleted.
+- **Australian English accent** option (stored `en-AU` migrates to `en-US`).
+- **Voca 深度双解精编词库 (233词） book** (`core233`): the book and its embedded dataset were removed (the app package shrinks by ~190 KB). Users parked on it migrate to the CET-4 book; learning records are headword-keyed, so progress carries over. The curated rich entries still power examples inside the other books. The custom book no longer falls back to demo words when empty.
+- **Data page bulk**: the multi-thousand-word storage-path/migration guide card was deleted and the remaining cards' copy cut down; the page is now three compact functional cards.
+- **Settings duplication**: the online-dictionary source selector left Settings (the dictionary modal's own switcher is the single control, still persisted); the storage diagnostic now reads the entry total from the payload instead of a hardcoded number.
+
+### Changed — chrome & visuals
+- The book/List selectors now appear only where they act: both on 学习， book only on 计划表， neither on 训练 / 生词本 / 数据 / 设置 (previously the pair followed the user across pages). The language/sort/view controls follow the same rule.
+- A visual refinement pass: softer card borders and shadows, rounder controls (10px), pill segmented controls, hairline word-row dividers, rounder modals — a quieter, more modern surface in both themes.
+
+### Changed
+- Version stamped `1.0.8` throughout (title, sidebar badge, `state.appVersion`, backup filename/version, host title, `assemblyIdentity` 1.0.8.0, `Image Version` 1.8). `schemaVersion` stays at `4`; v1.0.0 ~ v1.0.7 archives load unchanged.
+- The storage diagnostic line now reads the entry total from the payload (`VOCA_PACK.totalRows`) instead of a hardcoded number.
+
+### Verification (1.0.8)
+Headless-Chromium checks: the new book appears in the selector with 4,449 words over 15 lists; 原序 mode's first five words match the source list's #1–#5 exactly; cross-book search attributes the new word "quickly" to 四级完整词表 and jumps to it; diagnostics show 43,304 entries. For the interaction batch: no auto-scroll elements remain and spelling training works; the plan for 15 Lists computes 33 days with a measured maximum daily load of 5 Lists; the days input, click-mode selector, dictionary-source selector and Australian accent are gone from Settings; the fixed row click moves a row from 0/5 to 1/5; the data page renders three compact cards (723 characters of body text, down from several thousand); the dictionary modal shows the local definition and example instantly; a seeded archive with `currentBook: "core233"` and accent `en-AU` loads as CET-4 + `en-US`; the full v1.0.7 regression (sparse save, corruption recovery, global search, check-in, spelling) still passes. Zero page errors throughout. Full details: `docs/12-v1.0.8-cet4-complete-list-report.md`.
+
+### Known Issues (1.0.8)
+1. Everything inherited that this round did not touch: `voca.db` phonetics follow ECDICT's notation, `Voca.exe` is unsigned, Android paused and unverified on any device.
+2. The 14 new words' glosses come from the source CET-4 list itself (one garbled gloss, a.m., was cleaned); their examples are new and machine-checked for headword presence, not human-proofread — same caveat as the 1.0.6 examples.
+
+---
+
 ## [1.0.7] - 2026-11-18
 
 Windows-only release. **Android remains paused** (see 1.0.5). Implements the approved change review of the v1.0.6 systematic UX evaluation, with emphasis on interaction.

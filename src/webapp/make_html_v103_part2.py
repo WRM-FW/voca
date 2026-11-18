@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 2 of Voca v1.0.7 HTML Application:
+Generates Part 2 of Voca v1.0.8 HTML Application:
 - High-DPI 256x256 brand icon in sidebar (version badge).
 - Removed '英英模式' (en_en) button from #langModeGroup (retains 双语 / 只看英文 / 只看中文).
 - Removed all '掌握度' (mastery) UI elements, keeping only '不会程度' (unfamiliarity 0..5).
@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.0.7</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.0.8</span></div>
       </div>
     </div>
 
@@ -48,7 +48,7 @@ HTML_PART2_TEMPLATE = r"""
       <button class="nav-btn" data-tab="train" id="navBtnTrain">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span>专项强化训练</span>
-        <span class="nav-pill">拼词/滚动</span>
+        <span class="nav-pill">拼词</span>
       </button>
       <button class="nav-btn" data-tab="notebook" id="navBtnNotebook">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -81,7 +81,6 @@ HTML_PART2_TEMPLATE = r"""
           <option value="toefl">托福核心 (TOEFL · 6,974词)</option>
           <option value="ielts">雅思核心 (IELTS · 5,040词)</option>
           <option value="gre">GRE 核心 (GRE高阶 · 7,504词)</option>
-          <option value="core233">Voca 深度双解精编词库 (233词)</option>
           <option value="custom">用户自定义导入词库</option>
         </select>
 
@@ -234,9 +233,9 @@ HTML_PART2_TEMPLATE = r"""
         <div class="stat-card" style="margin-bottom:16px; padding:18px 20px;">
           <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:12px;">
             <div>
-              <h2 style="font-size:1.22rem; font-weight:800;" id="planHeaderTitle">艾宾浩斯遗忘曲线学习计划表（支持自由定义 List 个数与学习周期天数）</h2>
+              <h2 style="font-size:1.22rem; font-weight:800;" id="planHeaderTitle">艾宾浩斯遗忘曲线学习计划表</h2>
               <p style="font-size:0.84rem; color:var(--text-muted); margin-top:4px; white-space:normal;">
-                💡 <strong>自定义与无损保护说明</strong>：您可以自由设定任意 <strong>List 数量 (1~365)</strong> 与 <strong>学习周期天数 (1~730)</strong>。调整参数后系统将重新均匀划分词书并自适应生成每日新学与 5 轮艾宾浩斯复习日程，<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
+                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔（+1/+2/+4/+7/+15 天）自动排期，每天新学与复习合计不超过 5 个 List。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
               </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
@@ -253,12 +252,6 @@ HTML_PART2_TEMPLATE = r"""
             </label>
 
             <label style="font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              自定义学习周期天数:
-              <input type="number" id="planCycleDaysInput" class="ctrl-input-num" min="1" max="730" step="1" value="30" title="自由输入学习总周期天数 (1 ~ 730)">
-              <span style="font-size:0.78rem; color:var(--text-muted); font-weight:500;">天</span>
-            </label>
-
-            <label style="font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
               词序分配:
               <select id="planOrderModeSelect" class="ctrl-select">
                 <option value="shuffle">乱序版本 (随机均分)</option>
@@ -271,16 +264,16 @@ HTML_PART2_TEMPLATE = r"""
 
             <div class="plan-preset-pills" id="planPresetPills">
               <span style="font-size:0.76rem; color:var(--text-muted);">快捷填充:</span>
-              <button type="button" class="preset-pill-btn" data-n="7" data-d="14">7组/14天</button>
-              <button type="button" class="preset-pill-btn" data-n="10" data-d="25">10组/25天</button>
-              <button type="button" class="preset-pill-btn active" data-n="15" data-d="30">15组/30天</button>
-              <button type="button" class="preset-pill-btn" data-n="21" data-d="36">21组/36天</button>
-              <button type="button" class="preset-pill-btn" data-n="30" data-d="45">30组/45天</button>
+              <button type="button" class="preset-pill-btn" data-n="7">7组</button>
+              <button type="button" class="preset-pill-btn" data-n="10">10组</button>
+              <button type="button" class="preset-pill-btn active" data-n="15">15组</button>
+              <button type="button" class="preset-pill-btn" data-n="21">21组</button>
+              <button type="button" class="preset-pill-btn" data-n="30">30组</button>
             </div>
           </div>
 
           <div style="font-size:0.80rem; color:var(--brand-primary); font-weight:600; margin-top:8px;" id="planFormulaSummary">
-            当前计划参数：共 15 个 List（每组约 257 词）· 总周期 30 天 · 艾宾浩斯复习间隔：+1天, +2天, +4天, +7天, +15天
+            当前计划参数：共 15 个 List（每组约 257 词）· 天数由软件按艾宾浩斯间隔自动计算 · 复习间隔：+1天, +2天, +4天, +7天, +15天
           </div>
         </div>
 
@@ -321,18 +314,13 @@ HTML_PART2_TEMPLATE = r"""
         </div>
       </section>
 
-      <!-- ==================== VIEW 3: SPECIALIZED TRAINING (拼词 + 滚动) ==================== -->
+      <!-- ==================== VIEW 3: SPECIALIZED TRAINING (拼词) ==================== -->
       <section class="view-section" id="view-train">
         <div class="m-only m-view-head">
           <h2>⚡ 专项强化训练</h2>
-          <p>拼词模式可点字母卡片或 ⌫ 删除；滚动模式手指按住列表即暂停。</p>
+          <p>点字母卡片组词，也可直接用键盘输入；⌫ 删除上一字母。</p>
         </div>
         <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px;">
-          <div class="seg-group" id="trainSubModeGroup">
-            <button class="seg-btn active" data-tmode="spell">🔤 拼词模式 (5卡片点选+键盘)</button>
-            <button class="seg-btn" data-tmode="scroll">📜 自动滚动模式</button>
-          </div>
-
           <div style="display:flex; align-items:center; gap:10px;">
             <label style="font-size:0.84rem; font-weight:600;">训练词源:
               <select id="trainSourceSelect" class="ctrl-select">
@@ -379,31 +367,6 @@ HTML_PART2_TEMPLATE = r"""
           </div>
         </div>
 
-        <!-- Training Mode B: Auto-Scroll Mode -->
-        <div id="trainPanelScroll" style="display:none;">
-          <div class="stat-card" style="margin-bottom:12px; display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
-            <div>
-              <span style="font-weight:800;">📜 自动循环滚动记忆流</span>
-              <span class="d-only" style="font-size:0.80rem; color:var(--text-muted); margin-left:6px;">悬停列表自动暂停，支持左/右键调节不会程度、标星或查在线词典</span>
-              <span class="m-only m-inline" style="font-size:0.80rem; color:var(--text-muted); margin-left:6px;">触摸列表自动暂停，支持轻触/长按调节不会程度、标星或查在线词典</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <label style="font-size:0.82rem; font-weight:600;">速度:
-                <select id="scrollSpeedSelect" class="ctrl-select">
-                  <option value="1">慢速 (0.6x)</option>
-                  <option value="2" selected>适中 (1.0x)</option>
-                  <option value="3">快速 (1.6x)</option>
-                  <option value="5">极速刷词 (2.5x)</option>
-                </select>
-              </label>
-              <button class="btn btn-primary btn-sm" id="scrollBtnToggle">▶ 开启自动滚动</button>
-            </div>
-          </div>
-
-          <div id="scrollViewport" class="scroll-viewport">
-            <div id="scrollListContent"></div>
-          </div>
-        </div>
       </section>
 
       <!-- ==================== VIEW 4: NOTEBOOK & MASTERED (生词本与熟词表) ==================== -->
@@ -474,7 +437,7 @@ HTML_PART2_TEMPLATE = r"""
           <div class="stat-card" style="padding:18px;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">🖨️ 多页 PDF 导出、打印与 HTML 导出</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
-              支持生成多页 A4 排版文档，完整导出全部词条与计划表（自动分页、跨页表头重复、行防截断），支持<strong>直接导出多页 .pdf 文件</strong>、<strong>调用系统打印/另存为 PDF</strong> 以及<strong>下载独立 .html 文件</strong>。
+              把全部词条与计划表导出为多页 A4 文档，可存为 PDF、打印或下载为独立 HTML。
             </p>
             <div style="display:flex; flex-direction:column; gap:8px;">
               <button class="btn" id="btnExportPdfSchedule">📅 导出「自定义艾宾浩斯学习计划表」PDF/打印版</button>
@@ -488,11 +451,11 @@ HTML_PART2_TEMPLATE = r"""
           <div class="stat-card" style="padding:18px;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">💾 本地数据持久化备份与恢复</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
-              所有学习进度、自定义计划参数、不会程度、生词本、熟词表、在线词典偏好及自定义词库均实时保存在本地双引擎（LocalStorage + IndexedDB）中，完全兼容 v1.0.0 / v1.0.1 / v1.0.2 备份文件。
+              学习进度保存在本地（LocalStorage + IndexedDB）。换设备或重装前，先导出一份 JSON 备份。
               <span class="m-only"><br>Android 版当前内核不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.7
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.8
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -520,74 +483,27 @@ HTML_PART2_TEMPLATE = r"""
           </div>
         </div>
 
-        <!-- Card 4: Comprehensive Data Storage Paths, Upgrade & Cross-Platform Migration Guide -->
-        <div class="stat-card" id="dataMigrationGuideCard" style="padding:20px; line-height:1.7;">
-          <h3 style="font-size:1.12rem; font-weight:800; margin-bottom:12px;">📂 版本升级、数据存储路径与跨平台迁移说明</h3>
-          <div class="panel-grid-inner" style="font-size:0.83rem; color:var(--text-secondary);">
-            <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
-              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">1. 用户数据实际存放位置及相对路径</div>
-              <p>• <strong>Windows 平台</strong>（参照位置：解压后的 <code>windows/</code> 目录，即 <code>Voca.exe</code> 所在同级文件夹）：<br>
-                - 运行时用户学习数据（不会程度、生词本、熟词表、自定义计划、在线词典设置、打卡进度）：存放在相对路径 <code>./data/profile/Default/Local Storage/leveldb/</code> 与 <code>./data/profile/Default/IndexedDB/</code>。<br>
-                - 默认内置离线 SQLite 词库文件：存放在相对路径 <code>./data/voca.db</code>。<br>
-                - 应用前端与跨平台统一字体包：存放在相对路径 <code>./app/index.html</code> 与 <code>./app/fonts/</code>。</p>
-              <p style="margin-top:6px;">• <strong>Android 平台</strong>（参照位置：Android 系统内部存储应用私有沙箱根目录 <code>/data/data/com.voca.app/</code>）：<br>
-                - 运行时用户学习数据：存放在相对路径 <code>./app_webview/Default/Local Storage/</code> 与 <code>./app_webview/Default/IndexedDB/</code>。<br>
-                - 内置词库与统一字体包：封装于 APK 安装包内部只读资产路径 <code>assets/index.html</code> 与 <code>assets/fonts/</code>。</p>
-            </div>
-
-            <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
-              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">2. 升级到 v1.0.7 的数据保留与跨平台迁移</div>
-              <p>• <strong>升级前准备与数据自动迁移机制</strong>：升级前建议先点击上方「⬇ 导出完整学习备份 (.json)」保存一份备份。v1.0.7 未改变存档结构（仍为 Schema v4），v1.0.0 ~ v1.0.6 的存档可直接读取；v1.0.7 起存档只保存非默认学习记录，旧存档会在下一次保存时自动精简，学习数据不受影响，删除「重置不会度」只移除界面按钮、不影响任何已保存的不会程度数值；更早的 v1.0.2 及以前存档（Schema v3）启动时仍会自动迁移，清理已废弃的「掌握度 (`mastery`)」与「英英模式 (`en_en`)」字段，同时 <strong>100% 无损保留</strong>所有单词的「不会程度 (`unfam`)」、生词本、熟词表、自定义释义、笔记、艾宾浩斯计划表参数与打卡记录。</p>
-              <p style="margin-top:6px;">• <strong>已支持的迁移方式</strong>：<br>
-                1) <strong>通用 JSON 备份迁移（推荐，支持 Windows ⇄ Android 互传）</strong>：在旧版或原设备导出 <code>.json</code> 备份，在新版或新设备点击「⬆ 从备份文件恢复数据」即可一键迁移并验证。<br>
-                2) <strong>Windows 同平台升级/迁移</strong>：将旧版 <code>windows/data/profile/</code> 文件夹复制到新版的 <code>windows/data/profile/</code> 下即可直接继承全部数据。</p>
-              <p style="margin-top:6px; color:var(--amber-mark);">• <strong>明确的实际限制（不支持项）</strong>：不支持云端账号自动同步；且因操作系统权限与底层 LevelDB 格式差异，<strong>不支持</strong>将 Windows 的 <code>./data/profile/</code> 目录直接拷贝至 Android 手机恢复。</p>
-            </div>
-
-            <div style="background:var(--bg-elevated); padding:14px 16px; border-radius:12px; border:1px solid var(--border-color); white-space:normal;">
-              <div style="font-weight:800; color:var(--text-primary); margin-bottom:6px;">3. 覆盖安装、重新安装与卸载对本地数据的影响</div>
-              <p>• <strong>Windows</strong>：保留 <code>./data/profile/</code> 并替换 <code>Voca.exe</code> 与 <code>./app/</code> 属于覆盖升级，数据完整保留；若删除整个 <code>windows/</code> 文件夹（卸载），则 <code>./data/profile/</code> 中的本地数据会一并被删除。</p>
-              <p style="margin-top:6px;">• <strong>Android</strong>：使用同签名 APK 直接覆盖安装时系统自动保留数据；若因签名变更需先卸载再重装，或执行「卸载应用 / 清除数据」，Android 系统会彻底清空 <code>/data/data/com.voca.app/</code>，<strong>因此卸载前请务必先导出 .json 备份文件</strong>。</p>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- ==================== VIEW 6: SETTINGS & HELP ==================== -->
       <section class="view-section" id="view-settings">
         <div class="m-only m-view-head">
           <h2>⚙️ 偏好设置与帮助</h2>
-          <p>词典来源、点击行为、主题与全局文字大小，均实时持久保存。</p>
+          <p>发音、主题与全局文字大小，均实时持久保存。</p>
         </div>
         <div class="panel-grid panel-grid-loose">
           <!-- Preferences -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
             <h3 style="font-size:1.1rem; font-weight:800;">⚙️ 学习与词典偏好设置</h3>
 
-            <!-- Requirement 4: Persistent Online Dictionary Selection Setting -->
-            <label style="font-size:0.86rem; font-weight:700; color:var(--brand-primary);">📖 在线词典查询来源选择（用于「查看词典详细与编辑」弹窗，重启后持久生效）
-              <select id="settingOnlineDict" class="ctrl-select" style="width:100%; margin-top:6px;">
-                <option value="eudic" selected>欧路词典 (dict.eudic.net — 窗口内直接显示释义)</option>
-                <option value="iciba">爱词霸英汉词典 (iciba.com — 窗口内直接显示页面)</option>
-                <option value="wordreference">WordReference 英汉 (wordreference.com — 在 Voca 词典窗口中打开)</option>
-              </select>
-            </label>
+            <p style="font-size:0.86rem; color:var(--text-secondary);">在线词典来源在词典弹窗内直接切换（欧路 / 爱词霸 / WordReference），选择会被记住。</p>
 
-            <!-- Requirement 2: Row Click Behavior based on Unfamiliarity (不会程度) -->
-            <label style="font-size:0.86rem; font-weight:600;">单词行鼠标/触控点击行为设置（管理「不会程度」）
-              <select id="settingRowClickMode" class="ctrl-select" style="width:100%; margin-top:6px;">
-                <option value="unfam_lr" selected>1. 不会程度模式：左键/轻触加深不会程度(+1)并发音 · 右键/长按降低不会程度(-1)</option>
-                <option value="left_sound_right_unfam">2. 分区模式 A：点击左半部仅发音，右半部加深不会程度(+1) · 右键/长按降低(-1)</option>
-                <option value="right_sound_left_unfam">3. 分区模式 B：点击右半部仅发音，左半部加深不会程度(+1) · 右键/长按降低(-1)</option>
-                <option value="sound_only">4. 纯发音模式：点击仅朗读发音（不改变不会程度）</option>
-              </select>
-            </label>
+            <p style="font-size:0.86rem; color:var(--text-secondary);">单词行点击行为（固定）：左键/轻触 = 不会程度 +1 并发音 · 右键/长按 = 不会程度 −1。</p>
 
             <label style="font-size:0.86rem; font-weight:600;">英语发音口音偏好
               <select id="settingAccentMode" class="ctrl-select" style="width:100%; margin-top:6px;">
                 <option value="en-US">美式发音 (American English)</option>
                 <option value="en-GB">英式发音 (British English)</option>
-                <option value="en-AU">澳式发音 (Australian English)</option>
               </select>
             </label>
 
@@ -624,7 +540,7 @@ HTML_PART2_TEMPLATE = r"""
 
           <!-- Shortcuts & Architecture Info -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:12px; white-space:normal;">
-            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.7)</h3>
+            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.8)</h3>
             <div style="font-size:0.83rem; color:var(--text-secondary); line-height:1.7;">
               <div>• <strong>左键/点击单词行</strong>：加深该词不会程度 (+1，上限 5/5) 并朗读发音</div>
               <div>• <strong>右键点击单词行</strong>：降低该词不会程度 (-1，下限 0/5)；触屏可长按同一行</div>
@@ -634,7 +550,7 @@ HTML_PART2_TEMPLATE = r"""
               <div class="d-only">• <strong>1 / 2 / 3 键</strong>：快速切换 双语 / 只看英文 / 只看中文 模式</div>
             </div>
             <div style="border-top:1px solid var(--border-color); padding-top:12px; font-size:0.82rem; color:var(--text-muted);">
-              <strong>字体、词库与在线词典声明 (v1.0.7)</strong>：<br>
+              <strong>字体、词库与在线词典声明 (v1.0.8)</strong>：<br>
               1) <strong>跨平台内嵌字体</strong>：内置 <strong>Inter</strong> 与 <strong>Noto Sans CJK SC</strong> (SIL Open Font License 1.1) WOFF2 字体包。<br>
               2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>43,304</strong> 条词条，主要源自开源词典 <strong>ECDICT</strong>（MIT License）；「四级完整词表」的词序与释义来自用户自备的 CET-4 词表。<br>
               3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 部署了 Anubis 人机验证：它只放行顶层页面，嵌进本弹窗会一直停在验证页，因此 Voca 会在自己的「在线词典窗口」里以顶层页面打开它（不弹到系统浏览器）。三家词典的网页内容版权归各自平台所有。
@@ -685,6 +601,12 @@ HTML_PART2_TEMPLATE = r"""
     </div>
 
     <div style="display:flex; flex-direction:column; gap:12px;">
+      <!-- Local lexicon entry: rendered instantly, no network needed -->
+      <div style="background:var(--bg-elevated); border:1px solid var(--border-color); border-radius:12px; padding:12px 14px;">
+        <div style="font-size:0.78rem; font-weight:800; color:var(--brand-primary); margin-bottom:4px;">本地词库</div>
+        <div style="font-size:0.92rem; color:var(--text-primary); line-height:1.55;" id="modalLocalCn"></div>
+        <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.55; margin-top:4px;" id="modalLocalEx"></div>
+      </div>
       <!-- Online Dictionary Content Block (Replaces the 2 deleted blocks: '英英释义与同义词拓展' and '双语语境例句与助记') -->
       <div class="dict-online-box" id="modalOnlineDictSection">
         <div class="dict-online-header">
@@ -700,10 +622,6 @@ HTML_PART2_TEMPLATE = r"""
             <button type="button" class="btn btn-sm" id="modalBtnReloadDict">🔄 重新查询</button>
             <a class="btn btn-sm" id="modalDictExternalLink" href="https://dict.eudic.net/dicts/en/abandon" target="_blank" rel="noopener noreferrer">↗ 词典窗口打开源页面</a>
           </div>
-        </div>
-
-        <div style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;">
-          查询地址：<code id="modalDictUrlCode">https://dict.eudic.net/dicts/en/abandon</code>
         </div>
 
         <!-- Honest Real-Time Status Banner (Loading / Success / Word Not Found / Offline / Network Error) -->

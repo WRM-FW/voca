@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 1 of Voca v1.0.7 HTML Application:
+Generates Part 1 of Voca v1.0.8 HTML Application:
 - Multi-size High-DPI <link rel="icon"> tags (256/192/128/64/48/32/16 + voca.ico) so Windows taskbar & titlebar icons in --app mode are never downsampled to 16x16.
 - Embedded cross-platform @font-face (VocaSans Inter + VocaSansCJK Noto Sans CJK SC).
 - Removed Mastery (.mastery-badge, data-mastery) styles; enhanced Unfamiliarity (.unfam-badge, data-unfam) styles.
@@ -31,7 +31,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.0.7 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
+<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
      Any scale without its own declared frame gets resampled and looks soft. -->
@@ -1246,7 +1246,6 @@ html, body {
   margin-top: 14px;
 }
 
-.scroll-viewport {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -1945,13 +1944,11 @@ html.ui-mobile .check-label {
 }
 
 /* ---- Training: auto-scroll drill ---- */
-html.ui-mobile .scroll-viewport {
-  max-height: none;
+html.ui-mobile   max-height: none;
   height: min(60vh, 520px);
   height: min(60dvh, 520px);
 }
 
-html.ui-mobile #trainPanelScroll .stat-card {
   flex-direction: column;
   align-items: stretch;
 }
@@ -2161,8 +2158,7 @@ html.ui-mobile .toast-item {
     font-size: 0.78rem;
   }
   html.ui-mobile .mob-nav-btn span:first-child { font-size: 1.05rem; }
-  html.ui-mobile .scroll-viewport { height: min(52vh, 420px); }
-  html.ui-mobile .immersive-stage { padding: 12px 14px; }
+  html.ui-mobile   html.ui-mobile .immersive-stage { padding: 12px 14px; }
 }
 
 /* ---- Very narrow phones (<= 360px CSS): shed non-essential chrome ---- */
@@ -2296,10 +2292,11 @@ html.ui-mobile .toast-item {
 /* E: header follows the active tab (set by switchTab on <body data-tab>).
    Book/list/sort/language/view controls only act on learn (and plan keeps
    book/list); elsewhere they are hidden instead of inviting no-op changes. */
-body[data-tab="settings"] .header-left, body[data-tab="data"] .header-left, body[data-tab="notebook"] .header-left,
-body[data-tab="settings"] #sortSelect, body[data-tab="data"] #sortSelect, body[data-tab="notebook"] #sortSelect,
-body[data-tab="settings"] #layoutModeGroup, body[data-tab="data"] #layoutModeGroup, body[data-tab="notebook"] #layoutModeGroup,
-body[data-tab="plan"] #langModeGroup, body[data-tab="plan"] #sortSelect, body[data-tab="plan"] #layoutModeGroup { display: none !important; }
+body[data-tab="settings"] .header-left, body[data-tab="data"] .header-left, body[data-tab="notebook"] .header-left, body[data-tab="train"] .header-left,
+body[data-tab="settings"] #sortSelect, body[data-tab="data"] #sortSelect, body[data-tab="notebook"] #sortSelect, body[data-tab="train"] #sortSelect,
+body[data-tab="settings"] #layoutModeGroup, body[data-tab="data"] #layoutModeGroup, body[data-tab="notebook"] #layoutModeGroup, body[data-tab="train"] #layoutModeGroup,
+body[data-tab="settings"] #langModeGroup, body[data-tab="data"] #langModeGroup, body[data-tab="notebook"] #langModeGroup, body[data-tab="train"] #langModeGroup,
+body[data-tab="plan"] #langModeGroup, body[data-tab="plan"] #sortSelect, body[data-tab="plan"] #layoutModeGroup, body[data-tab="plan"] #listSelect { display: none !important; }
 /* D1: desktop shell at narrow widths. Gated like the existing desktop rules
    (hover + fine pointer) so touch devices keep the mobile shell. */
 @media (hover: hover) and (pointer: fine) and (max-width: 900px) {
@@ -2330,6 +2327,23 @@ html.ui-mobile #view-learn .m-view-head p { display: none; }
 html.ui-mobile #view-learn .learn-toolbar { gap: 6px; margin-bottom: 6px; }
 html.ui-mobile #clickRuleHint { display: none; }
 html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74rem; margin-bottom: 8px; }
+
+/* ================= v1.0.8 visual refinement: quieter surfaces, softer depth ================= */
+.stat-card { border: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04); border-radius: 16px; }
+.btn { border-radius: 10px; font-weight: 600; letter-spacing: 0.01em; }
+.btn-primary { box-shadow: 0 1px 2px rgba(5, 150, 105, 0.28); }
+.btn-primary:hover { box-shadow: 0 2px 6px rgba(5, 150, 105, 0.30); }
+.ctrl-select, .ctrl-input-num { border-radius: 10px; border-color: var(--border-color); }
+.ctrl-select:focus, .ctrl-input-num:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.14); outline: none; }
+.seg-group { border: 1px solid var(--border-color); border-radius: 999px; padding: 3px; background: var(--bg-elevated); }
+.seg-btn { border-radius: 999px; font-weight: 600; }
+.seg-btn.active { background: var(--bg-card); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.10); }
+.word-row { border-bottom: 1px solid var(--border-color); }
+.modal-panel { border-radius: 18px; box-shadow: var(--shadow-lg); }
+.preset-pill-btn { border-radius: 999px; }
+.icon-btn { border-radius: 9px; }
+.top-header { box-shadow: 0 1px 0 var(--border-color); }
+.brand-badge { border-radius: 999px; font-weight: 700; letter-spacing: 0.02em; }
 </style>
 <script>
 /* ==================== INPUT-CAPABILITY SHELL SELECTOR ====================
