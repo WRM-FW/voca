@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.0.9</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.1.0</span></div>
       </div>
     </div>
 
@@ -100,7 +100,6 @@ HTML_PART2_TEMPLATE = r"""
           <option value="random">随机序列</option>
           <option value="az">字母升序 A→Z</option>
           <option value="hard_first">不会的单词排前面</option>
-          <option value="easy_first">易掌握的单词排前面</option>
         </select>
 
         <!-- View Switcher: List View vs Card View -->
@@ -462,6 +461,7 @@ HTML_PART2_TEMPLATE = r"""
             <div style="display:flex; flex-direction:column; gap:8px;">
               <button class="btn" id="btnExportPdfSchedule">📅 导出「自定义艾宾浩斯学习计划表」PDF/打印版</button>
               <button class="btn" id="btnExportPdfListBilingual">📋 导出「当前 List 完整单词表（双语对照版）」</button>
+              <button class="btn" id="btnExportPdfBookBilingual">📚 导出「整本词书完整单词表（双语对照版）」</button>
               <button class="btn" id="btnExportPdfListQuiz">✍️ 导出「当前 List 完整默写自测卷（隐中/隐英）」</button>
               <button class="btn" id="btnExportPdfStarred">⭐ 导出「生词本重难词汇总手册」</button>
             </div>
@@ -475,7 +475,7 @@ HTML_PART2_TEMPLATE = r"""
               <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.0.9
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.1.0
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -528,8 +528,6 @@ HTML_PART2_TEMPLATE = r"""
                 <option value="random" selected>随机序列</option>
                 <option value="initial">初始序列</option>
                 <option value="az">字母升序 A→Z</option>
-                <option value="hard_first">不会的单词排前面</option>
-                <option value="easy_first">易掌握的单词排前面</option>
               </select>
             </label>
             <button class="btn btn-primary" id="btnGeneratePlan">✓ 生成学习计划</button>

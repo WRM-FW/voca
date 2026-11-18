@@ -1,5 +1,5 @@
 /*
- * Voca v1.0.9 Windows host: native Win32 window + WebView2.
+ * Voca v1.1.0 Windows host: native Win32 window + WebView2.
  *
  * Why this exists. Since v1.0.0 Voca.exe was only a launcher that opened
  * `msedge.exe --app=...`. In that mode the taskbar button icon is produced by
@@ -652,6 +652,156 @@ static void DictFetch_Start(int id, const wchar_t *url) {
         DictFetch_Finish(0, NULL);
 }
 
+
+/* ------------------------------------------- dictionary page overlay (v1.1.0)
+   The user wants the ORIGINAL WordReference page inside Voca, not a text
+   extraction. A second WebView2 controller is parented to the MAIN window
+   and painted exactly over the modal's frame box: a real top-level
+   navigation in a real WebView, so the site's framing ban does not apply
+   and its human-check runs in place. Protocol (from the page):
+     {"voca":"dict-show","url":"...","x":..,"y":..,"w":..,"h":..,"dpr":..}
+     {"voca":"dict-rect","x":..,"y":..,"w":..,"h":..,"dpr":..}
+     {"voca":"dict-hide"}
+   Rects arrive in CSS pixels of the main WebView viewport and are scaled
+   by the page's devicePixelRatio. The host acks {"voca":"dict-shown",
+   "ok":bool} after the overlay's first NavigationCompleted; on failure the
+   page falls back to the v1.0.9 fetch bridge. */
+
+static ICoreWebView2Controller *g_ovl_controller = NULL;
+static ICoreWebView2           *g_ovl_webview    = NULL;
+static int           g_ovl_creating = 0;
+static int           g_ovl_visible  = 0;
+static wchar_t       g_ovl_pending_url[4096] = L"";
+static RECT          g_ovl_rect = { 0, 0, 0, 0 };
+
+static void Overlay_PostShown(int ok) {
+    if (!g_webview) return;
+    wchar_t json[96];
+    _snwprintf_s(json, 96, _TRUNCATE, L"{\"voca\":\"dict-shown\",\"ok\":%s}", ok ? L"true" : L"false");
+    g_webview->lpVtbl->PostWebMessageAsJson(g_webview, json);
+}
+
+static HRESULT STDMETHODCALLTYPE OvlNav_QueryInterface(ICoreWebView2NavigationCompletedEventHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2NavigationCompletedEventHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE OvlNav_AddRef(ICoreWebView2NavigationCompletedEventHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE OvlNav_Release(ICoreWebView2NavigationCompletedEventHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE OvlNav_Invoke(ICoreWebView2NavigationCompletedEventHandler *self, ICoreWebView2 *sender, ICoreWebView2NavigationCompletedEventArgs *args) {
+    (void)self; (void)sender;
+    BOOL ok = FALSE;
+    if (args) args->lpVtbl->get_IsSuccess(args, &ok);
+    Overlay_PostShown(ok ? 1 : 0);
+    return S_OK;
+}
+static ICoreWebView2NavigationCompletedEventHandlerVtbl ovlnav_vtbl = { OvlNav_QueryInterface, OvlNav_AddRef, OvlNav_Release, OvlNav_Invoke };
+static struct { ICoreWebView2NavigationCompletedEventHandlerVtbl *lpVtbl; } g_ovl_nav_handler = { &ovlnav_vtbl };
+
+static HRESULT STDMETHODCALLTYPE Octl_QueryInterface(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2CreateCoreWebView2ControllerCompletedHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Octl_AddRef(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Octl_Release(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Octl_Invoke(ICoreWebView2CreateCoreWebView2ControllerCompletedHandler *self, HRESULT result, ICoreWebView2Controller *controller) {
+    (void)self;
+    g_ovl_creating = 0;
+    if (FAILED(result) || !controller) { Overlay_PostShown(0); return S_OK; }
+    g_ovl_controller = controller;
+    g_ovl_controller->lpVtbl->AddRef(g_ovl_controller);
+    g_ovl_controller->lpVtbl->get_CoreWebView2(g_ovl_controller, &g_ovl_webview);
+    if (g_ovl_webview) {
+        EventRegistrationToken tok;
+        g_ovl_webview->lpVtbl->add_NavigationCompleted(
+            g_ovl_webview, (ICoreWebView2NavigationCompletedEventHandler*)&g_ovl_nav_handler, &tok);
+    }
+    g_ovl_controller->lpVtbl->put_Bounds(g_ovl_controller, g_ovl_rect);
+    g_ovl_controller->lpVtbl->put_IsVisible(g_ovl_controller, g_ovl_visible ? TRUE : FALSE);
+    if (g_ovl_webview && g_ovl_pending_url[0]) {
+        g_ovl_webview->lpVtbl->Navigate(g_ovl_webview, g_ovl_pending_url);
+        g_ovl_pending_url[0] = 0;
+    }
+    return S_OK;
+}
+static ICoreWebView2CreateCoreWebView2ControllerCompletedHandlerVtbl octl_vtbl = { Octl_QueryInterface, Octl_AddRef, Octl_Release, Octl_Invoke };
+static struct { ICoreWebView2CreateCoreWebView2ControllerCompletedHandlerVtbl *lpVtbl; } g_ovl_ctl_handler = { &octl_vtbl };
+
+static void Overlay_ApplyRect(void) {
+    if (g_ovl_controller) g_ovl_controller->lpVtbl->put_Bounds(g_ovl_controller, g_ovl_rect);
+}
+
+static void Overlay_Show(const wchar_t *url, RECT phys) {
+    g_ovl_rect = phys;
+    g_ovl_visible = 1;
+    wcsncpy_s(g_ovl_pending_url, 4096, url, _TRUNCATE);
+    if (g_ovl_controller) {
+        Overlay_ApplyRect();
+        g_ovl_controller->lpVtbl->put_IsVisible(g_ovl_controller, TRUE);
+        if (g_ovl_webview) {
+            g_ovl_webview->lpVtbl->Navigate(g_ovl_webview, g_ovl_pending_url);
+            g_ovl_pending_url[0] = 0;
+        }
+        return;
+    }
+    if (!g_ovl_creating && g_environment && g_main_window) {
+        g_ovl_creating = 1;
+        HRESULT hr = g_environment->lpVtbl->CreateCoreWebView2Controller(
+            g_environment, g_main_window,
+            (ICoreWebView2CreateCoreWebView2ControllerCompletedHandler*)&g_ovl_ctl_handler);
+        if (FAILED(hr)) { g_ovl_creating = 0; Overlay_PostShown(0); }
+    } else if (!g_environment) {
+        Overlay_PostShown(0);
+    }
+}
+
+static void Overlay_Hide(void) {
+    g_ovl_visible = 0;
+    g_ovl_pending_url[0] = 0;
+    if (g_ovl_controller) g_ovl_controller->lpVtbl->put_IsVisible(g_ovl_controller, FALSE);
+}
+
+static double JsonNum(const wchar_t *json, const wchar_t *key) {
+    const wchar_t *p = wcsstr(json, key);
+    if (!p) return 0;
+    p = wcschr(p, L':');
+    if (!p) return 0;
+    return wcstod(p + 1, NULL);
+}
+
+static int JsonUrl(const wchar_t *json, wchar_t *out, size_t cap) {
+    const wchar_t *u = wcsstr(json, L"\"url\"");
+    if (!u) return 0;
+    u = wcschr(u, L':');
+    if (!u) return 0;
+    u = wcschr(u, L'"');
+    if (!u) return 0;
+    size_t j = 0;
+    u++;
+    while (*u && *u != L'"' && j + 1 < cap) {
+        if (*u == L'\\' && u[1]) u++;
+        out[j++] = *u++;
+    }
+    out[j] = 0;
+    return j > 8;
+}
+
+static RECT JsonRect(const wchar_t *json) {
+    double dpr = JsonNum(json, L"\"dpr\"");
+    if (dpr < 0.5 || dpr > 4) dpr = 1;
+    double x = JsonNum(json, L"\"x\""), y = JsonNum(json, L"\"y\"");
+    double w = JsonNum(json, L"\"w\""), h = JsonNum(json, L"\"h\"");
+    RECT rc;
+    rc.left   = (LONG)(x * dpr + 0.5);
+    rc.top    = (LONG)(y * dpr + 0.5);
+    rc.right  = (LONG)((x + w) * dpr + 0.5);
+    rc.bottom = (LONG)((y + h) * dpr + 0.5);
+    return rc;
+}
+
 /* WebMessageReceived on the main WebView: {"voca":"dict-fetch","id":N,"url":"..."} */
 static HRESULT STDMETHODCALLTYPE Wm_QueryInterface(ICoreWebView2WebMessageReceivedEventHandler *self, REFIID riid, void **pp) {
     if (!pp) return E_POINTER;
@@ -665,6 +815,16 @@ static HRESULT STDMETHODCALLTYPE Wm_Invoke(ICoreWebView2WebMessageReceivedEventH
     (void)self; (void)sender;
     LPWSTR json = NULL;
     if (FAILED(args->lpVtbl->get_WebMessageAsJson(args, &json)) || !json) return S_OK;
+    if (wcsstr(json, L"\"dict-show\"")) {
+        wchar_t url[4096];
+        if (JsonUrl(json, url, 4096)) Overlay_Show(url, JsonRect(json));
+        else Overlay_PostShown(0);
+    } else if (wcsstr(json, L"\"dict-rect\"")) {
+        g_ovl_rect = JsonRect(json);
+        if (g_ovl_visible) Overlay_ApplyRect();
+    } else if (wcsstr(json, L"\"dict-hide\"")) {
+        Overlay_Hide();
+    }
     if (wcsstr(json, L"\"dict-fetch\"")) {
         int id = 0;
         const wchar_t *p = wcsstr(json, L"\"id\"");
@@ -878,7 +1038,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
 
     g_main_window = CreateWindowExW(
         0, kWindowClassName,
-        L"Voca v1.0.9 — 离线艾宾浩斯背单词工坊 (Windows)",
+        L"Voca v1.1.0 — 离线艾宾浩斯背单词工坊 (Windows)",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, w, h,
         NULL, NULL, hInstance, NULL);

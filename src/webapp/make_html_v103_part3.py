@@ -80,6 +80,7 @@ JS_ENGINE = r"""
       canEmbed: false,
       canFetch: false,
       hostFetch: true,
+      hostOverlay: true,
       wantsDictWindow: false,
     }
   };
@@ -139,6 +140,85 @@ JS_ENGINE = r"""
         reject(e);
       }
     });
+  }
+
+  /* v1.1.0: host dictionary overlay (WordReference). The user wants the
+     ORIGINAL web page inside Voca, not a text extraction. The page posts
+     {voca:"dict-show", url, x, y, w, h, dpr} (CSS px of #modalDictIframeWrap);
+     the host shows its own WebView — a real top-level navigation that passes
+     the site's checks — exactly over that box and acks {voca:"dict-shown"}.
+     {voca:"dict-rect"} tracks resize/scroll; {voca:"dict-hide"} hides it.
+     If the ack reports failure (or never arrives), the caller falls back to
+     the v1.0.9 fetch-and-parse bridge. */
+  let dictOverlayActive = false;
+  let dictShownWaiter = null;
+  (function installDictShownListener() {
+    const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+    if (!wv || typeof wv.addEventListener !== "function") return;
+    wv.addEventListener("message", function(ev) {
+      let data = ev && ev.data;
+      if (typeof data === "string") { try { data = JSON.parse(data); } catch (e) { return; } }
+      if (!data || data.voca !== "dict-shown" || !dictShownWaiter) return;
+      const waiter = dictShownWaiter;
+      dictShownWaiter = null;
+      clearTimeout(waiter.timer);
+      waiter.resolve(!!data.ok);
+    });
+  })();
+
+  function dictOverlaySupported() {
+    const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+    return !!(wv && typeof wv.postMessage === "function");
+  }
+
+  function dictOverlayRectPayload() {
+    const el = document.getElementById("modalDictIframeWrap");
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (r.width < 10 || r.height < 10) return null;
+    return { x: r.left, y: r.top, w: r.width, h: r.height, dpr: window.devicePixelRatio || 1 };
+  }
+
+  function hostDictShow(url) {
+    return new Promise(function(resolve) {
+      if (!dictOverlaySupported()) { resolve(false); return; }
+      const payload = dictOverlayRectPayload();
+      if (!payload) { resolve(false); return; }
+      dictOverlayActive = true;
+      const timer = setTimeout(function() {
+        if (dictShownWaiter && dictShownWaiter.timer === timer) dictShownWaiter = null;
+        resolve(false);
+      }, 9000);
+      dictShownWaiter = { resolve: resolve, timer: timer };
+      try {
+        window.chrome.webview.postMessage({ voca: "dict-show", url: url, x: payload.x, y: payload.y, w: payload.w, h: payload.h, dpr: payload.dpr });
+      } catch (e) {
+        clearTimeout(timer);
+        dictShownWaiter = null;
+        dictOverlayActive = false;
+        resolve(false);
+      }
+    });
+  }
+
+  function hostDictHide() {
+    if (!dictOverlayActive) return;
+    dictOverlayActive = false;
+    if (dictShownWaiter) { clearTimeout(dictShownWaiter.timer); dictShownWaiter = null; }
+    if (!dictOverlaySupported()) return;
+    try { window.chrome.webview.postMessage({ voca: "dict-hide" }); } catch (e) {}
+  }
+
+  function hostDictRectSync() {
+    if (!dictOverlayActive || !dictOverlaySupported()) return;
+    const payload = dictOverlayRectPayload();
+    if (!payload) return;
+    try { window.chrome.webview.postMessage({ voca: "dict-rect", x: payload.x, y: payload.y, w: payload.w, h: payload.h, dpr: payload.dpr }); } catch (e) {}
+  }
+
+  if (typeof window !== "undefined" && window.addEventListener) {
+    window.addEventListener("resize", hostDictRectSync);
+    document.addEventListener("scroll", hostDictRectSync, true);
   }
 
   function openInVocaDictWindow(url) {
@@ -255,6 +335,9 @@ JS_ENGINE = r"""
     merged.agentImportBatches = (loaded && loaded.agentImportBatches && typeof loaded.agentImportBatches === "object" && !Array.isArray(loaded.agentImportBatches)) ? loaded.agentImportBatches : {};
     merged.planConfig = (loaded && loaded.planConfig && typeof loaded.planConfig === "object" && loaded.planConfig.bookId) ? loaded.planConfig : null;
     if (merged.planConfig && merged.planConfig.bookId === "cet4") merged.planConfig.bookId = "cet4full";
+    // v1.1.0: record-based sequences (hard_first / easy_first) no longer exist at
+    // plan level; frozen plans stored with them fall back to the initial sequence.
+    if (merged.planConfig && (merged.planConfig.sortMode === "hard_first" || merged.planConfig.sortMode === "easy_first")) merged.planConfig.sortMode = "initial";
 
     // 1. Validate Theme
     if (VALID_THEMES.indexOf(merged.settings.theme) === -1) {
@@ -288,7 +371,7 @@ JS_ENGINE = r"""
       merged.intraSort = "hard_first";
     }
     // An unknown value would leave #sortSelect showing nothing.
-    const validIntraSorts = ["initial", "random", "az", "hard_first", "easy_first"];
+    const validIntraSorts = ["initial", "random", "az", "hard_first"];  // v1.1.0: easy_first removed; stored values fall back to random
     if (validIntraSorts.indexOf(merged.intraSort) === -1) {
       merged.intraSort = "random";
     }
@@ -715,10 +798,6 @@ JS_ENGINE = r"""
       arr.sort(function(a, b) { return a.word.localeCompare(b.word); });
     } else if (mode === "shuffle" || mode === "random") {
       return seededShuffle(arr, seed || 20261016);
-    } else if (mode === "hard_first") {
-      arr.sort(function(a, b) { return (getRecord(b.id).unfam || 0) - (getRecord(a.id).unfam || 0); });
-    } else if (mode === "easy_first") {
-      arr.sort(function(a, b) { return (getRecord(a.id).unfam || 0) - (getRecord(b.id).unfam || 0); });
     } else {
       arr.sort(function(a, b) { return (a.seq || 0) - (b.seq || 0); });
     }
@@ -864,10 +943,6 @@ JS_ENGINE = r"""
     } else if (state.intraSort === "hard_first") {
       filtered.sort(function(a, b) {
         return (getRecord(b.id).unfam || 0) - (getRecord(a.id).unfam || 0);
-      });
-    } else if (state.intraSort === "easy_first") {
-      filtered.sort(function(a, b) {
-        return (getRecord(a.id).unfam || 0) - (getRecord(b.id).unfam || 0);
       });
     }
     return filtered;
@@ -1575,6 +1650,7 @@ JS_ENGINE = r"""
     const iframeEl = document.getElementById("modalOnlineDictIframe");
 
     function clearFrame() {
+      hostDictHide();
       iframeWrap.classList.remove("dict-frame-visible");
       iframeWrap.style.display = "none";
       iframeEl.src = "about:blank";
@@ -1734,23 +1810,48 @@ JS_ENGINE = r"""
     }
 
     if (dictCfg.hostFetch) {
-      // Same inline experience as Eudic: the host fetches the rendered entry,
-      // the modal parses and shows it here — no separate window by default.
-      statusBanner.textContent = "⏳ 正在通过 Voca 词典通道查询【" + dictCfg.name + "】词条“" + w.word + "”（该站需先通过其人机验证，可能需要几秒）...";
-      hostDictFetch(parseUrl, 22000).then(function(htmlText) {
-        if (myQuery !== dictQuerySeq) return;
-        const parsed = parseOnlineDictionaryHtml(htmlText, dictKey, w.word);
-        if (parsed.notFound) {
-          renderNotFoundState();
-        } else if (!parsed.entries.length) {
-          renderFallbackFailure("词典通道已返回页面，但没有解析到释义内容。");
-        } else {
-          renderParsedSuccess(parsed.entries);
-        }
-      }).catch(function() {
-        if (myQuery !== dictQuerySeq) return;
-        renderHostFetchFallback();
-      });
+      const runHostFetchParse = function() {
+        // v1.0.9 path, kept as fallback: the host fetches the rendered entry,
+        // the modal parses and shows the text here.
+        statusBanner.className = "dict-status-banner dict-status-loading";
+        statusBanner.textContent = "⏳ 正在通过 Voca 词典通道查询【" + dictCfg.name + "】词条“" + w.word + "”（该站需先通过其人机验证，可能需要几秒）...";
+        hostDictFetch(parseUrl, 22000).then(function(htmlText) {
+          if (myQuery !== dictQuerySeq) return;
+          const parsed = parseOnlineDictionaryHtml(htmlText, dictKey, w.word);
+          if (parsed.notFound) {
+            renderNotFoundState();
+          } else if (!parsed.entries.length) {
+            renderFallbackFailure("词典通道已返回页面，但没有解析到释义内容。");
+          } else {
+            renderParsedSuccess(parsed.entries);
+          }
+        }).catch(function() {
+          if (myQuery !== dictQuerySeq) return;
+          renderHostFetchFallback();
+        });
+      };
+      if (dictCfg.hostOverlay && dictOverlaySupported()) {
+        // v1.1.0 primary path: show the ORIGINAL page inside the modal — the
+        // host paints its own WebView over the frame box below. The site
+        // still runs its own human-check inside that view if it wants to.
+        statusBanner.className = "dict-status-banner dict-status-loading";
+        statusBanner.textContent = "⏳ 正在 Voca 内打开【" + dictCfg.name + "】原页面“" + w.word + "”...";
+        parsedBox.innerHTML = '<div class="dict-parsed-hint">下方即为 ' + escapeHtml(dictCfg.name) + ' 官方原页面，可直接滚动、点链接；若页面在做人机验证，请稍候它自己完成。</div>';
+        iframeWrap.style.display = "";
+        iframeWrap.classList.add("dict-frame-visible");
+        hostDictShow(parseUrl).then(function(ok) {
+          if (myQuery !== dictQuerySeq) return;
+          if (ok) {
+            statusBanner.className = "dict-status-banner dict-status-ok";
+            statusBanner.textContent = "✓ 已在弹窗内打开【" + dictCfg.name + "】中“" + w.word + "”的原页面";
+          } else {
+            clearFrame();
+            runHostFetchParse();
+          }
+        });
+        return;
+      }
+      runHostFetchParse();
       return;
     }
 
@@ -2036,7 +2137,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.9 艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.1.0 艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -2066,7 +2167,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.0.9 艾宾浩斯背单词计划表",
+        title: "Voca v1.1.0 艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -2078,7 +2179,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.9 离线背单词工坊";
+    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.1.0 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -3093,6 +3194,7 @@ JS_ENGINE = r"""
 
     // Dictionary Modal Actions (Requirement 3 & 4)
     document.getElementById("modalBtnCloseDict").addEventListener("click", function() {
+      hostDictHide();
       document.getElementById("dictModal").classList.remove("open");
     });
     document.getElementById("btnCloseGlobalSearch").addEventListener("click", function() {
@@ -3157,6 +3259,7 @@ JS_ENGINE = r"""
       if (!rec.starredAt) rec.starredAt = Date.now();
       saveState();
       refreshAllViews();
+      hostDictHide();
       document.getElementById("dictModal").classList.remove("open");
       showToast("已保存释义与笔记，并同步至生词本与主词库");
     });
@@ -3241,6 +3344,14 @@ JS_ENGINE = r"""
       const built = buildPrintableWordListHtml(arr, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " · 双语对照表", false);
       openPrintPreviewModal("当前 List 双语背诵表", built.html, built.docData, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1));
     });
+    document.getElementById("btnExportPdfBookBilingual").addEventListener("click", function() {
+      // v1.1.0: export the whole current book, in the frozen plan's List order.
+      const all = [];
+      (currentLists || []).forEach(function(l) { for (let i = 0; i < l.length; i++) all.push(l[i]); });
+      const words = all.length ? all : getBookWords(state.currentBook);
+      const built = buildPrintableWordListHtml(words, getBookDisplayName(state.currentBook) + " · 整本词书双语对照表", false);
+      openPrintPreviewModal("整本词书双语背诵表", built.html, built.docData, getBookDisplayName(state.currentBook) + " 整本词书");
+    });
     document.getElementById("btnExportPdfListQuiz").addEventListener("click", function() {
       const arr = currentLists[state.currentListIndex] || [];
       const built = buildPrintableWordListHtml(arr, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " · 默写测试卷", true);
@@ -3305,11 +3416,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.9",
+        version: "1.1.0",
         exportedAt: new Date().toISOString(),
         state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.9_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.1.0_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 

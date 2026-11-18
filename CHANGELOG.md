@@ -2,6 +2,23 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.1.0] - 2026-11-18
+
+WordReference now shows its original web page inside the dictionary modal (native-host overlay view), the two record-based sequences are removed from plan level (and "easy first" everywhere), and the whole book can be exported in one document.
+
+### Changed — WordReference shows the original page in-app
+- The v1.0.9 fetch-and-parse display was replaced at the user's direction: they want the **original WordReference page** inside Voca. The native host now creates a second WebView2 controller parented to the main window and paints it exactly over the modal's frame box. The page posts `{voca:"dict-show", url, x, y, w, h, dpr}` (CSS px of the box); the host scales by the device pixel ratio, shows the view and navigates it — a real top-level navigation, so the site's framing ban does not apply and its Anubis check runs in place, in the original page. `{voca:"dict-rect"}` keeps the view glued to the box on window resize and scroll; `{voca:"dict-hide"}` hides it when the modal closes or another source/render takes over. The host acks `{voca:"dict-shown", ok}` after the first NavigationCompleted.
+- Fallback chain is unchanged below that: overlay failure → the v1.0.9 host fetch + parse rendering → the in-modal button that opens the source page in the dictionary window. In a plain browser (no host) the overlay step is skipped automatically.
+- Host window title updated to v1.1.0; the overlay controller shares the app's WebView2 environment, so cookies/verification state are shared with the dictionary window.
+
+### Removed — record-based sequences at plan level; "easy first" everywhere
+- The Settings plan sequence no longer offers 不会的单词排前面 (hard_first) or 易掌握的单词排前面 (easy_first): both rank by learning records, which only make sense inside a List being studied, not when splitting a whole book into a plan. Plan sequences are now 随机 / 初始 / 字母升序 only.
+- 易掌握的单词排前面 (easy_first) was also removed from the Learn page's in-list sequence (which keeps 不会的单词排前面). Stored values migrate automatically: a frozen plan saved with hard_first/easy_first falls back to the initial sequence, and an in-list easy_first falls back to random via the existing whitelist validation.
+
+### Added — whole-book export
+- The Data page export card gains 导出「整本词书完整单词表（双语对照版）」: one printable document with every word of the current book in the frozen plan's List order, exported as `<book> 整本词书.pdf` / `.html` (verified: the CET-4 book exports 4,450 table rows = 4,449 words + header).
+
+
 ## [1.0.9] - 2026-11-18
 
 A plan-system and dictionary release: study plans are now configured once in Settings (book + learn days + word sequence) and frozen, examples show both languages line by line, WordReference renders inside the dictionary modal through a new native-host fetch bridge, and exports are named after the book and List they contain.
