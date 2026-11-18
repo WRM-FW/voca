@@ -32,6 +32,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows)</title>
+<script src="voca_auto_import.js"></script>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
      Any scale without its own declared frame gets resampled and looks soft. -->

@@ -123,6 +123,7 @@ JS_ENGINE = r"""
     planChecks: {},
     records: {},                // wordKey -> { unfam: 0..5, starred: false, starredAt: 0, mastered: false, customCn: "", note: "" }
     customWords: [],
+    agentImportBatches: {},   // v1.0.8: batchId -> {at, count, book} for Agent direct write-in imports
     modeHintsShown: {
       en_only: false,
       cn_only: false
@@ -200,6 +201,7 @@ JS_ENGINE = r"""
     merged.records = {};
     merged.planChecks = (loaded && loaded.planChecks) || {};
     merged.customWords = Array.isArray(loaded && loaded.customWords) ? loaded.customWords : [];
+    merged.agentImportBatches = (loaded && loaded.agentImportBatches && typeof loaded.agentImportBatches === "object" && !Array.isArray(loaded.agentImportBatches)) ? loaded.agentImportBatches : {};
 
     // 1. Validate Theme
     if (VALID_THEMES.indexOf(merged.settings.theme) === -1) {
@@ -382,6 +384,7 @@ JS_ENGINE = r"""
               rebuildCustomBookCache();
               applySettingsToDOM();
               refreshAllViews();
+              applyAgentAutoImports();
               if (corruptLsRaw && !storageToastShown) {
                 storageToastShown = true;
                 showToast("已从 IndexedDB 备份恢复本地学习数据（原 LocalStorage 存档已损坏，坏数据已另存备份）。");
@@ -1696,6 +1699,64 @@ JS_ENGINE = r"""
   }
 
   // ==================== 10. MULTI-PAGE PDF EXPORT, PRINT & HTML EXPORT ====================
+  // v1.0.8: Agent direct write-in. An AI agent with local file access writes
+  // batches into app/voca_auto_import.js (window.__VOCA_AUTO_IMPORTS__); the
+  // head script tag loads it before boot, and on startup every batch whose id
+  // has not been applied yet is merged into the custom book automatically —
+  // the user never exports, downloads or imports anything by hand. Words are
+  // deduplicated against the custom book, and applied batch ids are kept in
+  // the archive so reopening the app never imports the same batch twice.
+  function applyAgentAutoImports() {
+    const batches = window.__VOCA_AUTO_IMPORTS__;
+    if (!Array.isArray(batches) || !batches.length) return;
+    if (!state.agentImportBatches || typeof state.agentImportBatches !== "object") state.agentImportBatches = {};
+    const existing = {};
+    (state.customWords || []).forEach(function(w) { existing[String(w.word || "").toLowerCase()] = true; });
+    let totalAdded = 0;
+    const names = [];
+    batches.forEach(function(b) {
+      if (!b || !Array.isArray(b.words) || !b.words.length) return;
+      const bid = String(b.id || "").trim();
+      if (!bid || state.agentImportBatches[bid]) return;
+      let added = 0;
+      b.words.forEach(function(item) {
+        if (!item) return;
+        const spell = String(item.w || item.word || "").trim();
+        const cn = String(item.cn || item.meaning || "").trim();
+        if (!spell || !cn || existing[spell.toLowerCase()]) return;
+        const ipa = String(item.ipa || item.phonetic || "/-/").trim() || "/-/";
+        const newId = "custom_" + Date.now() + "_agent_" + (state.customWords.length + added + 1);
+        const wObj = {
+          id: newId,
+          seq: 80000 + state.customWords.length + added + 1,
+          word: spell,
+          uk: ipa,
+          us: ipa,
+          cn: cn,
+          ex_en: String(item.ex_en || item.exEn || "").trim(),
+          ex_cn: String(item.ex_cn || item.exCn || "").trim(),
+          tip: "Agent 导入词条",
+          books: ["custom"],
+          freq: 5
+        };
+        state.customWords.push(wObj);
+        wordLookupById[newId] = wObj;
+        existing[spell.toLowerCase()] = true;
+        added++;
+      });
+      state.agentImportBatches[bid] = { at: Date.now(), count: added, book: String(b.book || "") };
+      if (added > 0) { totalAdded += added; if (b.book) names.push(String(b.book)); }
+    });
+    if (totalAdded > 0) {
+      rebuildCustomBookCache();
+      saveState();
+      refreshAllViews();
+      showToast("🤖 Agent 已自动导入 " + totalAdded + " 个词条" + (names.length ? "（" + names.join("、") + "）" : "") + "，已收入「自定义词库」");
+    } else {
+      saveState();
+    }
+  }
+
   function parseCustomTextLines(rawText) {
     const lines = rawText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(Boolean);
     let added = 0;
@@ -3289,6 +3350,7 @@ JS_ENGINE = r"""
     applySettingsToDOM();
     bindEvents();
     refreshAllViews();
+    applyAgentAutoImports();
   }
 
   if (document.readyState === "loading") {

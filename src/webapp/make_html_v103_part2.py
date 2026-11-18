@@ -435,18 +435,24 @@ HTML_PART2_TEMPLATE = r"""
             <div style="border-top:1px solid var(--border-color); margin-top:14px; padding-top:12px;">
               <div style="font-size:0.92rem; font-weight:800; margin-bottom:4px;">Agent 导入（让 AI 帮你整理词库）</div>
               <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; white-space:normal;">
-                手里有 PDF、Word、表格、网页或图片版的词表？三步即可：① 把词库文件发给你的 AI Agent（任意可用的助手）；② 把下方提示词粘贴给它；③ 把它生成的 CSV 文件下载回来，用上方「选择本地词表」导入（也可以把文本粘贴到上方输入框解析导入）。
+                手里有 PDF、Word、表格、网页或图片版的词表？把词库文件发给一个能在你电脑上读写文件的 AI Agent（如 Claude Code、Cursor 等本地 Agent），再把下方提示词粘贴给它。Agent 会把词直接写进 Voca 的数据文件——你什么都不用导，重新打开 Voca 就会看到词条已经自动进入「自定义词库」，并有导入成功的提示。
               </p>
-              <textarea id="agentPromptText" rows="7" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">你是一名词库整理助手。我会给你一份单词资料（文件或文本），请把它整理成 Voca 背单词软件可直接导入的 CSV。
+              <textarea id="agentPromptText" rows="7" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">你是一名能读写本地文件的 Agent 助手。我会给你一份单词资料（文件或文本），请你把这些词直接写进 Voca 背单词软件，全程不需要我手动导入或下载任何文件。
 
-输出要求：
-1. 生成一个名为 voca_import.csv 的 UTF-8 编码文件供我下载；如果无法生成文件，就把完整 CSV 内容放在一个代码块里输出，不要省略任何一行。
-2. 每行一个单词，固定 5 列，依次为：单词,音标,中文释义,英文例句,例句翻译。列之间用英文逗号分隔；如果某列内容本身含英文逗号，请用英文双引号把该列包起来。
-3. 单词用原形（动词原形、名词单数），不要重复；保持资料原有顺序，不要漏词。
-4. 音标用国际音标并带斜杠，如 /əˈbændən/；资料里没有音标时按标准发音补上，实在不确定就留空。
-5. 中文释义简洁准确，标注词性，多个义项用中文分号分隔，如：v. 放弃，遗弃；n. 放任。
-6. 每个单词配一条自然地道的英文例句和对应中文翻译，例句难度与单词级别匹配。
-7. 完成后告诉我总词数；资料中有无法识别的内容请单独列出说明，不要擅自编造词条。
+你要做的事：
+1. 在这台电脑上找到 Voca 的安装目录：包含 Voca.exe 的文件夹，其下有 app 子文件夹（里面有 index.html 和 voca_auto_import.js）。找不到就问我路径，不要猜。
+2. 把词条整理好，写入 app 文件夹里的 voca_auto_import.js：文件里是一个 window.__VOCA_AUTO_IMPORTS__ 数组，一个批次一个对象；已有批次不要覆盖或改动，把新批次追加到数组末尾。格式：
+window.__VOCA_AUTO_IMPORTS__ = [
+  {
+    "id": "批次唯一标识，英文短横线命名并带日期，如 ielts-a-20261118",
+    "book": "这批词的来源名称，如：雅思核心词表",
+    "words": [
+      {"w": "abandon", "ipa": "/əˈbændən/", "cn": "v. 放弃，遗弃；n. 放任", "ex_en": "He abandoned the plan.", "ex_cn": "他放弃了这个计划。"}
+    ]
+  }
+];
+3. 词条整理规则：单词用原形（动词原形、名词单数），不要重复，保持资料原有顺序、不要漏词；音标用国际音标并带斜杠，资料里没有就按标准发音补，实在不确定就留空字符串；中文释义简洁准确、标注词性、多个义项用中文分号分隔；每个单词配一条自然地道的英文例句和中文翻译，难度与单词级别匹配；资料中有无法识别的内容单独列出说明，不要擅自编造词条。
+4. 写完后重新读取该文件，确认内容完整、能被当作 JavaScript 正常加载，然后告诉我：写进了多少个词、文件路径，并提醒我重新打开 Voca 即可看到（软件启动时会自动把这批词导入「自定义词库」，按批次 id 去重，重复打开不会重复导入）。
 
 我的单词资料见附件（或下文）：</textarea>
               <button class="btn btn-sm" id="btnCopyAgentPrompt">复制 Agent 提示词</button>
