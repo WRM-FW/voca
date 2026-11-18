@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 3 of Voca v1.0.5 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
+Generates Part 3 of Voca v1.0.6 HTML Application (JavaScript Engine) and assembles Voca_App_v103.html.
 Upgrades in v1.0.3:
 1. Removed '掌握度' (mastery) across state, UI, sorting, immersive card, spelling, CSV, and PDF exports; retained '不会程度' (unfam 0..5) with left-click (+1) and right-click (-1).
 2. Removed '英英模式' (en_en) from language modes, hints, rendering, and keyboard shortcuts; auto-migrates legacy 'en_en' state to 'bilingual'.
@@ -118,7 +118,7 @@ JS_ENGINE = r"""
 
   const defaultState = {
     schemaVersion: 4,
-    appVersion: "1.0.5",
+    appVersion: "1.0.6",
     currentBook: "cet4",
     currentListIndex: 0,
     langMode: "bilingual",      // bilingual | en_only | cn_only (en_en removed in v1.0.3)
@@ -297,7 +297,7 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.5";
+    merged.appVersion = "1.0.6";
     return merged;
   }
 
@@ -487,11 +487,15 @@ JS_ENGINE = r"""
   }
 
   // ==================== 3. LEXICON HYDRATION & CUSTOM LIST PARTITIONING ====================
+  // v1.0.6: every lexicon word now carries a real bilingual example in
+  // VOCA_PACK.examples, so this helper only synthesizes the tip line.
+  // (Before v1.0.6 it also fabricated one shared template sentence as the
+  // example for all non-rich words; that template has been removed.)
   function synthesizeContextProfile(hw, cnMeaning, rank) {
     const posMatches = cnMeaning.match(/\b(n|v|vt|vi|a|adj|adv|prep|conj|pron|num|art|aux|interj)\./g) || [];
     return {
-      ex_en: "Mastering the precise usage of '" + hw + "' in context improves academic reading and writing.",
-      ex_cn: "在语境中准确掌握“" + hw + "”的用法有助于提升学术读写能力。",
+      ex_en: "",
+      ex_cn: "",
       tip: "词性结构: " + (posMatches.length ? posMatches.join(" / ") : "核心考纲词") + " · 词频序: " + ((rank && rank < 900000) ? rank : "考纲精选")
     };
   }
@@ -523,6 +527,7 @@ JS_ENGINE = r"""
       };
     } else {
       const synth = synthesizeContextProfile(hw, cn, rank);
+      const exPair = (VOCA_PACK.examples || {})[hw.toLowerCase()];
       wObj = {
         id: wid,
         v1_id: null,
@@ -531,8 +536,8 @@ JS_ENGINE = r"""
         uk: ph,
         us: ph,
         cn: cn,
-        ex_en: synth.ex_en,
-        ex_cn: synth.ex_cn,
+        ex_en: exPair ? exPair[0] : synth.ex_en,
+        ex_cn: exPair ? exPair[1] : synth.ex_cn,
         tip: synth.tip,
         rank: rank
       };
@@ -1612,7 +1617,7 @@ JS_ENGINE = r"""
       openInVocaDictWindow(parseUrl).then(function(ok) {
         if (myQuery !== dictQuerySeq) return;
         if (ok) renderDictWindowOpened(parseUrl);
-        else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用 v1.0.5 的 Voca.exe（原生 WebView2 宿主），" +
+        else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用 v1.0.6 的 Voca.exe（原生 WebView2 宿主），" +
                             "或点右上角「↗ 词典窗口打开源页面」。");
       });
       return;
@@ -1763,7 +1768,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.5 自定义艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.6 自定义艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -1793,7 +1798,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.0.5 自定义艾宾浩斯背单词计划表",
+        title: "Voca v1.0.6 自定义艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -1805,7 +1810,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.5 离线背单词工坊";
+    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.6 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -2016,7 +2021,7 @@ JS_ENGINE = r"""
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(
-        "Voca v1.0.5 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
+        "Voca v1.0.6 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
         PAGE_W_PX / 2,
         PAGE_H_PX - 26
       );
@@ -2182,7 +2187,7 @@ JS_ENGINE = r"""
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.5 · 内置词条 38,855 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.6 · 内置词条 38,855 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 
@@ -3071,7 +3076,7 @@ JS_ENGINE = r"""
     document.getElementById("btnDownloadDirectPdf").addEventListener("click", function() {
       if (!lastPrintDocData) return;
       const res = generateMultiPagePdfBinary(lastPrintDocData);
-      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.5.pdf";
+      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.6.pdf";
       window.__LAST_GENERATED_PDF_INFO__ = {
         filename: safeName,
         pageCount: res.pageCount,
@@ -3099,7 +3104,7 @@ JS_ENGINE = r"""
         "th, td { border: 1px solid #94A3B8; padding: 6px 8px; word-break: break-word; }" +
         "th { background: #F1F5F9; }" +
         "</style></head><body>" + lastPrintHtmlContent + "</body></html>";
-      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.5.html";
+      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.6.html";
       window.__LAST_GENERATED_HTML_INFO__ = {
         filename: safeHtmlName,
         byteLength: standalone.length
@@ -3112,11 +3117,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.5",
+        version: "1.0.6",
         exportedAt: new Date().toISOString(),
         state: state
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.5_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.0.6_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 

@@ -2,6 +2,29 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.0.6] - 2026-11-18
+
+Windows-only release. **Android remains paused** (see 1.0.5): no APK is built, and the Android asset copy of the frontend is not refreshed.
+
+### Added
+- **A real bilingual example sentence for every word in the lexicon.** In v1.0.5 only the 233 curated "rich" entries carried hand-written examples; the other 14,710 unique words fell back to a single shared template sentence ("Mastering the precise usage of '…' in context improves academic reading and writing."). Each of those 14,710 words now has its own English example sentence written for the primary part of speech and sense of its Chinese gloss, plus a Chinese translation of that sentence. Together with the 233 rich entries, all **14,942 unique words** (38,855 book rows across the 8 books) now display a word-specific bilingual example in the list view, the immersive cards and the spelling-cloze trainer. The pairs live in a new `examples` map (`{headword_lowercase: [ex_en, ex_cn]}`) in `src/lexicon/v103_lexicon_payload.json` and are fully offline.
+
+### Removed
+- **The template-sentence fallback.** `synthesizeContextProfile()` in the frontend no longer fabricates an example sentence; it only builds the part-of-speech / frequency tip line, and `hydrateUniqueWord()` reads examples from `VOCA_PACK.examples` (rich entries keep priority). No code path can surface the old template sentence any more.
+
+### Changed
+- Version stamped `1.0.6` throughout the shared frontend and the Windows build (title, sidebar badge, `state.appVersion`, PDF/HTML export headers and filenames, backup filename and version field, host builder banner, `assemblyIdentity` 1.0.6.0, `Image Version` 1.6). `schemaVersion` stays at `4`; v1.0.0 ~ v1.0.5 archives load unchanged.
+
+### Verification (1.0.6)
+Data-level checks over the shipped payload and the assembled frontend: 14,942 / 14,942 unique words resolve to a non-empty bilingual example; 0 occurrences of the old template sentence remain in the payload or the assembled `index.html`; every generated English example contains its headword or a regular/irregular inflected form (the only stem-check flags were irregular forms such as `threw`, `shook`, `wrung`, each confirmed correct); no duplicate example sentences. The frontend was reassembled with the repository's own builder (`make_html_v103_part3.py`, the same step `build_all.sh` runs) and the result copied to both `windows/app/index.html` and `src/webapp/index.html`.
+
+### Known Issues (1.0.6)
+1. The 14,710 new examples were generated for this release and machine-checked for coverage, headword presence and duplication, but they have not been individually proofread by a human editor; occasional awkward phrasing may remain.
+2. `Voca.exe` itself is not rebuilt by this change: the repository ships source plus the assembled frontend, and the Windows binary is produced by running `build_all.sh` on Windows as before.
+3. Everything inherited from 1.0.5 that this round did not touch: no `Esc`-to-close on the modal, `voca.db` phonetics follow ECDICT's notation, `Voca.exe` is unsigned, Android paused and unverified on any device.
+
+---
+
 ## [1.0.5] - 2026-10-17
 
 Windows-only release. **Android development is paused indefinitely** and is not part of this version: no 1.0.5 APK is built or published, and `build_all.sh` now skips the Android steps unless `VOCA_ANDROID=1` is set.

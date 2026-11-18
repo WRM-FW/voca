@@ -1,4 +1,4 @@
-# Voca v1.0.5 — 离线艾宾浩斯背单词（Windows 版）
+# Voca v1.0.6 — 离线艾宾浩斯背单词（Windows 版）
 
 **Voca** 是一款离线单机的艾宾浩斯遗忘曲线背单词软件，同一套前端同时跑在 Windows 桌面与 Android 手机上。背诵、计划表生成、生词本管理、拼词/滚动训练、多页 PDF 导出全部 **100% 离线**可用，不注册账号、不上传数据；「查看词典详细与编辑」模块额外提供按需的在线词典查询。
 
@@ -14,6 +14,12 @@
 | **Android** | **无限期暂停开发（最后版本 v1.0.4，实验版）** | 自 v1.0.5 起不再开发、不再构建、不再交付 APK。v1.0.4 的 Android 结论仍然成立：前端在 8 个手机/平板视口下验证过，APK 结构校验通过，但**从未在任何真机或模拟器上运行过**。历史说明见本文第三节与 `docs/08`。 |
 
 Windows 版仍有未修完的缺陷（弹窗 `Esc`、`Voca.exe` 未代码签名等），见 [第七节 已知问题](#七已知问题)。
+
+## v1.0.6 相对 v1.0.5 的变化（仅 Windows）
+
+1. **全部单词都有真实例句了**：此前只有 233 个核心词有人工例句，其余 14,710 个词在界面上显示的是同一句模板句（“Mastering the precise usage of …”）。v1.0.6 为这 14,710 个词逐词补了一条英文例句 + 中文翻译，按各词中文释义的主词性与主义项编写；加上原有 233 条，内置词库 14,942 个不重复单词现在全部有双语例句。例句存放在词库数据 `src/lexicon/v103_lexicon_payload.json` 的 `examples` 字段中，离线可用，列表视图、沉浸卡片与拼写挖空训练共用同一份数据。
+2. **删掉模板句回退**：前端 `synthesizeContextProfile()` 不再生成例句，只保留词性/词频提示行；例句一律来自词库数据。
+3. 存档结构未变（`schemaVersion` 保持 4），v1.0.0 ~ v1.0.5 存档可直接读取；Android 继续暂停，本版未刷新 Android 资产、未构建 APK。
 
 ## v1.0.5 相对 v1.0.4 的变化（仅 Windows）
 
@@ -38,11 +44,11 @@ Windows 版仍有未修完的缺陷（弹窗 `Esc`、`Voca.exe` 未代码签名�
 
 | 资产 | 平台 | 说明 |
 | :--- | :--- | :--- |
-| `Voca_v1.0.5_Windows_x64.zip` | **Windows（唯一在维护的版本）** | 免安装绿色包，含 `Voca.exe`、`WebView2Loader.dll`、`windows/app/`、`windows/data/` |
-| `Voca_v1.0.5_source.zip` | 源码 | 与 `v1.0.5` 标签的源码快照等价 |
+| `Voca_v1.0.6_Windows_x64.zip` | **Windows（唯一在维护的版本）** | 免安装绿色包，含 `Voca.exe`、`WebView2Loader.dll`、`windows/app/`、`windows/data/` |
+| `Voca_v1.0.6_source.zip` | 源码 | 与 `v1.0.6` 标签的源码快照等价 |
 | `Voca_v1.0.4_release.apk` | Android（已停止开发） | 最后一个 Android 产物，`versionCode=5` / `versionName=1.0.4`，自签证书；v1.0.5 起不再发布 APK |
 
-v1.0.4 及更早的 Windows 包仍在同一 Releases 页面可下载。Android 端内嵌的前端与 Windows 构建自同一套生成器，但 v1.0.5 的前端未在 Android 容器上验证过。
+v1.0.4 及更早的 Windows 包仍在同一 Releases 页面可下载。Android 端内嵌的前端与 Windows 构建自同一套生成器，但 v1.0.6 的前端未在 Android 容器上验证过。
 
 ---
 
@@ -281,7 +287,8 @@ python3 scripts/run_e2e_v103.py        # Selenium + Chromium 端到端功能与�
 | 1.0.0 ~ 1.0.2 | 双平台离线首版、38,855 词条词库、APK 二进制修复、自由计划参数、离线 PDF 导出、WOFF2 子集 | 已发布 |
 | 1.0.3 | 8 级 DPI 图标与 `PerMonitorV2`、移除掌握度只留不会程度、双在线词典集成、移除英英模式 | 已发布 |
 | 1.0.4 | 原生 Win32 + WebView2 宿主（真正修复任务栏图标）、在线词典根因修复与三源改造、删除「重置不会度」与左上角副标题、修复首次启动多开 Edge 窗口、Android 触屏外壳重做、v1.0.3→v1.0.4 数据自动迁移 | 已发布 |
-| **1.0.5** | 学习页排序选择、WordReference 经 Voca 自有顶层词典窗口真实可查、未知排序值归一化、**Android 无限期暂停** | **当前版本** |
+| 1.0.5 | 学习页排序选择、WordReference 经 Voca 自有顶层词典窗口真实可查、未知排序值归一化、**Android 无限期暂停** | 已发布 |
+| **1.0.6** | 为其余 14,710 个词逐词补齐双语例句（全库 14,942 词全覆盖）、删除模板例句回退 | **当前版本** |
 | 后续（未排期） | `Esc` 关闭弹窗、`Voca.exe` 代码签名、词典窗口的前进/后退控件。Android 侧的 `DownloadListener` / 文件选择器 / 真机复验随 Android 一并暂停 | 未开始 |
 
 ## 九、反馈渠道
