@@ -2,6 +2,37 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.0.7] - 2026-11-18
+
+Windows-only release. **Android remains paused** (see 1.0.5). Implements the approved change review of the v1.0.6 systematic UX evaluation, with emphasis on interaction.
+
+### Fixed
+- **Archive corruption no longer silently wipes progress.** A present-but-unparseable LocalStorage state is treated like a missing one: the corrupt value is preserved under a `voca_offline_state_v1.corrupt.<timestamp>` key, the intact IndexedDB mirror is restored, and the user is notified. LocalStorage write failures (quota/blocked) now surface a toast advising a backup export instead of only a console warning.
+- **Fruitless searches no longer claim the list is finished.** The learn view's empty state is split by cause (no search match / all mastered / empty list); the "🎉 all mastered" message only appears when it is true.
+
+### Changed
+- **Sparse, debounced persistence.** Saves write only non-default word records (previously every rendered word materialized a default record: one click after opening CET-4 persisted 383 KB / 3,992 records; now 644 B / 1 record), coalesce over 250 ms, and flush on page hide/exit. Old archives are pruned losslessly on their next save; the storage diagnostic counts active records. Backup exports carry the same pruned state.
+- **Header follows the active tab.** Book/list/sort/language/view controls are hidden on the settings, data and notebook tabs, and sort/language/view are hidden on the plan tab; the theme button stays.
+- **Mobile portrait learn view reprioritized.** The four stat cards become a compact single-row strip and redundant hint lines are dropped on the mobile shell, moving the first word row on 390×844 from ~730 px to ~443 px.
+- **Desktop narrow windows.** At ≤900 px (fine pointer) the sidebar collapses to a 68 px icon rail and the header wraps instead of clipping controls out of reach; at ≤620 px the stats grid goes two-up.
+- Version stamped `1.0.7` throughout (title, sidebar badge, `state.appVersion`, backup filename/version, host title, `assemblyIdentity` 1.0.7.0, `Image Version` 1.7). `schemaVersion` stays at `4`; v1.0.0 ~ v1.0.6 archives load unchanged.
+
+### Added
+- **Cross-book search.** From a no-match search, "在全部词库中搜索" searches every book (plus custom words), lists matches with their book, and jumps to the word's book/List with a highlight flash.
+- **Escape closes any open modal** (dictionary, add-word, print, global search), via each modal's own close path.
+- **Keyboard/AT basics:** `:focus-visible` focus ring, `prefers-reduced-motion` downgrade, `aria-label`s on icon-only row buttons.
+- **One-time first-click hint** explaining the row-click contract (click = unfamiliarity +1 & pronounce, right-click/long-press −1, switchable in settings).
+
+### Verification (1.0.7)
+Headless-Chromium regression with the review harness: sparse save measured at 644 B / 1 record; a seeded v1.0.6 archive (2,502 records incl. 2,500 defaults) migrated losslessly and pruned to its 2 real records; corruption injection recovered from IndexedDB with toast, corrupt-value backup key and repaired LocalStorage; global search found "ubiquitous" in GRE from CET-4 and jumped with flash; Esc closed the dictionary modal; header context rules verified per tab; mobile 390×844 first row at 443 px; spelling/cards/plan/notebook/data/settings/check-in smoke-tested with zero page errors. The desktop narrow-window rules were additionally measured with the hover/pointer gate removed, because the headless shell cannot emulate those media features; on a real mouse desktop the gate matches the app's pre-existing breakpoints. Full details: `docs/11-v1.0.7-interaction-and-storage-report.md`.
+
+### Known Issues (1.0.7)
+1. Everything inherited that this round did not touch: `voca.db` phonetics follow ECDICT's notation, `Voca.exe` is unsigned, Android paused and unverified on any device.
+2. The 14,710 examples added in 1.0.6 remain machine-checked but not human-proofread.
+3. `Voca.exe` is built from this source with the repository's builders, as before; the shipped frontend is the assembled `index.html` from `make_html_v103_part3.py`.
+
+---
+
 ## [1.0.6] - 2026-11-18
 
 Windows-only release. **Android remains paused** (see 1.0.5): no APK is built, and the Android asset copy of the frontend is not refreshed.

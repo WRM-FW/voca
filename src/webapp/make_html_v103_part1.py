@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 1 of Voca v1.0.6 HTML Application:
+Generates Part 1 of Voca v1.0.7 HTML Application:
 - Multi-size High-DPI <link rel="icon"> tags (256/192/128/64/48/32/16 + voca.ico) so Windows taskbar & titlebar icons in --app mode are never downsampled to 16x16.
 - Embedded cross-platform @font-face (VocaSans Inter + VocaSansCJK Noto Sans CJK SC).
 - Removed Mastery (.mastery-badge, data-mastery) styles; enhanced Unfamiliarity (.unfam-badge, data-unfam) styles.
@@ -31,7 +31,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.0.6 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
+<title>Voca v1.0.7 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
      Any scale without its own declared frame gets resampled and looks soft. -->
@@ -2278,6 +2278,58 @@ html.ui-mobile .toast-item {
     font-weight: 700 !important;
   }
 }
+
+/* ================= v1.0.7 interaction & layout refinements ================= */
+/* G: visible keyboard focus + reduced-motion降级 */
+:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+/* F: global-search results + jump flash */
+.gs-result { display: flex; align-items: baseline; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-surface); cursor: pointer; font: inherit; color: var(--text-primary); }
+.gs-result:hover { border-color: var(--brand-primary); }
+.gs-word { font-weight: 700; white-space: nowrap; }
+.gs-meta { font-size: 0.75rem; color: var(--brand-primary); white-space: nowrap; }
+.gs-cn { font-size: 0.85rem; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.word-row.gs-flash { animation: gsFlash 1.6s ease-out; }
+@keyframes gsFlash { 0%, 60% { background: rgba(16, 185, 129, 0.18); } 100% { background: transparent; } }
+/* E: header follows the active tab (set by switchTab on <body data-tab>).
+   Book/list/sort/language/view controls only act on learn (and plan keeps
+   book/list); elsewhere they are hidden instead of inviting no-op changes. */
+body[data-tab="settings"] .header-left, body[data-tab="data"] .header-left, body[data-tab="notebook"] .header-left,
+body[data-tab="settings"] #sortSelect, body[data-tab="data"] #sortSelect, body[data-tab="notebook"] #sortSelect,
+body[data-tab="settings"] #layoutModeGroup, body[data-tab="data"] #layoutModeGroup, body[data-tab="notebook"] #layoutModeGroup,
+body[data-tab="plan"] #langModeGroup, body[data-tab="plan"] #sortSelect, body[data-tab="plan"] #layoutModeGroup { display: none !important; }
+/* D1: desktop shell at narrow widths. Gated like the existing desktop rules
+   (hover + fine pointer) so touch devices keep the mobile shell. */
+@media (hover: hover) and (pointer: fine) and (max-width: 900px) {
+  body .sidebar { width: 68px !important; padding: 16px 8px; }
+  body .brand-box { justify-content: center; }
+  body .brand-box > div { display: none; }
+  body .nav-btn { justify-content: center; padding: 10px 6px; }
+  body .nav-btn span:not(.nav-pill) { display: none; }
+  body .nav-btn .nav-pill { display: none; }
+  body .top-header { flex-wrap: wrap; height: auto; row-gap: 8px; }
+}
+@media (hover: hover) and (pointer: fine) and (max-width: 620px) {
+  body .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  body .top-header .ctrl-select { max-width: 44vw; }
+  body .learn-toolbar { flex-wrap: wrap; }
+}
+/* C: mobile portrait learn view — compact stats strip so the first word row
+   reaches the first screen (was ~730px down on 390x844). Sub-lines are dropped
+   on mobile only; the headline numbers stay. */
+html.ui-mobile #view-learn .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+html.ui-mobile #view-learn .stat-card { padding: 8px; border-radius: 12px; }
+html.ui-mobile #view-learn .stat-label { font-size: 0.6rem; }
+html.ui-mobile #view-learn .stat-label span:last-child { display: none; }
+html.ui-mobile #view-learn .stat-val { font-size: 1.05rem; margin-top: 2px; }
+html.ui-mobile #view-learn .stat-sub { display: none; }
+html.ui-mobile #view-learn .m-view-head { margin-bottom: 6px; }
+html.ui-mobile #view-learn .m-view-head p { display: none; }
+html.ui-mobile #view-learn .learn-toolbar { gap: 6px; margin-bottom: 6px; }
+html.ui-mobile #clickRuleHint { display: none; }
+html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74rem; margin-bottom: 8px; }
 </style>
 <script>
 /* ==================== INPUT-CAPABILITY SHELL SELECTOR ====================
@@ -2334,7 +2386,7 @@ html.ui-mobile .toast-item {
 })();
 </script>
 </head>
-<body>
+<body data-tab="learn">
 """
 
 HTML_PART1 = (

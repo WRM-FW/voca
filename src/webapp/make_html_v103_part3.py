@@ -297,9 +297,16 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.6";
+    merged.appVersion = "1.0.7";
     return merged;
   }
+
+  // v1.0.7: a present-but-unparseable LocalStorage state is remembered here so the
+  // IndexedDB recovery in initIndexedDB can treat "corrupt" like "missing"
+  // (previously corruption silently reset all progress while the intact
+  // IndexedDB mirror was never consulted).
+  let corruptLsRaw = null;
+  let storageToastShown = false;
 
   function loadFromLocalStorage() {
     if (window.__VOCA_PRELOAD_STATE__) {
@@ -309,20 +316,65 @@ JS_ENGINE = r"""
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        state = migrateStateIfNeeded(JSON.parse(raw));
+        try {
+          state = migrateStateIfNeeded(JSON.parse(raw));
+        } catch (parseErr) {
+          corruptLsRaw = raw;
+          try { localStorage.setItem(STORAGE_KEY + ".corrupt." + Date.now(), raw); } catch (e) {}
+          console.warn("LocalStorage state is corrupt; will attempt IndexedDB recovery.", parseErr);
+        }
       }
     } catch (err) {
       console.warn("LocalStorage read fallback:", err);
     }
   }
 
+  // v1.0.7: persistence is sparse + debounced.
+  // - Sparse: getRecord() materializes a default record for every rendered word,
+  //   so a naive save persisted thousands of untouched defaults (a single click
+  //   after opening CET-4 wrote ~383 KB / 3,992 records). Only non-default
+  //   records are written now; a missing record already means "default" on read.
+  // - Debounced: rapid row clicks no longer serialize the whole state per click.
+  //   flushSaveState() runs on pagehide / visibilitychange-hidden as well.
+  function isDefaultRecord(r) {
+    return !!r && !r.unfam && !r.starred && !r.mastered && !r.customCn && !r.note;
+  }
+  function countActiveRecords() {
+    let n = 0;
+    const recs = state.records || {};
+    Object.keys(recs).forEach(function(k) { if (!isDefaultRecord(recs[k])) n++; });
+    return n;
+  }
+  function prunedStateCopy() {
+    const copy = JSON.parse(JSON.stringify(state));
+    const kept = {};
+    const recs = copy.records || {};
+    Object.keys(recs).forEach(function(k) { if (!isDefaultRecord(recs[k])) kept[k] = recs[k]; });
+    copy.records = kept;
+    return copy;
+  }
+  let saveTimer = null;
+  let storageErrorActive = false;
   function saveState() {
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(flushSaveState, 250);
+  }
+  function flushSaveState() {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    const copy = prunedStateCopy();
+    let lsOk = true;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
     } catch (err) {
+      lsOk = false;
       console.warn("LocalStorage write warning:", err);
     }
-    saveToIndexedDB(state);
+    saveToIndexedDB(copy);
+    if (!lsOk && !storageErrorActive) {
+      storageErrorActive = true;
+      showToast("⚠️ 本地存储写入失败（空间不足或被浏览器拦截），学习进度可能无法保存，请到「词库导入与PDF导出」页导出备份。");
+    }
+    if (lsOk) storageErrorActive = false;
     updateStorageDiagnostics();
   }
 
@@ -344,11 +396,21 @@ JS_ENGINE = r"""
           getReq.onsuccess = function() {
             let hasLs = false;
             try { hasLs = !!localStorage.getItem(STORAGE_KEY); } catch (e) {}
-            if (getReq.result && !hasLs) {
+            if (getReq.result && (!hasLs || corruptLsRaw)) {
               state = migrateStateIfNeeded(getReq.result);
               rebuildCustomBookCache();
               applySettingsToDOM();
               refreshAllViews();
+              if (corruptLsRaw && !storageToastShown) {
+                storageToastShown = true;
+                showToast("已从 IndexedDB 备份恢复本地学习数据（原 LocalStorage 存档已损坏，坏数据已另存备份）。");
+              }
+              corruptLsRaw = null;
+              saveState();
+            } else if (corruptLsRaw && !storageToastShown) {
+              storageToastShown = true;
+              showToast("⚠️ 本地存档已损坏且无可用备份，学习进度已重置为初始状态；建议定期在数据页导出备份。");
+              corruptLsRaw = null;
             }
           };
         } catch (e) {}
@@ -867,6 +929,81 @@ JS_ENGINE = r"""
     );
   }
 
+  // v1.0.7: cross-book search. Reachable from the learn view's no-result state;
+  // searches every book (hydrating book caches on first use) and jumps to the
+  // word's own book/List on click.
+  function openGlobalSearchResults(query) {
+    const q = (query || "").trim().toLowerCase();
+    const modal = document.getElementById("globalSearchModal");
+    const box = document.getElementById("globalSearchResults");
+    const title = document.getElementById("globalSearchTitle");
+    if (!modal || !box || !title || !q) return;
+    title.textContent = "全库搜索「" + query + "」";
+    const bookNames = {};
+    document.querySelectorAll("#bookSelect option").forEach(function(o) {
+      bookNames[o.value] = (o.textContent || "").replace(/\s*\(.*?\)\s*/g, "").trim() || o.value;
+    });
+    const bookIds = Object.keys(VOCA_PACK.bookMap || {});
+    if ((state.customWords || []).length && bookIds.indexOf("custom") === -1) bookIds.push("custom");
+    let html = "";
+    let total = 0;
+    for (const bid of bookIds) {
+      if (total >= 100) break;
+      const words = getBookWords(bid);
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        if (w.word.toLowerCase().indexOf(q) === -1 && getEffectiveCnDef(w).toLowerCase().indexOf(q) === -1) continue;
+        total++;
+        if (total <= 100) {
+          html += '<button class="gs-result" data-book="' + escapeHtml(bid) + '" data-wid="' + escapeHtml(w.id) + '">' +
+            '<span class="gs-word">' + escapeHtml(w.word) + '</span>' +
+            '<span class="gs-meta">' + escapeHtml(bookNames[bid] || bid) + '</span>' +
+            '<span class="gs-cn">' + escapeHtml(getEffectiveCnDef(w)) + '</span></button>';
+        }
+      }
+    }
+    box.innerHTML = total === 0
+      ? '<div style="padding:18px; text-align:center; color:var(--text-muted);">全部词库中也没有找到与「' + escapeHtml(query) + '」匹配的单词。</div>'
+      : html + (total >= 100 ? '<div style="padding:10px; text-align:center; color:var(--text-muted);">结果较多，仅显示前 100 条，请缩小关键词。</div>' : "");
+    modal.classList.add("open");
+    box.querySelectorAll(".gs-result").forEach(function(btn) {
+      btn.addEventListener("click", function() { jumpToWord(btn.dataset.book, btn.dataset.wid); });
+    });
+  }
+
+  function jumpToWord(bookId, wordId) {
+    const modal = document.getElementById("globalSearchModal");
+    if (modal) modal.classList.remove("open");
+    state.currentBook = bookId;
+    const bookSel = document.getElementById("bookSelect");
+    if (bookSel) bookSel.value = bookId;
+    buildListsForCurrentBook();
+    let li = 0;
+    for (let i = 0; i < currentLists.length; i++) {
+      if (currentLists[i].some(function(w) { return w.id === wordId; })) { li = i; break; }
+    }
+    state.currentListIndex = li;
+    const search = document.getElementById("wordSearchInput");
+    if (search) search.value = "";
+    saveState();
+    refreshAllViews();
+    const flashRow = function() {
+      const row = document.querySelector('.word-row[data-wid="' + wordId + '"]');
+      if (!row) return false;
+      row.scrollIntoView({ block: "center" });
+      row.classList.add("gs-flash");
+      setTimeout(function() { row.classList.remove("gs-flash"); }, 1600);
+      return true;
+    };
+    setTimeout(function() {
+      if (!flashRow()) {
+        // The word may sit beyond the initial render limit; expand, then retry.
+        const showAll = document.getElementById("btnShowAllWordsInList");
+        if (showAll) { showAll.click(); setTimeout(flashRow, 350); }
+      }
+    }, 60);
+  }
+
   function renderLearnView() {
     buildListsForCurrentBook();
     renderListSelector();
@@ -890,7 +1027,20 @@ JS_ENGINE = r"""
 
     if (activeWords.length === 0) {
       pagBox.style.display = "none";
-      listBox.innerHTML = '<div style="padding:42px 20px; text-align:center; color:var(--text-muted);">🎉 当前 List 的单词已全部标为熟词或无匹配结果！可切换下一个 List 或在「熟词表」中恢复。</div>';
+      // v1.0.7: the empty state is split by cause. Previously a fruitless search
+      // produced the same celebratory "all mastered" message, so a typo looked
+      // like finishing the list.
+      const query = (document.getElementById("wordSearchInput").value || "").trim();
+      const rawList = currentLists[state.currentListIndex] || [];
+      if (query) {
+        listBox.innerHTML = '<div style="padding:42px 20px; text-align:center; color:var(--text-muted);">未在当前 List 找到与「' + escapeHtml(query) + '」匹配的单词（搜索范围仅限当前 List）。<br><button class="btn btn-sm btn-primary" id="btnGlobalSearch" style="margin-top:14px;">在全部词库中搜索「' + escapeHtml(query) + '」</button></div>';
+        const gsBtn = document.getElementById("btnGlobalSearch");
+        if (gsBtn) gsBtn.addEventListener("click", function() { openGlobalSearchResults(query); });
+      } else if (rawList.length > 0) {
+        listBox.innerHTML = '<div style="padding:42px 20px; text-align:center; color:var(--text-muted);">🎉 当前 List 的单词已全部标为熟词！可切换下一个 List 或在「熟词表」中恢复。</div>';
+      } else {
+        listBox.innerHTML = '<div style="padding:42px 20px; text-align:center; color:var(--text-muted);">当前 List 暂无单词。</div>';
+      }
       return;
     }
 
@@ -919,9 +1069,9 @@ JS_ENGINE = r"""
           '</div>' +
           '<div class="w-meaning-col">' + meaningBody + '</div>' +
           '<div class="w-actions">' +
-            '<button class="icon-btn' + (rec.starred ? ' starred' : '') + '" data-act="star" data-wid="' + w.id + '" title="加入/移出生词本">★</button>' +
-            '<button class="icon-btn master-btn" data-act="master" data-wid="' + w.id + '" title="标为熟词(从列表中移除)">✕</button>' +
-            '<button class="icon-btn" data-act="dict" data-wid="' + w.id + '" title="查看词典详细与编辑">📖</button>' +
+            '<button class="icon-btn' + (rec.starred ? ' starred' : '') + '" data-act="star" data-wid="' + w.id + '" title="加入/移出生词本" aria-label="加入或移出生词本">★</button>' +
+            '<button class="icon-btn master-btn" data-act="master" data-wid="' + w.id + '" title="标为熟词(从列表中移除)" aria-label="标为熟词">✕</button>' +
+            '<button class="icon-btn" data-act="dict" data-wid="' + w.id + '" title="查看词典详细与编辑" aria-label="查看词典详情与编辑">📖</button>' +
           '</div>' +
         '</div>';
     });
@@ -1236,8 +1386,8 @@ JS_ENGINE = r"""
             '<div class="w-cn">' + escapeHtml(getEffectiveCnDef(w)) + '</div>' +
           '</div>' +
           '<div class="w-actions">' +
-            '<button class="icon-btn' + (rec.starred ? ' starred' : '') + '" data-act="star" data-wid="' + w.id + '">★</button>' +
-            '<button class="icon-btn" data-act="dict" data-wid="' + w.id + '">📖</button>' +
+            '<button class="icon-btn' + (rec.starred ? ' starred' : '') + '" data-act="star" data-wid="' + w.id + '" aria-label="加入或移出生词本">★</button>' +
+            '<button class="icon-btn" data-act="dict" data-wid="' + w.id + '" aria-label="查看词典详情与编辑">📖</button>' +
           '</div>' +
         '</div>';
     });
@@ -1323,7 +1473,7 @@ JS_ENGINE = r"""
             '</div>' +
             '<div class="w-actions">' +
               '<button class="btn btn-sm" data-act="dict" data-wid="' + w.id + '">词典/编辑</button>' +
-              '<button class="icon-btn starred" data-act="star" data-wid="' + w.id + '" title="从生词本移除(恢复原释义)">★</button>' +
+              '<button class="icon-btn starred" data-act="star" data-wid="' + w.id + '" title="从生词本移除(恢复原释义)" aria-label="从生词本移除">★</button>' +
             '</div>' +
           '</div>';
       });
@@ -2183,11 +2333,11 @@ JS_ENGINE = r"""
   function updateStorageDiagnostics() {
     const box = document.getElementById("storageDiagnosticBox");
     if (!box) return;
-    const recCount = Object.keys(state.records || {}).length;
+    const recCount = countActiveRecords();
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.6 · 内置词条 38,855 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.7 · 内置词条 38,855 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 
@@ -2254,6 +2404,7 @@ JS_ENGINE = r"""
   // ==================== 11. EVENT LISTENERS ====================
   function bindEvents() {
     function switchTab(tabId) {
+      document.body.setAttribute("data-tab", tabId);
       document.querySelectorAll(".view-section").forEach(function(sec) {
         sec.classList.toggle("active", sec.id === "view-" + tabId);
       });
@@ -2440,6 +2591,12 @@ JS_ENGINE = r"""
             rec.unfam = (rec.unfam || 0) + 1;
             saveState();
             updateRowUnfamDOM(row, rec);
+            // v1.0.7: explain the row-click contract once, where it happens.
+            if (!state.modeHintsShown.rowClick) {
+              state.modeHintsShown.rowClick = true;
+              saveState();
+              showToast("💡 点单词行 = 不会程度 +1 并发音，右键/长按可 −1；点击行为可在「偏好设置与帮助」中切换（此提示仅首次显示）。");
+            }
           } else {
             showToast("「" + w.word + "」不会程度已达上限 (5/5)");
           }
@@ -2913,6 +3070,9 @@ JS_ENGINE = r"""
     document.getElementById("modalBtnCloseDict").addEventListener("click", function() {
       document.getElementById("dictModal").classList.remove("open");
     });
+    document.getElementById("btnCloseGlobalSearch").addEventListener("click", function() {
+      document.getElementById("globalSearchModal").classList.remove("open");
+    });
     document.getElementById("modalBtnSpeakWord").addEventListener("click", function() {
       const w = wordLookupById[currentModalWordId];
       if (w) speakText(w.word);
@@ -3117,11 +3277,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.6",
+        version: "1.0.7",
         exportedAt: new Date().toISOString(),
-        state: state
+        state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.6_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.0.7_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 
@@ -3237,6 +3397,18 @@ JS_ENGINE = r"""
 
     // Global Keyboard Shortcuts (Shortcut '4' for en_en removed per Requirement 5)
     window.addEventListener("keydown", function(e) {
+      // v1.0.7: Escape closes whichever modal is open (previously unsupported,
+      // so a modal could only be dismissed via its close button).
+      if (e.key === "Escape") {
+        const openModal = document.querySelector(".modal-backdrop.open");
+        if (openModal) {
+          const closeBtn = openModal.querySelector('[id^="btnClose"], [id^="modalBtnClose"]');
+          if (closeBtn) closeBtn.click();
+          else openModal.classList.remove("open");
+          e.preventDefault();
+          return;
+        }
+      }
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
@@ -3306,6 +3478,11 @@ JS_ENGINE = r"""
     } catch (e) {}
     loadFromLocalStorage();
     initIndexedDB();
+    // v1.0.7: never lose the debounced tail of a study session on exit/hide.
+    window.addEventListener("pagehide", flushSaveState);
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === "hidden") flushSaveState();
+    });
     rebuildCustomBookCache();
     applySettingsToDOM();
     bindEvents();

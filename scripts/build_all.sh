@@ -21,7 +21,7 @@ if [ -z "$PY" ]; then
 fi
 echo "  using interpreter: $PY ($("$PY" -c 'import sys;print(sys.executable)'))"
 
-echo "[1/5] Building Voca v1.0.6 multi-DPI Win32 icons and cross-platform WOFF2 font subsets..."
+echo "[1/5] Building Voca v1.0.7 multi-DPI Win32 icons and cross-platform WOFF2 font subsets..."
 # Regenerating assets needs the original OpenType sources (Debian/Ubuntu: fonts-inter,
 # fonts-noto-cjk) at the absolute paths hardcoded in build_assets_v103.py.
 # assets/ already ships the generated WOFF2 subsets and icon frames, so this step is opt-in.
@@ -31,7 +31,7 @@ else
   echo "  skipped (set VOCA_BUILD_ASSETS=1 to regenerate assets/fonts and assets/icons from system OpenType sources)"
 fi
 
-echo "[2/5] Assembling Voca v1.0.6 offline frontend..."
+echo "[2/5] Assembling Voca v1.0.7 offline frontend..."
 VOCA_EMBEDDED_ASSETS="$ROOT_DIR/assets/embedded_assets.json" \
 VOCA_CORE233_JSON="$ROOT_DIR/windows/data/voca_lexicon.json" \
 VOCA_PACK_JSON="$ROOT_DIR/src/lexicon/v103_lexicon_payload.json" \
@@ -96,4 +96,4 @@ else
   echo "[4/5] Android build skipped (paused since v1.0.5). Re-enable with VOCA_ANDROID=1."
 fi
 
-echo "Voca v1.0.6 reproducible build and verification completed successfully."
+echo "Voca v1.0.7 reproducible build and verification completed successfully."
