@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows &amp; Android)</title>
+<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows)</title>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
      Any scale without its own declared frame gets resampled and looks soft. -->
@@ -2329,7 +2329,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
    phone chrome. Shell is now chosen by what the primary pointing device IS:
 
      ui-mobile  -> primary pointer is coarse (finger), or hover is impossible and the
-                   device is touch-capable, or a legacy Android WebView that predates
+                   device is touch-capable, or a legacy mobile WebView that predates
                    the (pointer:)/(hover:) media features is a touch device in a narrow
                    window.
      ui-desktop -> fine pointer with hover (mouse / trackpad / WebView2 on Windows),
@@ -2350,7 +2350,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
   function isTouchShell() {
     if (mq("(pointer: coarse)")) return true;
     if (mq("(hover: none)") && touchCapable()) return true;
-    /* Android WebView older than Chrome 39 understands neither (pointer:) nor (hover:). */
+    /* Mobile WebViews older than Chrome 39 understand neither (pointer:) nor (hover:). */
     var narrow = Math.min(window.innerWidth || 4000, (window.screen && window.screen.width) || 4000) <= 900;
     if (/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "") && touchCapable() && narrow) return true;
     return false;
@@ -2590,7 +2590,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
             <div>
               <h2 style="font-size:1.22rem; font-weight:800;" id="planHeaderTitle">艾宾浩斯遗忘曲线学习计划表</h2>
               <p style="font-size:0.84rem; color:var(--text-muted); margin-top:4px; white-space:normal;">
-                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔（+1/+2/+4/+7/+15 天）自动排期，每天新学与复习合计不超过 5 个 List。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
+                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔自动排期：每天新学 1 个 List，每个 List 在 +1/+2/+4/+7/+15 天各复习一次，共 N+15 天。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
               </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
@@ -2827,7 +2827,7 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">💾 本地数据持久化备份与恢复</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
               学习进度保存在本地（LocalStorage + IndexedDB）。换设备或重装前，先导出一份 JSON 备份。
-              <span class="m-only"><br>Android 版当前内核不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
+              <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
               存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.8
@@ -2840,17 +2840,17 @@ html.ui-mobile #view-learn .m-gesture-hint { padding: 7px 10px; font-size: 0.74r
               </label>
               <button class="btn btn-sm" id="btnExportLexiconCsv">导出当前词库 CSV</button>
             </div>
-            <textarea id="pasteRestoreTextarea" rows="4" class="m-only" placeholder="Android 上若文件选择无效，把备份 .json 的完整内容粘贴到这里，再点下方按钮恢复。" style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.82rem; margin:10px 0 8px;"></textarea>
+            <textarea id="pasteRestoreTextarea" rows="4" class="m-only" placeholder="若文件选择无效，把备份 .json 的完整内容粘贴到这里，再点下方按钮恢复。" style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.82rem; margin:10px 0 8px;"></textarea>
             <button class="btn btn-sm m-only" id="btnParsePasteRestore">从粘贴内容恢复备份</button>
           </div>
 
-          <!-- The Android WebView in this build has no DownloadListener, so an anchor
+          <!-- Some embedded WebViews install no download handler, so an anchor
                click never writes a file. On the touch shell exports land here instead. -->
           <div class="stat-card m-only" id="touchExportBox" style="padding:18px; display:none;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📤 导出内容（长按复制保存）</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px; white-space:normal;">
               文件名：<strong id="touchExportName"></strong> · 类型 <span id="touchExportKind"></span>。
-              当前 Android 版无法直接把文件写入存储，请点「复制到剪贴板」后粘贴到备忘录或文件管理器保存；
+              当前环境无法直接把文件写入存储时，请点「复制到剪贴板」后粘贴到备忘录或文件管理器保存；
               备份 JSON 可在上方「从粘贴内容恢复备份」原样贴回。
             </p>
             <textarea id="touchExportTextarea" rows="8" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.78rem; margin-bottom:10px;"></textarea>
@@ -3721,49 +3721,21 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
     }
   }
 
-  // v1.0.8: the user sets only the number of Lists. The software derives the
-  // day count from the fixed Ebbinghaus intervals (+1/+2/+4/+7/+15 days):
-  // a day never carries more than 5 Lists in total (new + reviews due), new
-  // Lists are paced at at most 2 per day, and a new List is only placed when
-  // every one of its future review days still stays within the same cap.
+  // v1.0.8: the user sets only the number of Lists. The schedule is the
+  // canonical Ebbinghaus table (corrected per the user's own reference
+  // table): exactly ONE new List per day — List i is learned on Day i —
+  // and every List is reviewed at +1/+2/+4/+7/+15 days after its learn
+  // day. Total days = N + 15 (the last List's final review). No daily
+  // caps and no pacing: at full load a day carries 1 new + 5 reviews.
   function computeCustomEbbinghausSchedule() {
     const N = currentLists.length || Math.max(1, parseInt(state.planListCount, 10) || 15);
     const intervals = [1, 2, 4, 7, 15];
-    const MAX_PER_DAY = 5;
-    const MAX_NEW_PER_DAY = 2;
 
     const dayNewMap = {};
-    const dueCount = {};
-    let nextList = 1;
-    let day = 0;
-    let learnDays = 0;
-    while (nextList <= N && day < 3650) {
-      day++;
-      const dueToday = dueCount[day] || 0;
-      let canAdd = Math.min(MAX_NEW_PER_DAY, MAX_PER_DAY - dueToday, N - nextList + 1);
-      let add = 0;
-      while (add < canAdd) {
-        let fits = true;
-        for (let gi = 0; gi < intervals.length; gi++) {
-          if ((dueCount[day + intervals[gi]] || 0) + add + 1 > MAX_PER_DAY) { fits = false; break; }
-        }
-        if (!fits) break;
-        add++;
-      }
-      if (add > 0) {
-        dayNewMap[day] = [];
-        for (let k = 0; k < add; k++) {
-          dayNewMap[day].push(nextList++);
-          learnDays = day;
-          for (let gi = 0; gi < intervals.length; gi++) {
-            const fd = day + intervals[gi];
-            dueCount[fd] = (dueCount[fd] || 0) + 1;
-          }
-        }
-      }
-    }
+    for (let i = 1; i <= N; i++) dayNewMap[i] = [i];
+    const learnDays = N;
+    const D = N > 0 ? N + intervals[intervals.length - 1] : 0;
 
-    const D = N > 0 ? learnDays + intervals[intervals.length - 1] : 0;
     const rows = [];
     for (let d = 1; d <= D; d++) {
       const revCols = intervals.map(function(gap) {
@@ -4176,7 +4148,7 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
     const bookTotal = getBookWords(state.currentBook).length;
     const avgWords = Math.ceil(bookTotal / N);
     document.getElementById("planFormulaSummary").textContent =
-      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 软件按艾宾浩斯间隔自动排期，共 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学，每天新学+复习不超过 5 个 List）· 复习间隔：" +
+      "当前生效配置：共 " + N + " 个 List（每组约 " + avgWords + " 词，总词数 " + bookTotal + " 词）· 软件按艾宾浩斯间隔自动排期，共 " + D + " 天（前 " + sched.learnDays + " 天完成首轮新学，每天新学 1 个 List）· 复习间隔：" +
       intervals.map(function(g) { return "+" + g + "天"; }).join(", ");
 
     document.getElementById("planTotalDaysSpan").textContent = String(D);
@@ -5233,7 +5205,7 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
     return true;
   }
 
-  /* The shipped Android WebView installs no DownloadListener, so a[download] is a silent
+  /* Some embedded WebViews install no download handler, so a[download] is a silent
      no-op there. Fire it anyway (a real mobile browser still saves the file) and always
      mirror text payloads into the copy-out box on the touch shell. */
   function downloadFileBlob(filename, contentData, mimeType) {
@@ -5243,11 +5215,11 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
       const copyable = typeof contentData === "string" &&
         /^(application\/json|text\/csv|text\/plain)/.test(type);
       if (!copyable) {
-        showToast("Android 版无法保存该文件，请在 Windows 版导出；备份可改用「导出完整学习备份 (.json)」");
+        showToast("当前环境无法保存该文件；备份可改用「导出完整学习备份 (.json)」");
         return "blocked";
       }
       if (contentData.length > 2000000) {
-        showToast("内容约 " + Math.round(contentData.length / 1024) + " KB，超出 Android 版可复制上限，请在 Windows 版导出");
+        showToast("内容约 " + Math.round(contentData.length / 1024) + " KB，超出可复制上限，请改用文件导出");
         return "blocked";
       }
       showTouchExport(filename, contentData, type);
@@ -5448,7 +5420,7 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
 
     // Left-click handler on Word Rows (Requirement 2: Manages Unfamiliarity 不会程度 +1)
     function handleWordListLeftClick(e) {
-      // Android synthesises a click after a long press; swallowing that echo is what keeps
+      // Mobile browsers synthesise a click after a long press; swallowing that echo is what keeps
       // "hold to lower" from immediately raising the same word back up again.
       if (Date.now() < suppressClickUntil) {
         if (e.stopPropagation) e.stopPropagation();
