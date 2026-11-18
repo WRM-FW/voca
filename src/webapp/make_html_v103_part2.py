@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 2 of Voca v1.0.8 HTML Application:
+Generates Part 2 of Voca v1.0.9 HTML Application:
 - High-DPI 256x256 brand icon in sidebar (version badge).
 - Removed '英英模式' (en_en) button from #langModeGroup (retains 双语 / 只看英文 / 只看中文).
 - Removed all '掌握度' (mastery) UI elements, keeping only '不会程度' (unfamiliarity 0..5).
@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.0.8</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.0.9</span></div>
       </div>
     </div>
 
@@ -71,9 +71,8 @@ HTML_PART2_TEMPLATE = r"""
     <!-- Top Global Toolbar -->
     <header class="top-header">
       <div class="header-left">
-        <select id="bookSelect" class="ctrl-select" title="选择当前内置词书 (共43,304词条)">
-          <option value="cet4" selected>四级核心 (CET-4 · 3,849词)</option>
-          <option value="cet4full">四级完整词表 (CET-4 · 4,449词)</option>
+        <select id="bookSelect" class="ctrl-select" disabled title="当前词书在「设置 → 学习计划」中选定；更换词书请去设置里重新生成计划 (共39,455词条)">
+          <option value="cet4full" selected>四级核心 (CET-4 · 4,449词)</option>
           <option value="cet6">六级核心 (CET-6 · 5,407词)</option>
           <option value="ky">考研核心 (硕士统考 · 4,801词)</option>
           <option value="zk">中考核心 (初中必备 · 1,603词)</option>
@@ -235,7 +234,7 @@ HTML_PART2_TEMPLATE = r"""
             <div>
               <h2 style="font-size:1.22rem; font-weight:800;" id="planHeaderTitle">艾宾浩斯遗忘曲线学习计划表</h2>
               <p style="font-size:0.84rem; color:var(--text-muted); margin-top:4px; white-space:normal;">
-                💡 <strong>说明</strong>：你只需设定 <strong>List 数量</strong>，天数由软件按艾宾浩斯间隔自动排期：每天新学 1 个 List，每个 List 在 +1/+2/+4/+7/+15 天各复习一次，共 N+15 天。调整后<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
+                💡 <strong>说明</strong>：学习计划在 <strong>设置 → 学习计划</strong> 中生成：选词书、定学习天数（List 数 = 学习天数）、选单词序列（默认随机），软件按艾宾浩斯间隔自动排期：每天新学 1 个 List，每个 List 在 +1/+2/+4/+7/+15 天各复习一次，共 学习天数+15 天。计划生成后整本书的切分即固定，学习页调整序列只改变当前 List 内的词序。重新生成计划时<strong>所有已背单词的不会程度、生词本、熟词表及打卡记录 100% 保留不丢失</strong>。
               </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
@@ -244,32 +243,9 @@ HTML_PART2_TEMPLATE = r"""
             </div>
           </div>
 
-          <div class="plan-custom-bar">
-            <label style="font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              自定义 List 个数:
-              <input type="number" id="planListCountInput" class="ctrl-input-num" min="1" max="365" step="1" value="15" title="自由输入 List 总数 (1 ~ 365)">
-              <span style="font-size:0.78rem; color:var(--text-muted); font-weight:500;">组</span>
-            </label>
-
-            <label style="font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              词序分配:
-              <select id="planOrderModeSelect" class="ctrl-select">
-                <option value="shuffle">乱序版本 (随机均分)</option>
-                <option value="az">正序版本 (A-Z均分)</option>
-                <option value="original">原序版本 (保持考纲词频序)</option>
-              </select>
-            </label>
-
-            <button class="btn btn-primary btn-sm" id="btnApplyCustomPlan">✓ 应用自定义计划配置</button>
-
-            <div class="plan-preset-pills" id="planPresetPills">
-              <span style="font-size:0.76rem; color:var(--text-muted);">快捷填充:</span>
-              <button type="button" class="preset-pill-btn" data-n="7">7组</button>
-              <button type="button" class="preset-pill-btn" data-n="10">10组</button>
-              <button type="button" class="preset-pill-btn active" data-n="15">15组</button>
-              <button type="button" class="preset-pill-btn" data-n="21">21组</button>
-              <button type="button" class="preset-pill-btn" data-n="30">30组</button>
-            </div>
+          <div class="plan-custom-bar" style="align-items:center;">
+            <span style="font-size:0.85rem; font-weight:600;" id="planCurrentSummary">尚未生成学习计划。</span>
+            <button class="btn btn-primary btn-sm" id="btnGotoPlanSettings">⚙️ 去设置生成 / 调整计划</button>
           </div>
 
           <div style="font-size:0.80rem; color:var(--brand-primary); font-weight:600; margin-top:8px;" id="planFormulaSummary">
@@ -420,7 +396,7 @@ HTML_PART2_TEMPLATE = r"""
           <div class="stat-card" style="padding:18px;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📥 外部自定义词库导入</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
-              软件已默认内置 9 大考试词书（共 43,304 词条，无需手动导入）。如需补充额外专业词汇，支持导入 CSV / TSV / TXT / JSON 文件（自动识别 UTF-8 与 GBK/GB18030 编码）。
+              软件已默认内置 8 大考试词书（共 39,455 词条，无需手动导入）。如需补充额外专业词汇，支持导入 CSV / TSV / TXT / JSON 文件（自动识别 UTF-8 与 GBK/GB18030 编码）。
             </p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
               <label class="btn btn-primary btn-sm" style="cursor:pointer;">
@@ -437,22 +413,40 @@ HTML_PART2_TEMPLATE = r"""
               <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; white-space:normal;">
                 手里有 PDF、Word、表格、网页或图片版的词表？把词库文件发给一个能在你电脑上读写文件的 AI Agent（如 Claude Code、Cursor 等本地 Agent），再把下方提示词粘贴给它。Agent 会把词直接写进 Voca 的数据文件——你什么都不用导，重新打开 Voca 就会看到词条已经自动进入「自定义词库」，并有导入成功的提示。
               </p>
-              <textarea id="agentPromptText" rows="7" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">你是一名能读写本地文件的 Agent 助手。我会给你一份单词资料（文件或文本），请你把这些词直接写进 Voca 背单词软件，全程不需要我手动导入或下载任何文件。
+              <textarea id="agentPromptText" rows="9" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">请读取我提供的、包含单词信息的词库文件，将其中的单词及相关信息整理、转换为 VOCA 软件兼容的词库格式，并直接写入 VOCA 软件的词库目录中，完成实际导入。
 
-你要做的事：
-1. 在这台电脑上找到 Voca 的安装目录：包含 Voca.exe 的文件夹，其下有 app 子文件夹（里面有 index.html 和 voca_auto_import.js）。找不到就问我路径，不要猜。
-2. 把词条整理好，写入 app 文件夹里的 voca_auto_import.js：文件里是一个 window.__VOCA_AUTO_IMPORTS__ 数组，一个批次一个对象；已有批次不要覆盖或改动，把新批次追加到数组末尾。格式：
-window.__VOCA_AUTO_IMPORTS__ = [
-  {
-    "id": "批次唯一标识，英文短横线命名并带日期，如 ielts-a-20261118",
-    "book": "这批词的来源名称，如：雅思核心词表",
-    "words": [
-      {"w": "abandon", "ipa": "/əˈbændən/", "cn": "v. 放弃，遗弃；n. 放任", "ex_en": "He abandoned the plan.", "ex_cn": "他放弃了这个计划。"}
-    ]
-  }
-];
-3. 词条整理规则：单词用原形（动词原形、名词单数），不要重复，保持资料原有顺序、不要漏词；音标用国际音标并带斜杠，资料里没有就按标准发音补，实在不确定就留空字符串；中文释义简洁准确、标注词性、多个义项用中文分号分隔；每个单词配一条自然地道的英文例句和中文翻译，难度与单词级别匹配；资料中有无法识别的内容单独列出说明，不要擅自编造词条。
-4. 写完后重新读取该文件，确认内容完整、能被当作 JavaScript 正常加载，然后告诉我：写进了多少个词、文件路径，并提醒我重新打开 Voca 即可看到（软件启动时会自动把这批词导入「自定义词库」，按批次 id 去重，重复打开不会重复导入）。
+具体要求：
+
+1. 读取与分析
+- 完整读取我提供的词库文件，识别其文件格式、数据结构及包含的单词信息。
+- 尽可能保留原始词库中的完整信息，包括单词、音标、词性、释义、例句、短语、词根词缀及其他相关字段。
+- 不得随意删减、篡改或臆造原始数据。
+
+2. 格式转换
+- 先检查 VOCA 项目的实际词库格式、数据结构、字段定义及导入机制（VOCA 的导入入口是安装目录 app 文件夹中的 voca_auto_import.js 批次文件，请先读取该文件以及软件中引用它的代码，确认当前版本的实际格式后再转换，不要凭猜测写格式）。
+- 根据软件当前版本的实际要求进行数据转换，确保字段映射准确、数据结构兼容。
+- 对原始文件中缺失的信息保持为空，不要自行编造。
+
+3. 直接写入 VOCA
+- 找到当前 VOCA 软件实际使用的词库存储位置（包含 Voca.exe 的安装目录，其 app 子文件夹即数据所在；找不到就问我路径，不要猜）。
+- 将转换后的词库直接写入 VOCA 实际使用的数据存储中（向 voca_auto_import.js 追加一个新批次，批次 id 唯一、带日期）。
+- 不要仅仅生成一个待导入文件，然后让我自己下载、复制或通过软件界面再次导入。
+- 不要把生成文件保存在无关目录后就视为任务完成。
+
+4. 数据安全
+- 写入前检查现有词库及相关数据，避免覆盖、删除或破坏已有内容（已有批次只追加、不改动）。
+- 妥善处理重复单词、重复词条及不同来源的数据冲突（重复词只保留一条）。
+- 必要时先备份将要修改的数据文件。
+
+5. 验证与交付
+- 完成写入后，检查实际写入的数据量、词条数量及数据完整性（重新读取写入的文件确认格式无误）。
+- 验证 VOCA 能否正常识别、加载和使用新词库（软件启动时会自动把新批次导入「用户自定义导入词库」，按批次 id 去重）。
+- 如果需要重启软件或刷新数据才能生效，请明确说明（本机制正是重新打开 VOCA 即生效）。
+- 最后向我报告词库来源、处理的词条数量、实际写入位置、验证结果及未能处理的问题。
+
+最终目标：由你直接完成从读取原始词库文件到写入 VOCA 并验证可用的全过程。我只负责提供原始词库文件，不负责中间的数据转换、文件搬运或二次手动导入。
+
+如果你无法访问 VOCA 项目目录或缺少必要的写入权限，请明确指出具体障碍，不要用生成文件代替实际导入，也不要虚报完成。
 
 我的单词资料见附件（或下文）：</textarea>
               <button class="btn btn-sm" id="btnCopyAgentPrompt">复制 Agent 提示词</button>
@@ -481,7 +475,7 @@ window.__VOCA_AUTO_IMPORTS__ = [
               <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v1.0.8
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.0.9
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -518,6 +512,28 @@ window.__VOCA_AUTO_IMPORTS__ = [
           <p>发音、主题与全局文字大小，均实时持久保存。</p>
         </div>
         <div class="panel-grid panel-grid-loose">
+          <!-- Study plan (v1.0.9): book + learn days + sequence are chosen here -->
+          <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
+            <h3 style="font-size:1.1rem; font-weight:800;">📅 学习计划</h3>
+            <p style="font-size:0.86rem; color:var(--text-secondary); white-space:normal;">选择词书与学习天数，软件按学习天数计算总 List 数（每天新学 1 个 List，总周期 = 学习天数 + 15 天）。单词序列决定整本书的切分顺序，默认为随机序列。计划生成后切分固定；之后在学习页调整序列只改变当前 List 内的词序，不改变整本书。更换词书也在这里重新生成计划。</p>
+            <div style="font-size:0.86rem; font-weight:600; color:var(--brand-primary);" id="planConfigSummary">尚未生成学习计划。</div>
+            <label style="font-size:0.86rem; font-weight:600;">词书
+              <select id="planBookSelect" class="ctrl-select" style="width:100%; margin-top:6px;"></select>
+            </label>
+            <label style="font-size:0.86rem; font-weight:600;">学习天数（天）
+              <input type="number" id="planLearnDaysInput" class="ctrl-input-num" min="1" max="365" step="1" value="75" style="width:100%; margin-top:6px;" title="用多少天学完这本词书的新词（1 ~ 365）">
+            </label>
+            <label style="font-size:0.86rem; font-weight:600;">单词序列
+              <select id="planSortSelect" class="ctrl-select" style="width:100%; margin-top:6px;">
+                <option value="random" selected>随机序列</option>
+                <option value="initial">初始序列</option>
+                <option value="az">字母升序 A→Z</option>
+                <option value="hard_first">不会的单词排前面</option>
+                <option value="easy_first">易掌握的单词排前面</option>
+              </select>
+            </label>
+            <button class="btn btn-primary" id="btnGeneratePlan">✓ 生成学习计划</button>
+          </div>
           <!-- Preferences -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
             <h3 style="font-size:1.1rem; font-weight:800;">⚙️ 学习与词典偏好设置</h3>
@@ -566,7 +582,7 @@ window.__VOCA_AUTO_IMPORTS__ = [
 
           <!-- Shortcuts & Architecture Info -->
           <div class="stat-card" style="padding:20px; display:flex; flex-direction:column; gap:12px; white-space:normal;">
-            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.8)</h3>
+            <h3 style="font-size:1.1rem; font-weight:800;">⌨️ 操作指南、在线词典与开源授权 (v1.0.9)</h3>
             <div style="font-size:0.83rem; color:var(--text-secondary); line-height:1.7;">
               <div>• <strong>左键/点击单词行</strong>：加深该词不会程度 (+1，上限 5/5) 并朗读发音</div>
               <div>• <strong>右键点击单词行</strong>：降低该词不会程度 (-1，下限 0/5)；触屏可长按同一行</div>
@@ -576,9 +592,9 @@ window.__VOCA_AUTO_IMPORTS__ = [
               <div class="d-only">• <strong>1 / 2 / 3 键</strong>：快速切换 双语 / 只看英文 / 只看中文 模式</div>
             </div>
             <div style="border-top:1px solid var(--border-color); padding-top:12px; font-size:0.82rem; color:var(--text-muted);">
-              <strong>字体、词库与在线词典声明 (v1.0.8)</strong>：<br>
+              <strong>字体、词库与在线词典声明 (v1.0.9)</strong>：<br>
               1) <strong>跨平台内嵌字体</strong>：内置 <strong>Inter</strong> 与 <strong>Noto Sans CJK SC</strong> (SIL Open Font License 1.1) WOFF2 字体包。<br>
-              2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>43,304</strong> 条词条，主要源自开源词典 <strong>ECDICT</strong>（MIT License）；「四级完整词表」的词序与释义来自用户自备的 CET-4 词表。<br>
+              2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>39,455</strong> 条词条，主要源自开源词典 <strong>ECDICT</strong>（MIT License）；「四级核心 (CET-4 · 4,449词)」的词序与释义来自用户自备的 CET-4 词表。<br>
               3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 部署了 Anubis 人机验证：它只放行顶层页面，嵌进本弹窗会一直停在验证页，因此 Voca 会在自己的「在线词典窗口」里以顶层页面打开它（不弹到系统浏览器）。三家词典的网页内容版权归各自平台所有。
             </div>
           </div>
@@ -631,7 +647,8 @@ window.__VOCA_AUTO_IMPORTS__ = [
       <div style="background:var(--bg-elevated); border:1px solid var(--border-color); border-radius:12px; padding:12px 14px;">
         <div style="font-size:0.78rem; font-weight:800; color:var(--brand-primary); margin-bottom:4px;">本地词库</div>
         <div style="font-size:0.92rem; color:var(--text-primary); line-height:1.55;" id="modalLocalCn"></div>
-        <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.55; margin-top:4px;" id="modalLocalEx"></div>
+        <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.55; margin-top:4px;" id="modalLocalExEn"></div>
+        <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.55;" id="modalLocalExCn"></div>
       </div>
       <!-- Online Dictionary Content Block (Replaces the 2 deleted blocks: '英英释义与同义词拓展' and '双语语境例句与助记') -->
       <div class="dict-online-box" id="modalOnlineDictSection">

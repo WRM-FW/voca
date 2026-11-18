@@ -2,6 +2,35 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.0.9] - 2026-11-18
+
+A plan-system and dictionary release: study plans are now configured once in Settings (book + learn days + word sequence) and frozen, examples show both languages line by line, WordReference renders inside the dictionary modal through a new native-host fetch bridge, and exports are named after the book and List they contain.
+
+### Changed — plan system: configured in Settings, then frozen
+- **Plan generation moved to Settings.** A new 学习计划 card in Settings takes a book, a number of learn days and a word sequence (随机序列 by default, i.e. random). The List count is derived from the learn days (one new List per day; total cycle = learn days + 15 with the +1/+2/+4/+7/+15 review intervals). Generating a plan freezes the book split into `state.planConfig {bookId, learnDays, sortMode, seed, createdAt}`.
+- **The top-bar book selector is now read-only** (disabled, with an explanatory tooltip): changing books means regenerating the plan in Settings. The Plan page's List-count input, order-mode selector and preset pills are gone; the page shows a summary of the frozen plan plus a shortcut button to Settings.
+- **Sequence changes are scoped to the current List.** The Learn page's sequence selector （初始/随机/字母/不会优先/易掌握优先） only reorders words inside the current List; it can no longer re-split the book. Verified: switching the in-list sequence leaves every List's membership unchanged.
+- **First run guidance.** With no plan configured, the app opens on Settings with a toast asking the user to pick a book, learn days and a sequence and generate a plan. Existing users upgrading are guided once the same way; their records are untouched.
+- **The "random" sequence is random again.** In-list random ordering previously used a fixed seed derived from the plan seed, so the "random" order was identical on every visit. It now uses a session-level salt (re-rolled whenever the user re-picks 随机序列）, and random is the default in-list sequence for new archives.
+
+### Changed — examples
+- **Bilingual examples now render on two lines** — the English sentence on one line, its Chinese translation on the next — in the Learn list, the notebook and the dictionary modal's local entry (previously the translation was appended in parentheses, and the Learn list showed no Chinese example at all).
+
+### Added — WordReference inside the modal (native host fetch bridge)
+- WordReference sends `X-Frame-Options: SAMEORIGIN`, offers no CORS header and runs an Anubis proof-of-work gate, so the page can neither frame nor fetch it (measured again 2026-11-18). The native host now exposes a fetch bridge: the page posts `{voca:"dict-fetch", id, url}` over the WebView2 message channel; the host loads the URL in its (hidden) dictionary WebView — a real top-level navigation that passes Anubis — polls for the rendered entry table, and posts the page HTML back. The modal parses it with the existing WordReference parser and renders it inline, in the same panel as Eudic. The dictionary window is no longer opened automatically; if the bridge is unavailable or the fetch fails, the modal shows the reason and a button to open the source page in the dictionary window.
+- The WordReference parser also strips the site's `SC / Simplified Chinese` tooltip noise from extracted glosses.
+- Host window title updated to v1.0.9. `switchTab` was hoisted out of `bindEvents` (plan generation and first-run guidance call it from module scope; previously those calls threw).
+
+### Changed — export file names
+- PDF/HTML exports are named after their content instead of the app: the current List exports as `四级核心_List_1.pdf` / `.html` (book display name + List number), the quiz as `… List N 默写测试卷`, the plan schedule as `<book> 学习计划表`, and the notebook as `生词本重难点强化手册`. Browser "save as PDF" gets the same name via a temporary `document.title`. The hardcoded `_v1.0.6` suffix is gone, and printable subtitles now use the book's display name instead of its internal id.
+
+### Removed — the old CET-4 core book; `cet4full` renamed
+- The **四级核心 (CET-4 · 3,849 words, id `cet4`)** book was removed, and **四级完整词表 (CET-4 · 4,449 words, id `cet4full`) was renamed to 四级核心 (CET-4 · 4,449词）** and made the default book. Archives parked on `cet4` (including legacy `all` / `core233` migrations and frozen plans) migrate to `cet4full`; learning records are headword-keyed and carry over. Book rows total 39,455 (was 43,304); the unique-word count is unchanged (14,956). Nine headwords existed only in the removed book and leave the library with it: automatically, parlor, leverage, optics, Englishman, disapprove, vitally, systematical, uptodate.
+
+### Changed — Agent prompt
+- The built-in Agent prompt was rewritten to the user's five-part structure (read & analyse → convert against the app's actual on-disk format → write directly into Voca → data safety → verify & report), with an explicit end goal (the user only supplies the source file) and an instruction to state concrete obstacles instead of substituting a hand-import file or claiming false completion.
+
+
 ## [1.0.8] - 2026-11-18
 
 Windows-only release. **Android remains paused** (see 1.0.5). A content + interaction release: adds the CET-4 complete word list as a built-in book, removes several low-value options and modes, and rebuilds the study plan around the Ebbinghaus curve.

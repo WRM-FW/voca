@@ -69,13 +69,18 @@ JS_ENGINE = r"""
       key: "wordreference",
       name: "WordReference 英汉词典",
       parseUrl: "https://www.wordreference.com/enzh/@word@",
-      // Measured 2026-10-17: the 200 document carries no framing header, but Anubis answers
-      // the first request with a 418 JS proof-of-work that never completes when the embedder
-      // is a file:// page. A top-level frame does pass — hence Voca's own second window.
+      // The site sends X-Frame-Options: SAMEORIGIN and no CORS header, and runs
+      // an Anubis proof-of-work gate, so the page itself can neither frame nor
+      // fetch it. Since v1.0.9 the native host loads the entry in its hidden
+      // dictionary WebView (a real top-level navigation, which passes Anubis)
+      // and hands the rendered HTML back; the modal then parses and renders it
+      // inline, exactly like Eudic. Only if that bridge is unavailable or
+      // fails does the modal offer a button to open the dictionary window.
       embedUrl: "",
       canEmbed: false,
       canFetch: false,
-      wantsDictWindow: true,
+      hostFetch: true,
+      wantsDictWindow: false,
     }
   };
 
@@ -92,6 +97,49 @@ JS_ENGINE = r"""
       if (data && data.voca === "dict-window") dictWindowAcks.seen++;
     });
   })();
+
+  /* v1.0.9: host dictionary fetch bridge (WordReference). The page posts
+     {voca:"dict-fetch", id, url} to the native host; the host loads the URL
+     in its hidden dictionary WebView and posts back
+     {voca:"dict-fetch-result", id, ok, html}. In a plain browser there is no
+     host, so the promise rejects immediately and the caller falls back. */
+  const hostDictFetches = {};
+  let hostDictFetchSeq = 0;
+  (function installHostDictFetchListener() {
+    const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+    if (!wv || typeof wv.addEventListener !== "function") return;
+    wv.addEventListener("message", function(ev) {
+      let data = ev && ev.data;
+      if (typeof data === "string") { try { data = JSON.parse(data); } catch (e) { return; } }
+      if (!data || data.voca !== "dict-fetch-result") return;
+      const slot = hostDictFetches[data.id];
+      if (!slot) return;
+      delete hostDictFetches[data.id];
+      clearTimeout(slot.timer);
+      if (data.ok && typeof data.html === "string" && data.html.length > 0) slot.resolve(data.html);
+      else slot.reject(new Error(data.error || "host fetch failed"));
+    });
+  })();
+
+  function hostDictFetch(url, timeoutMs) {
+    return new Promise(function(resolve, reject) {
+      const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
+      if (!wv || typeof wv.postMessage !== "function") { reject(new Error("no host bridge")); return; }
+      const id = ++hostDictFetchSeq;
+      const timer = setTimeout(function() {
+        delete hostDictFetches[id];
+        reject(new Error("host fetch timeout"));
+      }, timeoutMs || 20000);
+      hostDictFetches[id] = { resolve: resolve, reject: reject, timer: timer };
+      try {
+        wv.postMessage({ voca: "dict-fetch", id: id, url: url });
+      } catch (e) {
+        clearTimeout(timer);
+        delete hostDictFetches[id];
+        reject(e);
+      }
+    });
+  }
 
   function openInVocaDictWindow(url) {
     const wv = (typeof window !== "undefined" && window.chrome && window.chrome.webview) || null;
@@ -110,11 +158,11 @@ JS_ENGINE = r"""
   const defaultState = {
     schemaVersion: 4,
     appVersion: "1.0.6",
-    currentBook: "cet4",
+    currentBook: "cet4full",
     currentListIndex: 0,
     langMode: "bilingual",      // bilingual | en_only | cn_only (en_en removed in v1.0.3)
     layoutMode: "list",         // list | card
-    intraSort: "initial",       // initial | az | random | hard_first | easy_first
+    intraSort: "random",        // initial | az | random | hard_first | easy_first (v1.0.9: random is the default)
     planListCount: 15,
     planCycleDays: 30,
     planOrderMode: "shuffle",   // shuffle | az | original
@@ -124,6 +172,7 @@ JS_ENGINE = r"""
     records: {},                // wordKey -> { unfam: 0..5, starred: false, starredAt: 0, mastered: false, customCn: "", note: "" }
     customWords: [],
     agentImportBatches: {},   // v1.0.8: batchId -> {at, count, book} for Agent direct write-in imports
+    planConfig: null,         // v1.0.9: {bookId, learnDays, sortMode, seed, createdAt} frozen at plan generation
     modeHintsShown: {
       en_only: false,
       cn_only: false
@@ -176,7 +225,9 @@ JS_ENGINE = r"""
   let currentModalWordId = null;
   let currentDictAbortCtrl = null;
   let lastPrintHtmlContent = "";
+  let intraShuffleSalt = (Math.random() * 1000000000) | 0;
   let lastPrintTitle = "Voca_Print_Sheet";
+  let lastPrintFileBase = "";
   let lastPrintDocData = null;
 
   // ==================== 1. PERSISTENCE & V1.0.0/V1.0.1/V1.0.2 -> V1.0.3 MIGRATION ====================
@@ -202,6 +253,8 @@ JS_ENGINE = r"""
     merged.planChecks = (loaded && loaded.planChecks) || {};
     merged.customWords = Array.isArray(loaded && loaded.customWords) ? loaded.customWords : [];
     merged.agentImportBatches = (loaded && loaded.agentImportBatches && typeof loaded.agentImportBatches === "object" && !Array.isArray(loaded.agentImportBatches)) ? loaded.agentImportBatches : {};
+    merged.planConfig = (loaded && loaded.planConfig && typeof loaded.planConfig === "object" && loaded.planConfig.bookId) ? loaded.planConfig : null;
+    if (merged.planConfig && merged.planConfig.bookId === "cet4") merged.planConfig.bookId = "cet4full";
 
     // 1. Validate Theme
     if (VALID_THEMES.indexOf(merged.settings.theme) === -1) {
@@ -219,10 +272,10 @@ JS_ENGINE = r"""
     }
 
     // 4. Migrate legacy Row Click Modes (from mastery-based v1.0.1/v1.0.2 to unfam-based v1.0.3)
-    // v1.0.8: the core233 book was removed; park its users on cet4. Learning
+    // v1.0.8: the core233 book was removed; park its users on cet4full. Learning
     // records are headword-keyed, so their progress carries over.
     if (merged.currentBook === "core233") {
-      merged.currentBook = "cet4";
+      merged.currentBook = "cet4full";
     }
     // v1.0.8: row-click behaviour is fixed (no user-selectable modes) and the
     // Australian accent option was removed; normalise both legacy values.
@@ -237,12 +290,14 @@ JS_ENGINE = r"""
     // An unknown value would leave #sortSelect showing nothing.
     const validIntraSorts = ["initial", "random", "az", "hard_first", "easy_first"];
     if (validIntraSorts.indexOf(merged.intraSort) === -1) {
-      merged.intraSort = "initial";
+      merged.intraSort = "random";
     }
 
     // 6. Migrate legacy Book IDs
     const bookMigrationMap = {
-      all: "cet4",
+      all: "cet4full",
+      cet4: "cet4full",
+      core233: "cet4full",
       kaoyan: "ky",
       academic: "ielts"
     };
@@ -599,6 +654,19 @@ JS_ENGINE = r"""
     bookCache["custom"] = (state.customWords || []).slice();
   }
 
+  function getBookDisplayName(bookId) {
+    const sel = document.getElementById("bookSelect");
+    if (sel) {
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === bookId) {
+          return (sel.options[i].textContent || bookId).replace(/\s*\(.*?\)\s*/g, "").trim() || bookId;
+        }
+      }
+    }
+    if (bookId === "custom") return "用户自定义导入词库";
+    return bookId;
+  }
+
   function getBookWords(bookId) {
     if (bookCache[bookId]) return bookCache[bookId].slice();
     const pairs = VOCA_PACK.bookMap[bookId];
@@ -641,13 +709,37 @@ JS_ENGINE = r"""
     return copy;
   }
 
+  function sortPoolByMode(pool, mode, seed) {
+    const arr = pool.slice();
+    if (mode === "az") {
+      arr.sort(function(a, b) { return a.word.localeCompare(b.word); });
+    } else if (mode === "shuffle" || mode === "random") {
+      return seededShuffle(arr, seed || 20261016);
+    } else if (mode === "hard_first") {
+      arr.sort(function(a, b) { return (getRecord(b.id).unfam || 0) - (getRecord(a.id).unfam || 0); });
+    } else if (mode === "easy_first") {
+      arr.sort(function(a, b) { return (getRecord(a.id).unfam || 0) - (getRecord(b.id).unfam || 0); });
+    } else {
+      arr.sort(function(a, b) { return (a.seq || 0) - (b.seq || 0); });
+    }
+    return arr;
+  }
+
   function buildListsForCurrentBook() {
-    let pool = getBookWords(state.currentBook);
-    if (state.planOrderMode === "az") {
+    // v1.0.9: when a plan has been generated in Settings, its book split is
+    // frozen with the plan (book, learn days, sequence, seed). Changing the
+    // in-list sequence on the Learn page never re-splits the book.
+    const pc = state.planConfig;
+    let pool;
+    if (pc && pc.bookId === state.currentBook) {
+      pool = sortPoolByMode(getBookWords(state.currentBook), pc.sortMode, pc.seed);
+    } else if (state.planOrderMode === "az") {
+      pool = getBookWords(state.currentBook);
       pool.sort(function(a, b) { return a.word.localeCompare(b.word); });
     } else if (state.planOrderMode === "shuffle") {
-      pool = seededShuffle(pool, state.planShuffleSeed);
+      pool = seededShuffle(getBookWords(state.currentBook), state.planShuffleSeed);
     } else {
+      pool = getBookWords(state.currentBook);
       pool.sort(function(a, b) { return (a.seq || 0) - (b.seq || 0); });
     }
 
@@ -765,7 +857,10 @@ JS_ENGINE = r"""
     if (state.intraSort === "az") {
       filtered.sort(function(a, b) { return a.word.localeCompare(b.word); });
     } else if (state.intraSort === "random") {
-      filtered = seededShuffle(filtered, state.planShuffleSeed + state.currentListIndex + 7);
+      // v1.0.9: session-level salt — the old fixed seed made "random" identical
+      // on every visit. Re-picking the random sequence re-rolls the salt (see
+      // the select handler); renders within a session stay stable.
+      filtered = seededShuffle(filtered, intraShuffleSalt + state.currentListIndex * 131 + 7);
     } else if (state.intraSort === "hard_first") {
       filtered.sort(function(a, b) {
         return (getRecord(b.id).unfam || 0) - (getRecord(a.id).unfam || 0);
@@ -974,7 +1069,8 @@ JS_ENGINE = r"""
 
       const meaningBody =
         '<div class="w-cn' + meanMasked + '" data-peek="1">' + escapeHtml(cn) + '</div>' +
-        '<div class="w-ex">' + escapeHtml(w.ex_en) + '</div>';
+        (w.ex_en ? '<div class="w-ex">' + escapeHtml(w.ex_en) + '</div>' : '') +
+        (w.ex_cn ? '<div class="w-ex w-ex-cn' + meanMasked + '" data-peek="1">' + escapeHtml(w.ex_cn) + '</div>' : '');
 
       html +=
         '<div class="word-row" data-wid="' + w.id + '" data-unfam="' + (rec.unfam || 0) + '">' +
@@ -1076,14 +1172,7 @@ JS_ENGINE = r"""
     const D = sched.D;
     const intervals = sched.intervals;
 
-    const nInput = document.getElementById("planListCountInput");
-    if (nInput && document.activeElement !== nInput) nInput.value = String(state.planListCount);
-    document.getElementById("planOrderModeSelect").value = state.planOrderMode;
-
-    document.querySelectorAll("#planPresetPills .preset-pill-btn").forEach(function(btn) {
-      const bn = parseInt(btn.dataset.n, 10);
-      btn.classList.toggle("active", bn === state.planListCount);
-    });
+    renderPlanConfigSummary();
 
     for (let sIdx = 0; sIdx < 5; sIdx++) {
       const th = document.getElementById("thRev" + (sIdx + 1));
@@ -1329,7 +1418,7 @@ JS_ENGINE = r"""
             '</div>' +
             '<div class="w-meaning-col">' +
               '<div class="w-cn">' + escapeHtml(getEffectiveCnDef(w)) + '</div>' +
-              (rec.note ? '<div class="w-ex" style="color:var(--amber-mark);">笔记: ' + escapeHtml(rec.note) + '</div>' : '<div class="w-ex">' + escapeHtml(w.ex_en) + '</div>') +
+              (rec.note ? '<div class="w-ex" style="color:var(--amber-mark);">笔记: ' + escapeHtml(rec.note) + '</div>' : (w.ex_en ? '<div class="w-ex">' + escapeHtml(w.ex_en) + '</div>' : '') + (w.ex_cn ? '<div class="w-ex w-ex-cn">' + escapeHtml(w.ex_cn) + '</div>' : '')) +
             '</div>' +
             '<div class="w-actions">' +
               '<button class="btn btn-sm" data-act="dict" data-wid="' + w.id + '">词典/编辑</button>' +
@@ -1440,6 +1529,7 @@ JS_ENGINE = r"""
     ) {
       return { notFound: true, entries: [] };
     }
+    doc.querySelectorAll(".tooltip, i.copy").forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
     const rows = doc.querySelectorAll("table.WRD tr.even, table.WRD tr.odd");
     rows.forEach(function (tr) {
       const fromW = tr.querySelector(".FrWrd");
@@ -1569,6 +1659,31 @@ JS_ENGINE = r"""
         '</div>';
     }
 
+    // Host bridge unavailable/failed: stay inside the modal and offer the
+    // dictionary window as an explicit user action (never auto-opened).
+    function renderHostFetchFallback() {
+      clearFrame();
+      statusBanner.className = "dict-status-banner dict-status-warn";
+      statusBanner.textContent = "⚠ 【" + dictCfg.name + "】的内嵌抓取未成功";
+      parsedBox.innerHTML =
+        '<div class="dict-parsed-note">' +
+          '<div>该站禁止被嵌入、也不开放跨域读取，Voca 改用宿主词典通道抓取渲染后的词条页在弹窗内显示；本次抓取未成功（可能未通过该站的人机验证，或当前不是通过最新版 Voca.exe 打开）。</div>' +
+          '<div style="margin-top:8px;"><button type="button" class="btn btn-sm btn-primary" id="btnWrOpenDictWindow">在词典窗口打开 ' + escapeHtml(dictCfg.name) + ' 源页面</button></div>' +
+          '<div style="margin-top:6px;">• 源站地址：<code>' + escapeHtml(parseUrl) + '</code></div>' +
+          localRefHtml() +
+        '</div>';
+      const btn = document.getElementById("btnWrOpenDictWindow");
+      if (btn) {
+        btn.addEventListener("click", function() {
+          openInVocaDictWindow(parseUrl).then(function(ok) {
+            if (myQuery !== dictQuerySeq) return;
+            if (ok) renderDictWindowOpened(parseUrl);
+            else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用最新版 Voca.exe，或在浏览器中打开源页面。");
+          });
+        });
+      }
+    }
+
     function renderOpenOnly(reason) {
       clearFrame();
       statusBanner.className = "dict-status-banner dict-status-warn";
@@ -1618,6 +1733,27 @@ JS_ENGINE = r"""
       return;
     }
 
+    if (dictCfg.hostFetch) {
+      // Same inline experience as Eudic: the host fetches the rendered entry,
+      // the modal parses and shows it here — no separate window by default.
+      statusBanner.textContent = "⏳ 正在通过 Voca 词典通道查询【" + dictCfg.name + "】词条“" + w.word + "”（该站需先通过其人机验证，可能需要几秒）...";
+      hostDictFetch(parseUrl, 22000).then(function(htmlText) {
+        if (myQuery !== dictQuerySeq) return;
+        const parsed = parseOnlineDictionaryHtml(htmlText, dictKey, w.word);
+        if (parsed.notFound) {
+          renderNotFoundState();
+        } else if (!parsed.entries.length) {
+          renderFallbackFailure("词典通道已返回页面，但没有解析到释义内容。");
+        } else {
+          renderParsedSuccess(parsed.entries);
+        }
+      }).catch(function() {
+        if (myQuery !== dictQuerySeq) return;
+        renderHostFetchFallback();
+      });
+      return;
+    }
+
     if (!dictCfg.canFetch) {
       if (!dictCfg.wantsDictWindow) {
         renderOpenOnly(dictCfg.name + " 不开放跨域读取，也不允许被嵌入。");
@@ -1626,7 +1762,7 @@ JS_ENGINE = r"""
       openInVocaDictWindow(parseUrl).then(function(ok) {
         if (myQuery !== dictQuerySeq) return;
         if (ok) renderDictWindowOpened(parseUrl);
-        else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用 v1.0.6 的 Voca.exe（原生 WebView2 宿主），" +
+        else renderOpenOnly("当前宿主没有可用的 Voca 词典窗口：请使用最新版 Voca.exe（原生 WebView2 宿主），" +
                             "或点右上角「↗ 词典窗口打开源页面」。");
       });
       return;
@@ -1688,7 +1824,10 @@ JS_ENGINE = r"""
     document.getElementById("modalDictIpa").textContent = getPhoneticString(w);
     // v1.0.8: the local lexicon entry renders instantly, before any network result.
     document.getElementById("modalLocalCn").textContent = getEffectiveCnDef(w);
-    document.getElementById("modalLocalEx").textContent = w.ex_en ? (w.ex_en + (w.ex_cn ? "（" + w.ex_cn + "）" : "")) : "（暂无例句）";
+    document.getElementById("modalLocalExEn").textContent = w.ex_en || "（暂无例句）";
+    const localExCnEl = document.getElementById("modalLocalExCn");
+    localExCnEl.textContent = w.ex_cn || "";
+    localExCnEl.style.display = w.ex_cn ? "" : "none";
     document.getElementById("modalEditCnInput").value = getEffectiveCnDef(w);
     document.getElementById("modalEditNoteInput").value = rec.note || "";
     document.getElementById("modalUnfamVal").textContent = String(rec.unfam || 0);
@@ -1699,6 +1838,66 @@ JS_ENGINE = r"""
   }
 
   // ==================== 10. MULTI-PAGE PDF EXPORT, PRINT & HTML EXPORT ====================
+  // v1.0.9: the plan is configured once in Settings — book, learn days and
+  // word sequence (random by default). Learn days become the List count
+  // (one new List per day, +15 review days). The split is frozen into
+  // state.planConfig; later sequence changes on the Learn page only reorder
+  // words inside the current List, never the book split.
+  function renderPlanConfigSummary() {
+    const pbs = document.getElementById("planBookSelect");
+    const bs = document.getElementById("bookSelect");
+    if (pbs && bs && !pbs.options.length) pbs.innerHTML = bs.innerHTML;
+    const pc = state.planConfig;
+    const sortNames = { random: "随机序列", shuffle: "随机序列", initial: "初始序列", original: "初始序列", az: "字母升序 A→Z", hard_first: "不会的单词排前面", easy_first: "易掌握的单词排前面" };
+    let text;
+    if (pc) {
+      const total = getBookWords(pc.bookId).length;
+      const per = total ? Math.ceil(total / pc.learnDays) : 0;
+      text = "当前计划：" + getBookDisplayName(pc.bookId) + " · 学习天数 " + pc.learnDays + " 天 → 共 " + pc.learnDays + " 个 List（每 List 约 " + per + " 词）· 单词序列：" + (sortNames[pc.sortMode] || pc.sortMode) + " · 总周期 " + (pc.learnDays + 15) + " 天（每天新学 1 个 List，+1/+2/+4/+7/+15 天复习）";
+    } else {
+      text = "尚未生成学习计划：在下方选择词书、学习天数与单词序列，点「生成学习计划」。";
+    }
+    ["planConfigSummary", "planCurrentSummary"].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    });
+    if (pc) {
+      if (pbs) pbs.value = pc.bookId;
+      const di = document.getElementById("planLearnDaysInput");
+      if (di && document.activeElement !== di) di.value = String(pc.learnDays);
+      const ss = document.getElementById("planSortSelect");
+      if (ss) ss.value = pc.sortMode === "shuffle" ? "random" : pc.sortMode;
+    }
+  }
+
+  function generatePlanFromSettings() {
+    const bookSel = document.getElementById("planBookSelect");
+    const bookId = (bookSel && bookSel.value) || state.currentBook || "cet4full";
+    const daysRaw = parseInt((document.getElementById("planLearnDaysInput") || {}).value, 10);
+    const learnDays = Math.max(1, Math.min(365, isNaN(daysRaw) ? 75 : daysRaw));
+    const sortSel = document.getElementById("planSortSelect");
+    const sortMode = (sortSel && sortSel.value) || "random";
+    state.planConfig = {
+      bookId: bookId,
+      learnDays: learnDays,
+      sortMode: sortMode,
+      seed: (Date.now() % 1000000) + ((Math.random() * 1000) | 0),
+      createdAt: Date.now()
+    };
+    state.planListCount = learnDays;
+    state.currentBook = bookId;
+    state.currentListIndex = 0;
+    state.planActiveDay = 1;
+    const topSel = document.getElementById("bookSelect");
+    if (topSel) topSel.value = bookId;
+    saveState();
+    refreshAllViews();
+    renderPlanConfigSummary();
+    playTone("success");
+    showToast("✓ 学习计划已生成：" + getBookDisplayName(bookId) + " · " + learnDays + " 个 List · 总周期 " + (learnDays + 15) + " 天（学习记录已无损保留）");
+    switchTab("plan");
+  }
+
   // v1.0.8: Agent direct write-in. An AI agent with local file access writes
   // batches into app/voca_auto_import.js (window.__VOCA_AUTO_IMPORTS__); the
   // head script tag loads it before boot, and on startup every batch whose id
@@ -1792,18 +1991,17 @@ JS_ENGINE = r"""
     });
     if (added > 0) {
       rebuildCustomBookCache();
-      state.currentBook = "custom";
-      document.getElementById("bookSelect").value = "custom";
       saveState();
       refreshAllViews();
-      showToast("成功导入 " + added + " 个自定义词条！");
+      showToast("成功导入 " + added + " 个自定义词条，已收入「用户自定义导入词库」（当前词书不变；要用它学习请到设置里生成计划时选择它）");
     } else {
       showToast("未识别到有效词条，请检查每行格式：单词, 音标, 释义");
     }
   }
 
-  function openPrintPreviewModal(title, bodyHtml, docData) {
+  function openPrintPreviewModal(title, bodyHtml, docData, fileBase) {
     lastPrintTitle = title;
+    lastPrintFileBase = fileBase || title;
     lastPrintHtmlContent = bodyHtml;
     lastPrintDocData = docData || null;
     document.getElementById("printModalTitle").textContent = title;
@@ -1821,7 +2019,7 @@ JS_ENGINE = r"""
     const N = sched.N;
     const D = sched.D;
     const intervals = sched.intervals;
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · List 数: " + N + " 组 · 总周期: " + D + " 天（软件按艾宾浩斯自动排期） · 复习间隔: " + intervals.map(function(g) { return "+" + g + "天"; }).join("/");
+    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · List 数: " + N + " 组 · 总周期: " + D + " 天（软件按艾宾浩斯自动排期） · 复习间隔: " + intervals.map(function(g) { return "+" + g + "天"; }).join("/");
 
     const headers = [
       "天数",
@@ -1838,7 +2036,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.6 自定义艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.0.9 艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -1868,7 +2066,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.0.6 自定义艾宾浩斯背单词计划表",
+        title: "Voca v1.0.9 艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -1880,7 +2078,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + state.currentBook.toUpperCase() + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.6 离线背单词工坊";
+    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.0.9 离线背单词工坊";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -2312,19 +2510,18 @@ JS_ENGINE = r"""
   }
 
   // ==================== 11. EVENT LISTENERS ====================
+  function switchTab(tabId) {
+    document.body.setAttribute("data-tab", tabId);
+    document.querySelectorAll(".view-section").forEach(function(sec) {
+      sec.classList.toggle("active", sec.id === "view-" + tabId);
+    });
+    document.querySelectorAll("#desktopNav .nav-btn, #mobileNav .mob-nav-btn").forEach(function(btn) {
+      btn.classList.toggle("active", btn.dataset.tab === tabId);
+    });
+    refreshAllViews();
+  }
+
   function bindEvents() {
-    function switchTab(tabId) {
-      document.body.setAttribute("data-tab", tabId);
-      document.querySelectorAll(".view-section").forEach(function(sec) {
-        sec.classList.toggle("active", sec.id === "view-" + tabId);
-      });
-      document.querySelectorAll("#desktopNav .nav-btn, #mobileNav .mob-nav-btn").forEach(function(btn) {
-        btn.classList.toggle("active", btn.dataset.tab === tabId);
-      });
-      if (tabId !== "train") {
-      }
-      refreshAllViews();
-    }
 
     document.getElementById("desktopNav").addEventListener("click", function(e) {
       const btn = e.target.closest(".nav-btn");
@@ -2390,6 +2587,7 @@ JS_ENGINE = r"""
 
     document.getElementById("sortSelect").addEventListener("change", function(e) {
       state.intraSort = e.target.value;
+      if (state.intraSort === "random") intraShuffleSalt = (Math.random() * 1000000000) | 0; // re-roll: picking random again reshuffles
       saveState();
       renderLearnView();
     });
@@ -2639,8 +2837,8 @@ JS_ENGINE = r"""
 
     document.getElementById("btnPrintCurrentList").addEventListener("click", function() {
       const wordsArr = currentLists[state.currentListIndex] || [];
-      const built = buildPrintableWordListHtml(wordsArr, "Voca · List " + (state.currentListIndex + 1) + " 单词背诵清单", false);
-      openPrintPreviewModal("List " + (state.currentListIndex + 1) + " 单词背诵表", built.html, built.docData);
+      const built = buildPrintableWordListHtml(wordsArr, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " · 单词背诵清单", false);
+      openPrintPreviewModal("List " + (state.currentListIndex + 1) + " 单词背诵表", built.html, built.docData, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1));
     });
 
     // Immersive Card Controls (Unfamiliarity-only)
@@ -2740,41 +2938,10 @@ JS_ENGINE = r"""
       if (w) openDictModal(w.id);
     });
 
-    // Custom Ebbinghaus Plan Events
-    function applyCustomPlanInputs() {
-      const rawN = document.getElementById("planListCountInput").value;
-      const clean = sanitizePlanParams(rawN, 0);
-      state.planListCount = clean.n;
-      document.getElementById("planListCountInput").value = String(clean.n);
-      buildListsForCurrentBook();
-      const sched = computeCustomEbbinghausSchedule();
-      if (state.planActiveDay > sched.D) {
-        state.planActiveDay = 1;
-      }
-      saveState();
-      refreshAllViews();
-      playTone("success");
-      showToast("✓ 已应用计划：" + clean.n + " 个 List · 软件自动排期共 " + sched.D + " 天（学习记录已无损保留）");
-    }
-
-    document.getElementById("btnApplyCustomPlan").addEventListener("click", applyCustomPlanInputs);
-    document.getElementById("planListCountInput").addEventListener("change", applyCustomPlanInputs);
-
-    document.getElementById("planPresetPills").addEventListener("click", function(e) {
-      const btn = e.target.closest(".preset-pill-btn");
-      if (!btn) return;
-      document.getElementById("planListCountInput").value = btn.dataset.n;
-      applyCustomPlanInputs();
-    });
-
-    document.getElementById("planOrderModeSelect").addEventListener("change", function(e) {
-      state.planOrderMode = e.target.value;
-      if (state.planOrderMode === "shuffle") {
-        state.planShuffleSeed = Date.now() % 1000000;
-      }
-      saveState();
-      refreshAllViews();
-    });
+    // v1.0.9: plans are generated in Settings (book + learn days + sequence)
+    // and then frozen; the Plan page only displays them.
+    document.getElementById("btnGeneratePlan").addEventListener("click", generatePlanFromSettings);
+    document.getElementById("btnGotoPlanSettings").addEventListener("click", function() { switchTab("settings"); });
 
     document.getElementById("planDayPicker").addEventListener("change", function(e) {
       state.planActiveDay = parseInt(e.target.value, 10) || 1;
@@ -2807,7 +2974,7 @@ JS_ENGINE = r"""
 
     document.getElementById("btnPrintPlanSchedule").addEventListener("click", function() {
       const built = buildPrintableScheduleHtml();
-      openPrintPreviewModal("自定义艾宾浩斯学习计划表", built.html, built.docData);
+      openPrintPreviewModal("艾宾浩斯学习计划表", built.html, built.docData, getBookDisplayName(state.currentBook) + " 学习计划表");
     });
 
     document.getElementById("trainSourceSelect").addEventListener("change", function() {
@@ -2875,8 +3042,8 @@ JS_ENGINE = r"""
     });
     document.getElementById("btnPrintStarredBook").addEventListener("click", function() {
       const starred = getAllKnownWordsForNotebook().filter(function(w) { return getRecord(w.id).starred; });
-      const built = buildPrintableWordListHtml(starred, "Voca · 生词本重难点强化手册", false);
-      openPrintPreviewModal("生词本重难词汇总表", built.html, built.docData);
+      const built = buildPrintableWordListHtml(starred, "生词本重难点强化手册", false);
+      openPrintPreviewModal("生词本重难词汇总表", built.html, built.docData, "生词本重难点强化手册");
     });
 
     // Add Custom Word Modal
@@ -3052,11 +3219,9 @@ JS_ENGINE = r"""
                 }
               });
               rebuildCustomBookCache();
-              state.currentBook = "custom";
-              document.getElementById("bookSelect").value = "custom";
               saveState();
               refreshAllViews();
-              showToast("成功从 JSON 导入 " + arr.length + " 个词条");
+              showToast("成功从 JSON 导入 " + arr.length + " 个词条，已收入「用户自定义导入词库」（当前词书不变）");
               return;
             }
           } catch (ex) {}
@@ -3069,17 +3234,17 @@ JS_ENGINE = r"""
     // Multi-Page PDF / Print / HTML Export Buttons
     document.getElementById("btnExportPdfSchedule").addEventListener("click", function() {
       const built = buildPrintableScheduleHtml();
-      openPrintPreviewModal("自定义艾宾浩斯学习计划表", built.html, built.docData);
+      openPrintPreviewModal("艾宾浩斯学习计划表", built.html, built.docData, getBookDisplayName(state.currentBook) + " 学习计划表");
     });
     document.getElementById("btnExportPdfListBilingual").addEventListener("click", function() {
       const arr = currentLists[state.currentListIndex] || [];
-      const built = buildPrintableWordListHtml(arr, "Voca · List " + (state.currentListIndex + 1) + " 双语对照表", false);
-      openPrintPreviewModal("当前 List 双语背诵表", built.html, built.docData);
+      const built = buildPrintableWordListHtml(arr, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " · 双语对照表", false);
+      openPrintPreviewModal("当前 List 双语背诵表", built.html, built.docData, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1));
     });
     document.getElementById("btnExportPdfListQuiz").addEventListener("click", function() {
       const arr = currentLists[state.currentListIndex] || [];
-      const built = buildPrintableWordListHtml(arr, "Voca · List " + (state.currentListIndex + 1) + " 默写测试卷", true);
-      openPrintPreviewModal("当前 List 默写自测卷", built.html, built.docData);
+      const built = buildPrintableWordListHtml(arr, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " · 默写测试卷", true);
+      openPrintPreviewModal("当前 List 默写自测卷", built.html, built.docData, getBookDisplayName(state.currentBook) + " List " + (state.currentListIndex + 1) + " 默写测试卷");
     });
     document.getElementById("btnExportPdfStarred").addEventListener("click", function() {
       const starred = getAllKnownWordsForNotebook().filter(function(w) { return getRecord(w.id).starred; });
@@ -3094,7 +3259,7 @@ JS_ENGINE = r"""
     document.getElementById("btnDownloadDirectPdf").addEventListener("click", function() {
       if (!lastPrintDocData) return;
       const res = generateMultiPagePdfBinary(lastPrintDocData);
-      const safeName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.6.pdf";
+      const safeName = (lastPrintFileBase || lastPrintTitle).replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + ".pdf";
       window.__LAST_GENERATED_PDF_INFO__ = {
         filename: safeName,
         pageCount: res.pageCount,
@@ -3107,6 +3272,11 @@ JS_ENGINE = r"""
 
     document.getElementById("btnTriggerBrowserPrint").addEventListener("click", function() {
       document.getElementById("dedicatedPrintRoot").innerHTML = lastPrintHtmlContent;
+      const prevTitle = document.title;
+      document.title = lastPrintFileBase || lastPrintTitle;
+      const restoreTitle = function() { document.title = prevTitle; window.removeEventListener("afterprint", restoreTitle); };
+      window.addEventListener("afterprint", restoreTitle);
+      setTimeout(restoreTitle, 5000);
       window.print();
     });
 
@@ -3122,7 +3292,7 @@ JS_ENGINE = r"""
         "th, td { border: 1px solid #94A3B8; padding: 6px 8px; word-break: break-word; }" +
         "th { background: #F1F5F9; }" +
         "</style></head><body>" + lastPrintHtmlContent + "</body></html>";
-      const safeHtmlName = lastPrintTitle.replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + "_v1.0.6.html";
+      const safeHtmlName = (lastPrintFileBase || lastPrintTitle).replace(/[^\w\u4e00-\u9fa5\-]+/g, "_") + ".html";
       window.__LAST_GENERATED_HTML_INFO__ = {
         filename: safeHtmlName,
         byteLength: standalone.length
@@ -3135,11 +3305,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.0.8",
+        version: "1.0.9",
         exportedAt: new Date().toISOString(),
         state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.0.8_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.0.9_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 
@@ -3351,6 +3521,11 @@ JS_ENGINE = r"""
     bindEvents();
     refreshAllViews();
     applyAgentAutoImports();
+    renderPlanConfigSummary();
+    if (!state.planConfig) {
+      switchTab("settings");
+      showToast("👋 先在「学习计划」里选择词书、学习天数和单词序列（默认随机），生成你的学习计划");
+    }
   }
 
   if (document.readyState === "loading") {

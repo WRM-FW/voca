@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Generates Part 1 of Voca v1.0.8 HTML Application:
+Generates Part 1 of Voca v1.0.9 HTML Application:
 - Multi-size High-DPI <link rel="icon"> tags (256/192/128/64/48/32/16 + voca.ico) so Windows taskbar & titlebar icons in --app mode are never downsampled to 16x16.
 - Embedded cross-platform @font-face (VocaSans Inter + VocaSansCJK Noto Sans CJK SC).
 - Removed Mastery (.mastery-badge, data-mastery) styles; enhanced Unfamiliarity (.unfam-badge, data-unfam) styles.
@@ -31,7 +31,7 @@ HTML_PART1_TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#0B3B8C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows)</title>
+<title>Voca v1.0.9 — 离线艾宾浩斯背单词工坊 (Windows)</title>
 <script src="voca_auto_import.js"></script>
 <!-- Window / taskbar icons. Windows asks the shell for a DPI-exact small icon
      (16@100%, 20@125%, 24@150%, 28@175%, 32@200%, 36@225%, 40@250%, 48@300%).
@@ -674,7 +674,8 @@ html, body {
   word-break: break-word;
 }
 
-.w-ex {
+.w-ex-cn { color: var(--text-secondary); margin-top: 1px; }
+    .w-ex {
   font-size: 0.79rem;
   color: var(--text-muted);
   word-break: break-word;

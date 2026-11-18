@@ -1,5 +1,5 @@
 /*
- * Voca v1.0.8 Windows host: native Win32 window + WebView2.
+ * Voca v1.0.9 Windows host: native Win32 window + WebView2.
  *
  * Why this exists. Since v1.0.0 Voca.exe was only a launcher that opened
  * `msedge.exe --app=...`. In that mode the taskbar button icon is produced by
@@ -47,6 +47,24 @@ static const wchar_t *kDictClassName   = L"Voca.DictWindow";
 /* WordReference runs an Anubis JS proof-of-work gate. It passes for a top-level frame
    but never completes inside our iframe (third-party cookies), so dictionary lookups that
    need it open in this second, Voca-owned WebView2 window instead of the system browser. */
+/* v1.0.9 dictionary fetch bridge: WordReference cannot be framed (X-Frame-
+   Options: SAMEORIGIN) and cannot be fetched from the page (no CORS header,
+   plus the Anubis proof-of-work gate), so the page asks the host to load the
+   entry in the dictionary WebView — a real top-level WebView2 navigation,
+   which passes Anubis — and hand the rendered entry HTML back over the
+   WebView2 message channel. The page then parses and renders it inline in
+   the dictionary modal, exactly like the Eudic/iCIBA sources. The dict
+   window is created hidden for fetches and is only shown when the user
+   explicitly opens it. */
+#define VOCA_FETCH_TIMER_ID 0xA11CE
+static int           g_fetch_id       = 0;
+static int           g_fetch_state    = 0;   /* 0 idle, 1 navigating, 2 polling */
+static int           g_fetch_polls    = 0;
+static int           g_dict_suppress_ack = 0;
+static int           g_dict_nav_registered = 0;
+static void VocaRegisterMainMessageHandlers(ICoreWebView2 *wv);
+static void VocaRegisterDictNavHandler(ICoreWebView2 *wv);
+
 static HWND          g_dict_window   = NULL;
 static ICoreWebView2Controller *g_dict_controller = NULL;
 static ICoreWebView2           *g_dict_webview    = NULL;
@@ -396,6 +414,8 @@ static HRESULT STDMETHODCALLTYPE Ctl_Invoke(ICoreWebView2CreateCoreWebView2Contr
         g_webview->lpVtbl->add_NewWindowRequested(
             g_webview, (ICoreWebView2NewWindowRequestedEventHandler*)&g_new_window_handler, &tok);
         Stage(L"nw-registered", 0);
+        VocaRegisterMainMessageHandlers(g_webview);
+        Stage(L"wm-registered", 0);
         wchar_t url[MAX_PATH + 32];
         HtmlFileUrl(url, MAX_PATH + 32);
         Stage(L"c5-navigate", 0);
@@ -445,9 +465,14 @@ static HRESULT STDMETHODCALLTYPE Dctl_Invoke(ICoreWebView2CreateCoreWebView2Cont
     RECT rc; GetClientRect(g_dict_window, &rc);
     controller->lpVtbl->put_Bounds(controller, rc);
     g_dict_controller->lpVtbl->get_CoreWebView2(g_dict_controller, &g_dict_webview);
+    if (g_dict_webview && !g_dict_nav_registered) {
+        VocaRegisterDictNavHandler(g_dict_webview);
+        g_dict_nav_registered = 1;
+    }
     if (g_dict_webview && g_dict_uri[0]) {
         g_dict_webview->lpVtbl->Navigate(g_dict_webview, g_dict_uri);
-        DictWindow_PostAck(g_dict_uri);
+        if (g_dict_suppress_ack) g_dict_suppress_ack = 0;
+        else DictWindow_PostAck(g_dict_uri);
         g_dict_uri[0] = 0;
     }
     return S_OK;
@@ -496,6 +521,188 @@ static void DictWindow_PostAck(const wchar_t *uri) {
     esc[j] = 0;
     _snwprintf_s(json, 4300, _TRUNCATE, L"{\"voca\":\"dict-window\",\"uri\":\"%s\"}", esc);
     g_webview->lpVtbl->PostWebMessageAsJson(g_webview, json);
+}
+
+
+/* ------------------------------------------------- dictionary fetch bridge */
+
+static void DictFetch_Finish(int ok, const wchar_t *html_json_literal) {
+    KillTimer(g_main_window, VOCA_FETCH_TIMER_ID);
+    g_fetch_state = 0;
+    if (!g_webview) return;
+    if (ok && html_json_literal) {
+        size_t cap = wcslen(html_json_literal) + 128;
+        wchar_t *json = (wchar_t *)malloc(cap * sizeof(wchar_t));
+        if (!json) return;
+        _snwprintf_s(json, cap, _TRUNCATE,
+            L"{\"voca\":\"dict-fetch-result\",\"id\":%d,\"ok\":true,\"html\":%s}",
+            g_fetch_id, html_json_literal);
+        g_webview->lpVtbl->PostWebMessageAsJson(g_webview, json);
+        free(json);
+    } else {
+        wchar_t json[160];
+        _snwprintf_s(json, 160, _TRUNCATE,
+            L"{\"voca\":\"dict-fetch-result\",\"id\":%d,\"ok\":false,\"error\":\"fetch-failed\"}",
+            g_fetch_id);
+        g_webview->lpVtbl->PostWebMessageAsJson(g_webview, json);
+    }
+}
+
+/* ExecuteScript stage 2: the result is the page HTML as a JSON string
+   literal; forward it verbatim inside the result message. */
+static HRESULT STDMETHODCALLTYPE Html_QueryInterface(ICoreWebView2ExecuteScriptCompletedHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2ExecuteScriptCompletedHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Html_AddRef(ICoreWebView2ExecuteScriptCompletedHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Html_Release(ICoreWebView2ExecuteScriptCompletedHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Html_Invoke(ICoreWebView2ExecuteScriptCompletedHandler *self, HRESULT result, LPCWSTR json) {
+    (void)self;
+    if (g_fetch_state != 2) return S_OK;
+    if (FAILED(result) || !json || json[0] != L'"' || wcslen(json) < 100) { DictFetch_Finish(0, NULL); return S_OK; }
+    DictFetch_Finish(1, json);
+    return S_OK;
+}
+static ICoreWebView2ExecuteScriptCompletedHandlerVtbl html_vtbl = { Html_QueryInterface, Html_AddRef, Html_Release, Html_Invoke };
+static struct { ICoreWebView2ExecuteScriptCompletedHandlerVtbl *lpVtbl; } g_html_handler = { &html_vtbl };
+
+/* ExecuteScript stage 1: probe whether the entry table has rendered yet
+   (Anubis answers first with a challenge page and reloads afterwards). */
+static HRESULT STDMETHODCALLTYPE Probe_QueryInterface(ICoreWebView2ExecuteScriptCompletedHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2ExecuteScriptCompletedHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Probe_AddRef(ICoreWebView2ExecuteScriptCompletedHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Probe_Release(ICoreWebView2ExecuteScriptCompletedHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Probe_Invoke(ICoreWebView2ExecuteScriptCompletedHandler *self, HRESULT result, LPCWSTR json) {
+    (void)self;
+    if (g_fetch_state != 2 || FAILED(result) || !json) return S_OK;
+    if (wcsstr(json, L"READY")) {
+        if (g_dict_webview)
+            g_dict_webview->lpVtbl->ExecuteScript(g_dict_webview,
+                L"document.documentElement.outerHTML",
+                (ICoreWebView2ExecuteScriptCompletedHandler*)&g_html_handler);
+    } else if (wcsstr(json, L"MISSING")) {
+        DictFetch_Finish(0, NULL);
+    }
+    return S_OK;
+}
+static ICoreWebView2ExecuteScriptCompletedHandlerVtbl probe_vtbl = { Probe_QueryInterface, Probe_AddRef, Probe_Release, Probe_Invoke };
+static struct { ICoreWebView2ExecuteScriptCompletedHandlerVtbl *lpVtbl; } g_probe_handler = { &probe_vtbl };
+
+static void DictFetch_Poll(void) {
+    if (g_fetch_state != 2) return;
+    if (!g_dict_webview || ++g_fetch_polls > 30) { DictFetch_Finish(0, NULL); return; }
+    g_dict_webview->lpVtbl->ExecuteScript(g_dict_webview,
+        L"(document.querySelector('#articleWRD table.WRD') ? 'READY' : (document.getElementById('noEntryFound') ? 'MISSING' : 'WAIT'))",
+        (ICoreWebView2ExecuteScriptCompletedHandler*)&g_probe_handler);
+}
+
+/* NavigationCompleted on the dictionary WebView starts the poll loop. */
+static HRESULT STDMETHODCALLTYPE Nav_QueryInterface(ICoreWebView2NavigationCompletedEventHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2NavigationCompletedEventHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Nav_AddRef(ICoreWebView2NavigationCompletedEventHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Nav_Release(ICoreWebView2NavigationCompletedEventHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Nav_Invoke(ICoreWebView2NavigationCompletedEventHandler *self, ICoreWebView2 *sender, ICoreWebView2NavigationCompletedEventArgs *args) {
+    (void)self; (void)sender; (void)args;
+    if (g_fetch_state == 1) {
+        g_fetch_state = 2;
+        g_fetch_polls = 0;
+        SetTimer(g_main_window, VOCA_FETCH_TIMER_ID, 500, NULL);
+    }
+    return S_OK;
+}
+static ICoreWebView2NavigationCompletedEventHandlerVtbl nav_vtbl = { Nav_QueryInterface, Nav_AddRef, Nav_Release, Nav_Invoke };
+static struct { ICoreWebView2NavigationCompletedEventHandlerVtbl *lpVtbl; } g_nav_handler = { &nav_vtbl };
+
+static void DictFetch_Start(int id, const wchar_t *url) {
+    if (g_fetch_state != 0) DictFetch_Finish(0, NULL);   /* supersede */
+    g_fetch_id = id;
+    g_fetch_state = 1;
+    g_fetch_polls = 0;
+    if (!g_dict_window) {
+        UINT dpi = g_main_window ? WindowDpi(g_main_window) : 96;
+        int w = MulDiv(1100, dpi, 96), h = MulDiv(820, dpi, 96);
+        g_dict_window = CreateWindowExW(0, kDictClassName,
+            L"Voca · 在线词典窗口 (WordReference)", WS_OVERLAPPEDWINDOW,
+            CW_USEDEFAULT, CW_USEDEFAULT, w, h, NULL, NULL, g_instance, NULL);
+        if (!g_dict_window) { DictFetch_Finish(0, NULL); return; }
+        /* deliberately not shown: the fetch is invisible unless the user
+           opens the dictionary window themselves */
+    }
+    if (g_dict_webview) {
+        g_dict_webview->lpVtbl->Navigate(g_dict_webview, url);
+        return;
+    }
+    wcscpy_s(g_dict_uri, 4096, url);
+    g_dict_suppress_ack = 1;
+    if (g_environment && !g_dict_controller)
+        g_environment->lpVtbl->CreateCoreWebView2Controller(
+            g_environment, g_dict_window,
+            (ICoreWebView2CreateCoreWebView2ControllerCompletedHandler*)&g_dict_ctl_handler);
+    else if (!g_environment)
+        DictFetch_Finish(0, NULL);
+}
+
+/* WebMessageReceived on the main WebView: {"voca":"dict-fetch","id":N,"url":"..."} */
+static HRESULT STDMETHODCALLTYPE Wm_QueryInterface(ICoreWebView2WebMessageReceivedEventHandler *self, REFIID riid, void **pp) {
+    if (!pp) return E_POINTER;
+    *pp = NULL;
+    if (IsEqualGUID(riid, &IID_IUnknown) || IsEqualGUID(riid, &IID_ICoreWebView2WebMessageReceivedEventHandler)) { *pp = (void *)self; return S_OK; }
+    return E_NOINTERFACE;
+}
+static ULONG STDMETHODCALLTYPE Wm_AddRef(ICoreWebView2WebMessageReceivedEventHandler *self) { (void)self; return 1; }
+static ULONG STDMETHODCALLTYPE Wm_Release(ICoreWebView2WebMessageReceivedEventHandler *self) { (void)self; return 1; }
+static HRESULT STDMETHODCALLTYPE Wm_Invoke(ICoreWebView2WebMessageReceivedEventHandler *self, ICoreWebView2 *sender, ICoreWebView2WebMessageReceivedEventArgs *args) {
+    (void)self; (void)sender;
+    LPWSTR json = NULL;
+    if (FAILED(args->lpVtbl->get_WebMessageAsJson(args, &json)) || !json) return S_OK;
+    if (wcsstr(json, L"\"dict-fetch\"")) {
+        int id = 0;
+        const wchar_t *p = wcsstr(json, L"\"id\"");
+        if (p) { p = wcschr(p, L':'); if (p) id = _wtoi(p + 1); }
+        const wchar_t *u = wcsstr(json, L"\"url\"");
+        if (u) {
+            u = wcschr(u, L':');
+            if (u) {
+                u = wcschr(u, L'"');
+                if (u) {
+                    wchar_t url[4096];
+                    size_t j = 0;
+                    u++;
+                    while (*u && *u != L'"' && j + 1 < 4096) {
+                        if (*u == L'\\' && u[1]) u++;
+                        url[j++] = *u++;
+                    }
+                    url[j] = 0;
+                    if (id > 0 && j > 8) DictFetch_Start(id, url);
+                }
+            }
+        }
+    }
+    CoTaskMemFree(json);
+    return S_OK;
+}
+static ICoreWebView2WebMessageReceivedEventHandlerVtbl wm_vtbl = { Wm_QueryInterface, Wm_AddRef, Wm_Release, Wm_Invoke };
+static struct { ICoreWebView2WebMessageReceivedEventHandlerVtbl *lpVtbl; } g_wm_handler = { &wm_vtbl };
+
+static void VocaRegisterMainMessageHandlers(ICoreWebView2 *wv) {
+    EventRegistrationToken tok;
+    wv->lpVtbl->add_WebMessageReceived(
+        wv, (ICoreWebView2WebMessageReceivedEventHandler*)&g_wm_handler, &tok);
+}
+static void VocaRegisterDictNavHandler(ICoreWebView2 *wv) {
+    EventRegistrationToken tok;
+    wv->lpVtbl->add_NavigationCompleted(
+        wv, (ICoreWebView2NavigationCompletedEventHandler*)&g_nav_handler, &tok);
 }
 
 static void DictWindow_Show(const wchar_t *uri) {
@@ -581,6 +788,9 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         DictWindow_Show((const wchar_t *)lp);
         CoTaskMemFree((void *)lp);
         return 0;
+    case WM_TIMER:
+        if (wp == VOCA_FETCH_TIMER_ID) { DictFetch_Poll(); return 0; }
+        break;
     case WM_SIZE:
         if (g_controller) {
             RECT rc; GetClientRect(hwnd, &rc);
@@ -668,7 +878,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrev, PWSTR cmd, int show) {
 
     g_main_window = CreateWindowExW(
         0, kWindowClassName,
-        L"Voca v1.0.8 — 离线艾宾浩斯背单词工坊 (Windows & Android)",
+        L"Voca v1.0.9 — 离线艾宾浩斯背单词工坊 (Windows)",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, w, h,
         NULL, NULL, hInstance, NULL);
