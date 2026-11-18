@@ -2337,7 +2337,7 @@ JS_ENGINE = r"""
     const customCount = (state.customWords || []).length;
     const dictName = (ONLINE_DICT_SOURCES[state.settings.onlineDict] || ONLINE_DICT_SOURCES.eudic).name;
     box.textContent =
-      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.7 · 内置词条 38,855 条 · 学习记录 " +
+      "本地双引擎状态：LocalStorage (已同步) · IndexedDB VocaDB_v1 (已同步) · Schema v1.0.7 · 内置词条 " + (VOCA_PACK.totalRows || 0).toLocaleString("en-US") + " 条 · 学习记录 " +
       recCount + " 条 · 自定义词条 " + customCount + " 条 · 在线词典: " + dictName;
   }
 

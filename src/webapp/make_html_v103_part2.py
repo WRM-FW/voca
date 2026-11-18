@@ -71,8 +71,9 @@ HTML_PART2_TEMPLATE = r"""
     <!-- Top Global Toolbar -->
     <header class="top-header">
       <div class="header-left">
-        <select id="bookSelect" class="ctrl-select" title="选择当前内置词书 (共38,855词条)">
+        <select id="bookSelect" class="ctrl-select" title="选择当前内置词书 (共43,304词条)">
           <option value="cet4" selected>四级核心 (CET-4 · 3,849词)</option>
+          <option value="cet4full">四级完整词表 (CET-4 · 4,449词)</option>
           <option value="cet6">六级核心 (CET-6 · 5,407词)</option>
           <option value="ky">考研核心 (硕士统考 · 4,801词)</option>
           <option value="zk">中考核心 (初中必备 · 1,603词)</option>
@@ -456,7 +457,7 @@ HTML_PART2_TEMPLATE = r"""
           <div class="stat-card" style="padding:18px;">
             <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📥 外部自定义词库导入</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
-              软件已默认内置 8 大考试词书（共 38,855 词条，无需手动导入）。如需补充额外专业词汇，支持导入 CSV / TSV / TXT / JSON 文件（自动识别 UTF-8 与 GBK/GB18030 编码）。
+              软件已默认内置 9 大考试词书（共 43,304 词条，无需手动导入）。如需补充额外专业词汇，支持导入 CSV / TSV / TXT / JSON 文件（自动识别 UTF-8 与 GBK/GB18030 编码）。
             </p>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
               <label class="btn btn-primary btn-sm" style="cursor:pointer;">
@@ -635,7 +636,7 @@ HTML_PART2_TEMPLATE = r"""
             <div style="border-top:1px solid var(--border-color); padding-top:12px; font-size:0.82rem; color:var(--text-muted);">
               <strong>字体、词库与在线词典声明 (v1.0.7)</strong>：<br>
               1) <strong>跨平台内嵌字体</strong>：内置 <strong>Inter</strong> 与 <strong>Noto Sans CJK SC</strong> (SIL Open Font License 1.1) WOFF2 字体包。<br>
-              2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>38,855</strong> 条词条，源自开源词典 <strong>ECDICT</strong>（MIT License）。<br>
+              2) <strong>内置词库授权</strong>：内置「Voca-词库数据包」共 <strong>43,304</strong> 条词条，主要源自开源词典 <strong>ECDICT</strong>（MIT License）；「四级完整词表」的词序与释义来自用户自备的 CET-4 词表。<br>
               3) <strong>在线词典集成</strong>：欧路词典 (dict.eudic.net) 与爱词霸 (iciba.com) 可在本窗口内直接显示词条内容；<strong>WordReference (wordreference.com)</strong> 部署了 Anubis 人机验证：它只放行顶层页面，嵌进本弹窗会一直停在验证页，因此 Voca 会在自己的「在线词典窗口」里以顶层页面打开它（不弹到系统浏览器）。三家词典的网页内容版权归各自平台所有。
             </div>
           </div>
