@@ -3161,6 +3161,26 @@ JS_ENGINE = r"""
       }
     });
 
+    // v1.0.8: Agent-import prompt copy (same clipboard strategy as the touch
+    // export box: execCommand first, async clipboard API as fallback).
+    document.getElementById("btnCopyAgentPrompt").addEventListener("click", function() {
+      const box = document.getElementById("agentPromptText");
+      box.removeAttribute("readonly");
+      box.select();
+      box.setSelectionRange(0, box.value.length);
+      let ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      box.setAttribute("readonly", "readonly");
+      if (ok) showToast("✓ 提示词已复制，去粘贴给你的 AI Agent 吧");
+      else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(box.value).then(
+          function() { showToast("✓ 提示词已复制，去粘贴给你的 AI Agent 吧"); },
+          function() { showToast("复制失败，请长按文本框手动全选复制"); });
+      } else {
+        showToast("复制失败，请长按文本框手动全选复制");
+      }
+    });
+
     // CSV Export (Unfamiliarity retained, Mastery removed)
     document.getElementById("btnExportLexiconCsv").addEventListener("click", function() {
       const pool = getBookWords(state.currentBook);
