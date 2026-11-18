@@ -3999,6 +3999,27 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
   // and every List is reviewed at +1/+2/+4/+7/+15 days after its learn
   // day. Total days = N + 15 (the last List's final review). No daily
   // caps and no pacing: at full load a day carries 1 new + 5 reviews.
+  /* v1.1.1 (round 2): the TRUE initial sequence. Sorting inside a randomly
+     split List can only order that chunk — List 1 still starts mid-book, which
+     is why the first fix did not satisfy "the initial sequence". Picking
+     the initial sequence in the List view therefore also restores the split
+     itself to book order whenever the frozen split is not book-ordered: same
+     List count, same schedule; word records are keyed by wid and check-ins by
+     List number, so nothing learned is lost. Returns true when it re-split. */
+  function ensureBookOrderSplit() {
+    const pc = (state.planConfig && state.planConfig.bookId === state.currentBook) ? state.planConfig : null;
+    if (pc) {
+      if (pc.sortMode === "initial") return false;
+      pc.sortMode = "initial";
+    } else {
+      if (state.planOrderMode === "sequence") return false;
+      state.planOrderMode = "sequence";
+    }
+    buildListsForCurrentBook();
+    renderPlanConfigSummary();
+    return true;
+  }
+
   function computeCustomEbbinghausSchedule() {
     const N = currentLists.length || Math.max(1, parseInt(state.planListCount, 10) || 15);
     const intervals = [1, 2, 4, 7, 15];
@@ -5953,6 +5974,9 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
     document.getElementById("sortSelect").addEventListener("change", function(e) {
       state.intraSort = e.target.value;
       if (state.intraSort === "random") intraShuffleSalt = (Math.random() * 1000000000) | 0; // re-roll: picking random again reshuffles
+      if (state.intraSort === "initial" && ensureBookOrderSplit()) {
+        showToast("已恢复词书初始序列：全书按原始顺序重新分组，List 1 从第一个词开始（学习记录与打卡保留）");
+      }
       saveState();
       renderLearnView();
     });
@@ -6186,10 +6210,35 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
       const listNum = state.currentListIndex + 1;
       state.planChecks["book_" + state.currentBook + "_L" + listNum] = Date.now();
       state.planChecks["d" + listNum + "_new_L" + listNum] = Date.now();
+      // v1.1.1: after check-in, advance automatically — to the next List, or
+      // to the next day (its first scheduled List) when the last List is done.
+      let navMsg = "";
+      if (listNum < currentLists.length) {
+        state.currentListIndex = listNum;
+        navMsg = "已自动进入 List " + (listNum + 1);
+      } else {
+        const sched = computeCustomEbbinghausSchedule();
+        if (state.planActiveDay < sched.D) {
+          state.planActiveDay += 1;
+          const row = sched.rows[state.planActiveDay - 1];
+          let firstList = null;
+          if (row) {
+            if (row.newLists.length) firstList = row.newLists[0];
+            else {
+              for (let ci = 0; ci < row.revCols.length && firstList === null; ci++) {
+                if (row.revCols[ci].length) firstList = row.revCols[ci][0];
+              }
+            }
+          }
+          if (firstList) state.currentListIndex = firstList - 1;
+          navMsg = "已自动进入 Day " + state.planActiveDay + " / " + sched.D;
+        }
+      }
       playTone("success");
       saveState();
       refreshAllViews();
-      showToast("🎉 已完成 List " + listNum + " 学习打卡！");
+      showToast("🎉 已完成 List " + listNum + " 学习打卡！" + (navMsg ? " " + navMsg : ""));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
 
     document.getElementById("btnOpenMasteredDrawer").addEventListener("click", function() {
