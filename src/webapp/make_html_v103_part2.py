@@ -30,7 +30,7 @@ HTML_PART2_TEMPLATE = r"""
     <div class="brand-box">
       <img class="brand-logo" src="data:image/png;base64,__ICON_256_B64__" alt="Voca Logo">
       <div>
-        <div class="brand-title">Voca <span class="brand-badge">v1.1.1</span></div>
+        <div class="brand-title">Voca <span class="brand-badge">v1.1.2</span></div>
       </div>
     </div>
 
@@ -237,7 +237,7 @@ HTML_PART2_TEMPLATE = r"""
               </p>
             </div>
             <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-              <button class="btn btn-sm btn-primary" id="btnPrintPlanSchedule">🖨️ 导出计划表 PDF/打印版</button>
+              <button class="btn btn-sm btn-primary" id="btnPrintPlanSchedule">📅 导出计划表</button>
               <button class="btn btn-sm" id="btnResetPlanChecks">重置打卡记录</button>
             </div>
           </div>
@@ -412,54 +412,35 @@ HTML_PART2_TEMPLATE = r"""
               <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px; white-space:normal;">
                 手里有 PDF、Word、表格、网页或图片版的词表？把词库文件发给一个能在你电脑上读写文件的 AI Agent（如 Claude Code、Cursor 等本地 Agent），再把下方提示词粘贴给它。Agent 会把词直接写进 Voca 的数据文件——你什么都不用导，重新打开 Voca 就会看到词条已经自动进入「自定义词库」，并有导入成功的提示。
               </p>
-              <textarea id="agentPromptText" rows="9" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">请读取我提供的、包含单词信息的词库文件，将其中的单词及相关信息整理、转换为 VOCA 软件兼容的词库格式，并直接写入 VOCA 软件的词库目录中，完成实际导入。
+              <textarea id="agentPromptText" rows="11" readonly style="width:100%; border-radius:10px; border:1px solid var(--border-strong); background:var(--bg-elevated); color:var(--text-primary); padding:10px; font-size:0.80rem; margin-bottom:8px;">请把我提供的词库文件里的单词导入 Voca 背单词软件：直接写一个文件就行，不用我手动导入。
 
-具体要求：
+关键信息：
+- 要写的文件：Voca 软件目录下 app 文件夹里的 voca_auto_import.js（和 index.html 在同一个文件夹）。找不到 Voca 装在哪就问我，不要猜。
+- 写法：文件不存在就新建；已存在就在末尾追加一段，不要改动文件里已有的内容。格式如下：
 
-1. 读取与分析
-- 完整读取我提供的词库文件，识别其文件格式、数据结构及包含的单词信息。
-- 尽可能保留原始词库中的完整信息，包括单词、音标、词性、释义、例句、短语、词根词缀及其他相关字段。
-- 不得随意删减、篡改或臆造原始数据。
+window.__VOCA_AUTO_IMPORTS__ = window.__VOCA_AUTO_IMPORTS__ || [];
+window.__VOCA_AUTO_IMPORTS__.push({
+  id: "import-20261119-1",
+  source: "词库来源，如文件名",
+  words: [
+    { "word": "example", "uk": "/ɪɡˈzɑːmpl/", "us": "", "cn": "n. 例子；榜样", "ex_en": "For example, this is a sentence.", "ex_cn": "例如，这是一个句子。", "tip": "" }
+  ]
+});
 
-2. 格式转换
-- 先检查 VOCA 项目的实际词库格式、数据结构、字段定义及导入机制（VOCA 的导入入口是安装目录 app 文件夹中的 voca_auto_import.js 批次文件，请先读取该文件以及软件中引用它的代码，确认当前版本的实际格式后再转换，不要凭猜测写格式）。
-- 根据软件当前版本的实际要求进行数据转换，确保字段映射准确、数据结构兼容。
-- 对原始文件中缺失的信息保持为空，不要自行编造。
-
-3. 直接写入 VOCA
-- 找到当前 VOCA 软件实际使用的词库存储位置（包含 Voca.exe 的安装目录，其 app 子文件夹即数据所在；找不到就问我路径，不要猜）。
-- 将转换后的词库直接写入 VOCA 实际使用的数据存储中（向 voca_auto_import.js 追加一个新批次，批次 id 唯一、带日期）。
-- 不要仅仅生成一个待导入文件，然后让我自己下载、复制或通过软件界面再次导入。
-- 不要把生成文件保存在无关目录后就视为任务完成。
-
-4. 数据安全
-- 写入前检查现有词库及相关数据，避免覆盖、删除或破坏已有内容（已有批次只追加、不改动）。
-- 妥善处理重复单词、重复词条及不同来源的数据冲突（重复词只保留一条）。
-- 必要时先备份将要修改的数据文件。
-
-5. 验证与交付
-- 完成写入后，检查实际写入的数据量、词条数量及数据完整性（重新读取写入的文件确认格式无误）。
-- 验证 VOCA 能否正常识别、加载和使用新词库（软件启动时会自动把新批次导入「用户自定义导入词库」，按批次 id 去重）。
-- 如果需要重启软件或刷新数据才能生效，请明确说明（本机制正是重新打开 VOCA 即生效）。
-- 最后向我报告词库来源、处理的词条数量、实际写入位置、验证结果及未能处理的问题。
-
-最终目标：由你直接完成从读取原始词库文件到写入 VOCA 并验证可用的全过程。我只负责提供原始词库文件，不负责中间的数据转换、文件搬运或二次手动导入。
-
-如果你无法访问 VOCA 项目目录或缺少必要的写入权限，请明确指出具体障碍，不要用生成文件代替实际导入，也不要虚报完成。
-
-我的单词资料见附件（或下文）：</textarea>
+- 只有 word 必填；音标、释义、例句、提示有就填，没有就留空字符串，不要编造。id 每次导入换一个新值就行。
+- 写完后我重新打开 Voca 就会自动导入到「自定义词库」。最后告诉我一共导入了多少个单词、写到了哪个文件。</textarea>
               <button class="btn btn-sm" id="btnCopyAgentPrompt">复制 Agent 提示词</button>
             </div>
           </div>
 
           <!-- Card 2: Multi-Page PDF & Printable Sheet Generator -->
           <div class="stat-card" style="padding:18px;">
-            <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">🖨️ 多页 PDF 导出、打印与 HTML 导出</h3>
+            <h3 style="font-size:1.08rem; font-weight:800; margin-bottom:6px;">📄 导出 PDF / HTML</h3>
             <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px; white-space:normal;">
-              把全部词条与计划表导出为多页 A4 文档，可存为 PDF、打印或下载为独立 HTML。
+              把全部词条与计划表导出为多页 A4 文档。推荐导出 HTML——在电脑上用浏览器打开最清晰、能搜索，也可自行打印；也可以直接导出 PDF。
             </p>
             <div style="display:flex; flex-direction:column; gap:8px;">
-              <button class="btn" id="btnExportPdfSchedule">📅 导出「自定义艾宾浩斯学习计划表」PDF/打印版</button>
+              <button class="btn" id="btnExportPdfSchedule">📅 导出「自定义艾宾浩斯学习计划表」</button>
               <button class="btn" id="btnExportPdfListBilingual">📋 导出「当前 List 完整单词表（双语对照版）」</button>
               <button class="btn" id="btnExportPdfBookBilingual">📚 导出「整本词书完整单词表（双语对照版）」</button>
               <button class="btn" id="btnExportPdfListQuiz">✍️ 导出「当前 List 完整默写自测卷（隐中/隐英）」</button>
@@ -475,7 +456,7 @@ HTML_PART2_TEMPLATE = r"""
               <span class="m-only"><br>若当前环境不会把导出文件写入存储：备份 .json 与词库 CSV 会显示在下方「导出内容」框供复制保存，恢复可把备份文本粘贴到「从粘贴内容恢复备份」。</span>
             </p>
             <div style="background:var(--bg-elevated); border-radius:10px; padding:10px 12px; font-size:0.79rem; margin-bottom:12px; white-space:normal;" id="storageDiagnosticBox">
-              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.1.1
+              存储引擎状态：LocalStorage (正常) · IndexedDB VocaDB_v1 (正常) · Schema v4 · App v1.1.2
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <button class="btn btn-primary btn-sm" id="btnExportBackupJson">⬇ 导出完整学习备份 (.json)</button>
@@ -728,13 +709,12 @@ HTML_PART2_TEMPLATE = r"""
   <div class="modal-panel" style="max-width:900px;">
     <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
       <div>
-        <h3 style="font-size:1.12rem; font-weight:800;" id="printModalTitle">多页 PDF / 打印版预览</h3>
+        <h3 style="font-size:1.12rem; font-weight:800;" id="printModalTitle">导出预览</h3>
         <div style="font-size:0.76rem; color:var(--text-muted);" id="printModalMeta">支持完整多页导出、跨页表头重复与行防截断</div>
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:8px;">
-        <button class="btn btn-primary btn-sm" id="btnDownloadDirectPdf">⬇ 直接导出多页 PDF (.pdf)</button>
-        <button class="btn btn-sm" id="btnTriggerBrowserPrint">🖨️ 调用系统打印 / 另存为 PDF</button>
-        <button class="btn btn-sm" id="btnDownloadPrintHtml">⬇ 下载独立 HTML (.html)</button>
+        <button class="btn btn-primary btn-sm" id="btnDownloadPrintHtml">⬇ 导出独立 HTML (.html)（推荐）</button>
+        <button class="btn btn-sm" id="btnDownloadDirectPdf">⬇ 直接导出多页 PDF (.pdf)</button>
         <button class="btn btn-sm" id="btnClosePrintModal">✕ 关闭</button>
       </div>
     </div>

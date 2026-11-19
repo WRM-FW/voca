@@ -237,7 +237,7 @@ JS_ENGINE = r"""
 
   const defaultState = {
     schemaVersion: 4,
-    appVersion: "1.0.6",
+    appVersion: "1.1.2",
     currentBook: "cet4full",
     currentListIndex: 0,
     langMode: "bilingual",      // bilingual | en_only | cn_only (en_en removed in v1.0.3)
@@ -418,7 +418,7 @@ JS_ENGINE = r"""
     }
 
     merged.schemaVersion = 4;
-    merged.appVersion = "1.0.8";
+    merged.appVersion = "1.1.2";
     return merged;
   }
 
@@ -2168,7 +2168,7 @@ JS_ENGINE = r"""
     document.getElementById("printModalTitle").textContent = title;
     const estPages = docData ? Math.max(1, Math.ceil(docData.rows.length / docData.rowsPerPage)) : 1;
     document.getElementById("printModalMeta").textContent =
-      "共 " + (docData ? docData.rows.length : 0) + " 行记录 · 预计 A4 分页 " + estPages + " 页（支持完整多页 PDF 导出、系统打印与 HTML 导出）";
+      "共 " + (docData ? docData.rows.length : 0) + " 行记录 · 预计 A4 分页 " + estPages + " 页（推荐导出 HTML，在电脑上查看最清晰；也可直接导出 PDF）";
     document.getElementById("printSheetBody").innerHTML = bodyHtml;
     document.getElementById("dedicatedPrintRoot").innerHTML = bodyHtml;
     document.getElementById("printModal").classList.add("open");
@@ -2197,7 +2197,7 @@ JS_ENGINE = r"""
 
     let html =
       '<div class="print-doc-wrap" style="padding:6px;">' +
-      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">Voca v1.1.1 艾宾浩斯背单词计划表</h2>' +
+      '<h2 style="text-align:center; margin-bottom:4px; font-size:1.25rem;">VOCA 艾宾浩斯背单词计划表</h2>' +
       '<p style="text-align:center; color:#475569; font-size:0.82rem; margin-bottom:12px;">' + escapeHtml(subtitle) + '</p>' +
       '<table style="width:100%; border-collapse:collapse; font-size:0.80rem;" border="1" cellspacing="0" cellpadding="6">' +
       '<thead><tr style="background:#F1F5F9;">' +
@@ -2227,7 +2227,7 @@ JS_ENGINE = r"""
     return {
       html: html,
       docData: {
-        title: "Voca v1.1.1 艾宾浩斯背单词计划表",
+        title: "VOCA 艾宾浩斯背单词计划表",
         subtitle: subtitle,
         headers: headers,
         colWidths: colWidths,
@@ -2239,7 +2239,7 @@ JS_ENGINE = r"""
 
   function buildPrintableWordListHtml(wordsArr, title, quizMode) {
     const fullList = wordsArr.slice();
-    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 Voca v1.1.1 离线背单词工坊";
+    const subtitle = "词库: " + getBookDisplayName(state.currentBook) + " · 共 " + fullList.length + " 词 · 生成自 VOCA";
     const headers = ["序号", "英文单词", "国际音标 (IPA)", "中文释义与词性", "不会程度"];
     const colWidths = [0.07, 0.22, 0.20, 0.41, 0.10];
     const pdfRows = [];
@@ -2288,6 +2288,9 @@ JS_ENGINE = r"""
   function generateMultiPagePdfBinary(docData) {
     const PAGE_W_PX = 1240;
     const PAGE_H_PX = 1754;
+    // v1.1.2: pages are rasterised to JPEG for the hand-rolled PDF; at the old
+    // 1240px (~150 dpi) the text came out blurry. Render at 2x (~300 dpi).
+    const PDF_SCALE = 2;
     const MARGIN_X = 64;
     const MARGIN_TOP = 68;
     const MARGIN_BOTTOM = 72;
@@ -2367,9 +2370,10 @@ JS_ENGINE = r"""
 
     for (let pIdx = 0; pIdx < totalPages; pIdx++) {
       const canvas = document.createElement("canvas");
-      canvas.width = PAGE_W_PX;
-      canvas.height = PAGE_H_PX;
+      canvas.width = PAGE_W_PX * PDF_SCALE;
+      canvas.height = PAGE_H_PX * PDF_SCALE;
       const ctx = canvas.getContext("2d");
+      ctx.scale(PDF_SCALE, PDF_SCALE);
 
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, PAGE_W_PX, PAGE_H_PX);
@@ -2450,12 +2454,12 @@ JS_ENGINE = r"""
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(
-        "Voca v1.0.6 离线艾宾浩斯背单词工坊  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
+        "VOCA  ·  第 " + (pIdx + 1) + " / " + totalPages + " 页",
         PAGE_W_PX / 2,
         PAGE_H_PX - 26
       );
 
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.90);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
       const b64 = dataUrl.split(",")[1];
       const binStr = atob(b64);
       const u8 = new Uint8Array(binStr.length);
@@ -2520,7 +2524,7 @@ JS_ENGINE = r"""
       xrefOffsets[imgObjId] = byteOffset;
       pushAscii(
         imgObjId + " 0 obj\n" +
-        "<< /Type /XObject /Subtype /Image /Width " + PAGE_W_PX + " /Height " + PAGE_H_PX +
+        "<< /Type /XObject /Subtype /Image /Width " + (PAGE_W_PX * PDF_SCALE) + " /Height " + (PAGE_H_PX * PDF_SCALE) +
         " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + jpg.length + " >>\nstream\n"
       );
       pushBytes(jpg);
@@ -3561,16 +3565,6 @@ JS_ENGINE = r"""
         "✓ 已成功生成并导出 " + res.pageCount + " 页 PDF 文档 (" + safeName + ")");
     });
 
-    document.getElementById("btnTriggerBrowserPrint").addEventListener("click", function() {
-      document.getElementById("dedicatedPrintRoot").innerHTML = lastPrintHtmlContent;
-      const prevTitle = document.title;
-      document.title = lastPrintFileBase || lastPrintTitle;
-      const restoreTitle = function() { document.title = prevTitle; window.removeEventListener("afterprint", restoreTitle); };
-      window.addEventListener("afterprint", restoreTitle);
-      setTimeout(restoreTitle, 5000);
-      window.print();
-    });
-
     document.getElementById("btnDownloadPrintHtml").addEventListener("click", function() {
       const standalone =
         "<!DOCTYPE html><html lang='zh-CN'><head><meta charset='UTF-8'><title>" + escapeHtml(lastPrintTitle) + "</title>" +
@@ -3596,11 +3590,11 @@ JS_ENGINE = r"""
     document.getElementById("btnExportBackupJson").addEventListener("click", function() {
       const backupObj = {
         app: "Voca Offline Vocabulary Studio",
-        version: "1.1.1",
+        version: "1.1.2",
         exportedAt: new Date().toISOString(),
         state: prunedStateCopy()
       };
-      announceExport(downloadFileBlob("voca_backup_v1.1.1_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
+      announceExport(downloadFileBlob("voca_backup_v1.1.2_" + new Date().toISOString().slice(0, 10) + ".json", JSON.stringify(backupObj, null, 2), "application/json;charset=utf-8"),
         "完整学习备份", "已导出完整本地学习备份 (.json)");
     });
 

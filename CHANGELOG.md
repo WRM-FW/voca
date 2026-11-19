@@ -2,6 +2,19 @@
 
 All notable changes to the **Voca** project are documented in this file.
 
+## [1.1.2] - 2026-11-19
+
+Export overhaul and a rewritten Agent-import prompt, from real-machine feedback on 1.1.1.
+
+### Changed — exports: HTML first, no system print, no version strings, sharper PDF
+- The print/export modal no longer offers 调用系统打印 / 另存为 PDF (button and handler removed). The recommended path is now the standalone HTML export — it is the primary button and labelled （推荐）: on a PC it opens in any browser with crisp, searchable text. The data page's export card says the same.
+- Exported documents no longer carry any version string — a stale footer still said "Voca v1.0.6" at the bottom of every direct-PDF page, and titles/subtitles named the app version. Documents now say only VOCA (titles, subtitles, and the per-page footer "VOCA · 第 X / Y 页").
+- The direct PDF export renders each page at 2x (2480×3508, ~300 dpi, JPEG quality 0.92) instead of 1240×1754 (~150 dpi), which was why the text looked blurry. The PDF is larger as a result; the HTML export remains the recommended, lightweight option.
+
+### Changed — Agent import prompt rewritten, short and concrete
+- The old prompt was a long five-section requirements document. The new one (632 characters) states only the key facts: the file to write (the `voca_auto_import.js` in the app folder next to `index.html` — ask the user if Voca's location is unknown), a copy-paste format example for appending one batch to `window.__VOCA_AUTO_IMPORTS__`, that only `word` is required and missing fields stay empty rather than invented, and to report the imported count and file path at the end.
+
+
 ## [1.1.1] - 2026-11-18
 
 A bug fix for the "initial sequence", a rename, and a UI modernisation pass over the app's dropdowns and scrollbars.
