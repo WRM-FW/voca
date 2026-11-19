@@ -11,8 +11,8 @@ A bug fix for the "initial sequence", a rename, and a UI modernisation pass over
 ### Fixed — the initial sequence now restores the book-order split
 - Picking 初始序列 on the Learn page now checks the frozen split: when it is not book-ordered (e.g. the plan was generated with the default random sequence), the book is re-split in its original order — same List count, same Ebbinghaus schedule — so List 1 starts at the book's first word. Word records (keyed by wid) and check-ins (keyed by List number) are unaffected. When the split is already book-ordered, the in-list sort by `w.seq` from the first fix applies as before.
 
-### Added — check-in auto-advance
-- After 完成本组打卡， the app moves on automatically: to the next List, or — after the last List — to the next day (plan day + 1, showing that day's first scheduled List). The toast confirms the move.
+### Added — check-in auto-advance (in the plan table's reading order)
+- After 完成本组打卡， the app moves on automatically following the Ebbinghaus table itself — top to bottom, left to right: within a day, the new List first, then the review columns (+1/+2/+4/+7/+15), then the next day's first task. (So on Day 2, checking in the new List 2 advances to the review of List 1, not to List 3.) The toast confirms the move (Day X · List Y). Plan-table chips now also carry their day, so jumping from the table keeps the current day in sync.
 
 ### Fixed — the in-list "initial sequence" was not the book's initial sequence
 - `getSortedActiveWords` had no branch for `initial`: it fell through unsorted, i.e. it displayed the plan-split order. With a plan split in the default random sequence, picking 初始序列 in a List showed that shuffled split order — the app effectively forgot the true initial sequence. "Initial" now sorts by the word's position in the book (`w.seq`). Verified against the lexicon payload: with a randomly split 30-day plan, the List's words under 初始序列 come out strictly in book order. (Plan-level splitting is unchanged: the sequence chosen in Settings still decides how the book is cut into Lists; the in-list 初始序列 now always means book order inside the List.)
