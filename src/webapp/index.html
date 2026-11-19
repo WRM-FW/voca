@@ -4020,6 +4020,38 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
     return true;
   }
 
+
+  /* v1.1.1 (round 3): check-in advance follows the Ebbinghaus table's own
+     reading order — top to bottom, left to right: within a day the new List
+     first, then the review columns (+1/+2/+4/+7/+15); then the next day.
+     (Round 2 advanced by list number +1, which is NOT the table order: on
+     Day 2, after the new List 2 comes the review of List 1, not List 3.) */
+  function getDayTasksInOrder(sched, day) {
+    const row = sched.rows[day - 1];
+    if (!row) return [];
+    const arr = (row.newLists || []).slice();
+    (row.revCols || []).forEach(function(col) {
+      (col || []).forEach(function(n) { arr.push(n); });
+    });
+    return arr;
+  }
+  function findNextTaskInTable(sched, day, listNum) {
+    const D = sched.rows.length;
+    const startDay = Math.min(Math.max(1, day || 1), Math.max(1, D));
+    for (let d = startDay; d <= D; d++) {
+      const tasks = getDayTasksInOrder(sched, d);
+      const i = tasks.indexOf(listNum);
+      if (i < 0) continue;
+      if (i + 1 < tasks.length) return { day: d, listNum: tasks[i + 1] };
+      for (let nd = d + 1; nd <= D; nd++) {
+        const nt = getDayTasksInOrder(sched, nd);
+        if (nt.length) return { day: nd, listNum: nt[0] };
+      }
+      return null;
+    }
+    return null;
+  }
+
   function computeCustomEbbinghausSchedule() {
     const N = currentLists.length || Math.max(1, parseInt(state.planListCount, 10) || 15);
     const intervals = [1, 2, 4, 7, 15];
@@ -4468,7 +4500,7 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
       let totalTasks = 0;
       let doneTasks = 0;
 
-      function renderCellChips(listNums) {
+      function renderCellChips(listNums, dayNum) {
         if (!listNums || listNums.length === 0) {
           return '<span style="color:var(--text-muted);">—</span>';
         }
@@ -4477,15 +4509,15 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
           const isDone = isListCompleted(listNum);
           if (isDone) doneTasks++;
           return (
-            '<button class="plan-chip' + (isDone ? ' done' : '') + '" data-listnum="' + listNum + '" title="点击跳转至 List ' + listNum + ' 单词学习界面">' +
+            '<button class="plan-chip' + (isDone ? ' done' : '') + '" data-listnum="' + listNum + '" data-day="' + dayNum + '" title="点击跳转至 List ' + listNum + ' 单词学习界面">' +
               (isDone ? '✓ ' : '→ ') + 'List ' + listNum +
             '</button>'
           );
         }).join(" ");
       }
 
-      const cNew = renderCellChips(row.newLists);
-      const cRevs = row.revCols.map(function(colLists) { return renderCellChips(colLists); });
+      const cNew = renderCellChips(row.newLists, day);
+      const cRevs = row.revCols.map(function(colLists) { return renderCellChips(colLists, day); });
 
       const rowPct = totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 100;
       const highlightStyle = day === state.planActiveDay ? ' style="background:var(--brand-soft);"' : '';
@@ -6210,29 +6242,16 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
       const listNum = state.currentListIndex + 1;
       state.planChecks["book_" + state.currentBook + "_L" + listNum] = Date.now();
       state.planChecks["d" + listNum + "_new_L" + listNum] = Date.now();
-      // v1.1.1: after check-in, advance automatically — to the next List, or
-      // to the next day (its first scheduled List) when the last List is done.
+      // v1.1.1: after check-in, advance automatically in the plan table's
+      // reading order (within the day: new List, then reviews +1/+2/+4/+7/+15;
+      // then the next day's first task).
       let navMsg = "";
-      if (listNum < currentLists.length) {
-        state.currentListIndex = listNum;
-        navMsg = "已自动进入 List " + (listNum + 1);
-      } else {
-        const sched = computeCustomEbbinghausSchedule();
-        if (state.planActiveDay < sched.D) {
-          state.planActiveDay += 1;
-          const row = sched.rows[state.planActiveDay - 1];
-          let firstList = null;
-          if (row) {
-            if (row.newLists.length) firstList = row.newLists[0];
-            else {
-              for (let ci = 0; ci < row.revCols.length && firstList === null; ci++) {
-                if (row.revCols[ci].length) firstList = row.revCols[ci][0];
-              }
-            }
-          }
-          if (firstList) state.currentListIndex = firstList - 1;
-          navMsg = "已自动进入 Day " + state.planActiveDay + " / " + sched.D;
-        }
+      const sched = computeCustomEbbinghausSchedule();
+      const nxt = findNextTaskInTable(sched, state.planActiveDay, listNum);
+      if (nxt) {
+        state.planActiveDay = nxt.day;
+        state.currentListIndex = nxt.listNum - 1;
+        navMsg = "已自动进入 Day " + nxt.day + " · List " + nxt.listNum;
       }
       playTone("success");
       saveState();
@@ -6368,6 +6387,8 @@ const VOCA_PACK = {"version":"1.0.1","source":"ECDICT Open Corpus (MIT License, 
       if (!chip) return;
       const listNum = parseInt(chip.dataset.listnum, 10);
       if (listNum >= 1) {
+        const chipDay = parseInt(chip.dataset.day, 10);
+        if (chipDay >= 1) state.planActiveDay = chipDay;
         state.currentListIndex = listNum - 1;
         listRenderLimit = 120;
         cardCursor = 0;
